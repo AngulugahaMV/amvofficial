@@ -1,0 +1,3352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Portal – Angulugaha Maha Vidyalaya</title>
+<link rel="icon" type="image/png" href="title_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --maroon:#800020;--maroon-light:#a0002a;--maroon-dark:#5a0015;
+  --gold:#D4AF37;--gold-light:#e8c84a;
+  --bg:#1e0008;--bg2:#2e000c;
+  --surface:rgba(255,255,255,0.07);--surface2:rgba(255,255,255,0.12);
+  --text:#f5e6d0;--text2:#c9a97a;
+  --border:rgba(212,175,55,0.25);
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+  --glow:0 0 20px rgba(212,175,55,0.3);
+  --radius:16px;--sidebar:270px;
+  --font-head:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --success:#4ade80;--danger:#f87171;--warn:#fbbf24;
+}
+[data-theme="dark"]{--bg:#040410;--bg2:#0c0c1c;--surface:rgba(128,0,32,0.1);--surface2:rgba(128,0,32,0.18);--text:#e8ddd0;--text2:#9a8060;--border:rgba(128,0,32,0.28);--glow:0 0 20px rgba(128,0,32,0.35);}
+[data-theme="light"]{--bg:#f5f0eb;--bg2:#ede5da;--surface:rgba(255,255,255,0.85);--surface2:rgba(255,255,255,0.95);--text:#2a1010;--text2:#6b4030;--border:rgba(128,0,32,0.15);--glow:0 0 15px rgba(212,175,55,0.2);--shadow:0 4px 20px rgba(128,0,32,0.1);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.4s,color 0.4s}
+#loader{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#2e000c,#800020);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s,visibility 0.5s;}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-icon{font-size:3rem;margin-bottom:16px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.loader-bar{width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:12px;overflow:hidden}
+.loader-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--maroon),var(--gold));animation:ld 2s ease forwards}
+@keyframes ld{to{width:100%}}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:0.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color 0.3s,box-shadow 0.3s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.12)}
+.form-group textarea{resize:vertical;min-height:90px}
+.btn{padding:11px 22px;border-radius:12px;font-family:var(--font-body);font-size:0.9rem;font-weight:600;cursor:pointer;border:none;transition:transform 0.3s,box-shadow 0.3s,background 0.3s,opacity 0.3s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:linear-gradient(135deg,var(--maroon),var(--maroon-light));color:#fff;box-shadow:0 4px 20px rgba(128,0,32,0.4)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(128,0,32,0.5)}
+.btn-primary:disabled{opacity:0.45;cursor:not-allowed;transform:none!important}
+.btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.btn-outline:hover{background:var(--gold);color:#1a0000}
+.btn-danger{background:rgba(127,29,29,0.4);border:1px solid rgba(248,113,113,0.3);color:#fca5a5}
+.btn-danger:hover{background:rgba(185,28,28,0.6)}
+.btn-full{width:100%;justify-content:center}
+.dash-layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;transition:transform 0.3s;overflow-y:auto;}
+.sb-brand{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sb-logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--maroon),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-logo-text{font-family:var(--font-head);font-size:0.82rem;color:var(--gold);line-height:1.3}
+.sb-logo-text span{display:block;font-size:0.62rem;color:var(--text2);font-family:var(--font-body)}
+.sb-user{margin:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--maroon-dark),var(--maroon-light));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.sb-user-info .name{font-size:0.85rem;font-weight:600;color:var(--text)}
+.sb-user-info .role{font-size:0.7rem;color:var(--gold)}
+.sb-nav{flex:1;padding:6px 12px}
+.nav-section{font-size:0.67rem;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;padding:10px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:all 0.25s;margin-bottom:2px;color:var(--text2);font-size:0.85rem;font-weight:500;border:1px solid transparent;}
+.nav-item:hover{background:var(--surface);color:var(--text);border-color:var(--border)}
+.nav-item.active{background:linear-gradient(135deg,rgba(128,0,32,0.4),rgba(128,0,32,0.2));color:var(--gold);border-color:var(--border)}
+.nav-item .icon{font-size:1.05rem;width:20px;text-align:center}
+.sb-footer{padding:12px 16px 16px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.sb-btn{flex:1;padding:7px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:0.75rem;font-family:var(--font-body);transition:all 0.3s;text-align:center;}
+.sb-btn:hover{background:var(--surface2);color:var(--text)}
+.sb-btn.logout:hover{border-color:#f87171;color:#f87171!important}
+.main-content{margin-left:var(--sidebar);flex:1;background:var(--bg);min-height:100vh;transition:background 0.4s}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(30,0,8,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:11px 26px;display:flex;align-items:center;justify-content:space-between;}
+[data-theme="light"] .topbar{background:rgba(245,240,235,0.92)}
+[data-theme="dark"] .topbar{background:rgba(4,4,16,0.92)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-family:var(--font-head);font-size:1.15rem;color:var(--gold)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.hbtn{display:none;background:var(--surface);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.2rem;align-items:center;justify-content:center;}
+.tb-btn{padding:6px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:0.78rem;font-family:var(--font-body);transition:all 0.3s;}
+.tb-btn:hover{border-color:var(--gold)}
+/* LIVE indicator */
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:#4ade80;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);padding:3px 10px;border-radius:20px;}
+.live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse-dot 1.5s ease infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.panel{display:none;padding:26px;animation:fadeIn 0.4s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.panel-header{margin-bottom:24px}
+.panel-header h2{font-family:var(--font-head);color:var(--gold);font-size:1.7rem;margin-bottom:4px}
+.panel-header p{color:var(--text2);font-size:0.88rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:border-color 0.3s,box-shadow 0.3s;margin-bottom:16px;}
+.card:hover{border-color:rgba(212,175,55,0.35)}
+.card-title{font-family:var(--font-head);color:var(--gold);font-size:1.05rem;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;}
+.stat-num{font-family:var(--font-head);font-size:1.9rem;color:var(--gold)}
+.stat-label{font-size:0.7rem;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:0.78rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px}
+.item-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.list-item{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;transition:border-color 0.3s;}
+.list-item:hover{border-color:rgba(212,175,55,0.35)}
+.list-item-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--maroon-dark),var(--maroon-light));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.list-item-info{flex:1}
+.list-item-info .name{font-weight:600;font-size:0.88rem;color:var(--text)}
+.list-item-info .meta{font-size:0.75rem;color:var(--text2);margin-top:2px;line-height:1.4}
+.del-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:4px;border-radius:6px;transition:all 0.3s;flex-shrink:0;}
+.del-btn:hover{color:#f87171;background:rgba(248,113,113,0.1)}
+.alert{padding:10px 16px;border-radius:10px;font-size:0.83rem;margin-top:10px;display:none;}
+.alert.show{display:block}
+.alert-success{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80}
+.alert-error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171}
+.alert-warn{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24}
+/* LEAVE SYSTEM */
+.leave-tracker{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.leave-progress{height:10px;border-radius:10px;background:rgba(255,255,255,0.08);overflow:hidden;margin:12px 0;}
+.leave-bar{height:100%;border-radius:10px;transition:width 0.4s ease;}
+.leave-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.leave-date{font-weight:600;color:var(--text)}
+.leave-reason{font-size:0.8rem;color:var(--text2);margin-top:2px}
+.leave-status{padding:4px 12px;border-radius:10px;font-size:0.73rem;font-weight:600;}
+.leave-status.approved{background:rgba(74,222,128,0.15);color:#4ade80}
+.leave-status.locked{background:rgba(248,113,113,0.15);color:#f87171}
+/* EXAM MARKS */
+.marks-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.marks-table th{text-align:left;padding:10px 12px;color:var(--gold);font-family:var(--font-head);font-size:0.8rem;border-bottom:2px solid var(--border);white-space:nowrap}
+.marks-table td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.subj-grade{font-size:0.68rem;padding:1px 6px;border-radius:6px;background:rgba(212,175,55,0.15);color:var(--gold);margin-left:5px}
+/* GLOBAL LEAVE POOL BANNER */
+.leave-pool-banner{
+  background:linear-gradient(135deg,rgba(128,0,32,0.25),rgba(212,175,55,0.08));
+  border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px;
+  display:flex;align-items:center;gap:16px;
+}
+.leave-pool-count{font-family:var(--font-head);font-size:2.4rem;color:var(--gold);min-width:50px;}
+.leave-pool-info .title{font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:3px}
+.leave-pool-info .sub{font-size:0.78rem;color:var(--text2)}
+.leave-pool-info .who{font-size:0.75rem;color:var(--warn);margin-top:4px}
+/* FILE UPLOAD */
+.file-drop-zone{
+  border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;
+  cursor:pointer;transition:border-color 0.3s,background 0.3s;position:relative;
+}
+.file-drop-zone:hover,.file-drop-zone.drag-over{border-color:var(--gold);background:rgba(212,175,55,0.04);}
+/* Hidden off-screen — no longer overlays siblings */
+.file-drop-zone input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;left:-9999px;top:auto;}
+.file-drop-zone .drop-icon{font-size:1.8rem;margin-bottom:6px}
+.file-drop-zone .drop-text{font-size:0.82rem;color:var(--text2)}
+.file-preview{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);border-radius:8px;margin-top:8px;font-size:0.82rem;}
+.file-preview .fp-name{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-preview .fp-size{color:var(--text2)}
+.file-preview .fp-remove{background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.9rem;flex-shrink:0;}
+/* RESULT UPLOAD */
+.result-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+.result-row .name{font-size:0.88rem;color:var(--text)}
+.result-row .index{font-size:0.75rem;color:var(--text2);font-family:monospace}
+.result-row .grade-badge{padding:3px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;background:rgba(212,175,55,0.15);color:var(--gold);}
+.empty-state{text-align:center;padding:40px;color:var(--text2);font-size:0.9rem;}
+.empty-state .icon{font-size:2.5rem;margin-bottom:8px}
+/* GALLERY UPLOAD */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}
+.gallery-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:border-color 0.3s,transform 0.2s;}
+.gallery-thumb:hover{border-color:var(--gold);transform:scale(1.02)}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-thumb .gal-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);opacity:0;transition:opacity 0.2s;display:flex;align-items:flex-end;padding:6px;}
+.gallery-thumb:hover .gal-overlay{opacity:1}
+.gallery-thumb .gal-caption{font-size:0.68rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.gallery-thumb .gal-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;color:#f87171;cursor:pointer;border-radius:6px;width:22px;height:22px;font-size:0.75rem;display:none;align-items:center;justify-content:center;}
+.gallery-thumb:hover .gal-del{display:flex}
+/* NEWS UPLOAD */
+.news-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:border-color 0.3s;}
+.news-item:hover{border-color:rgba(212,175,55,0.35)}
+.news-item-head{display:flex;align-items:flex-start;gap:10px}
+.news-badge{padding:2px 10px;border-radius:8px;font-size:0.7rem;font-weight:700;background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);white-space:nowrap;margin-top:2px;flex-shrink:0}
+.news-badge.urgent{background:rgba(248,113,113,0.15);color:#f87171;border-color:rgba(248,113,113,0.3)}
+.news-item-title{font-weight:600;font-size:0.9rem;color:var(--text);flex:1}
+.news-item-body{font-size:0.8rem;color:var(--text2);margin-top:6px;line-height:1.5}
+.news-item-meta{font-size:0.72rem;color:var(--text2);margin-top:6px;display:flex;align-items:center;gap:10px}
+/* APPLICATION UPLOAD */
+.app-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+.app-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#00102a,#001a40);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.app-info{flex:1}
+.app-info .name{font-weight:600;font-size:0.88rem;color:var(--text)}
+.app-info .meta{font-size:0.75rem;color:var(--text2);margin-top:2px}
+.app-status{padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);}
+/* NOTIFICATION BELL */
+.notif-btn{position:relative;background:var(--surface);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+.notif-btn:hover{border-color:var(--gold);color:var(--gold)}
+.notif-badge{position:absolute;top:-5px;right:-5px;background:#f87171;color:#fff;font-size:0.6rem;font-weight:700;min-width:17px;height:17px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--bg);animation:badgePop 0.3s ease;}
+@keyframes badgePop{from{transform:scale(0)}to{transform:scale(1)}}
+/* NOTIFICATION PANEL */
+.notif-panel{position:fixed;top:56px;right:16px;width:360px;max-height:80vh;background:var(--bg2);border:1px solid var(--border);border-radius:16px;box-shadow:0 16px 60px rgba(0,0,0,0.5);z-index:200;display:none;flex-direction:column;overflow:hidden;animation:slideDown 0.25s ease;}
+.notif-panel.open{display:flex}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.notif-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.notif-header h3{font-family:var(--font-head);color:var(--gold);font-size:1rem}
+.notif-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem;padding:2px 6px;border-radius:6px;transition:all 0.2s;}
+.notif-close:hover{color:var(--text);background:var(--surface)}
+.notif-body{flex:1;overflow-y:auto;padding:10px}
+.notif-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;transition:border-color 0.3s;position:relative;}
+.notif-item.unread{border-left:3px solid var(--gold)}
+.notif-item.approved{border-left:3px solid #4ade80}
+.notif-item.dismissed{border-left:3px solid #f87171}
+.notif-item-title{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:3px}
+.notif-item-meta{font-size:0.75rem;color:var(--text2);line-height:1.4}
+.notif-status-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;margin-top:5px;}
+.notif-status-chip.pending{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
+.notif-status-chip.approved{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3)}
+.notif-status-chip.dismissed{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)}
+.notif-empty{text-align:center;padding:32px;color:var(--text2);font-size:0.85rem}
+/* Real-time toast */
+.rt-toast{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--gold);border-radius:12px;padding:12px 18px;font-size:0.83rem;color:var(--text);box-shadow:0 8px 30px rgba(0,0,0,0.4);opacity:0;transform:translateX(40px);transition:all 0.4s;pointer-events:auto;}
+.toast.show{opacity:1;transform:translateX(0)}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0}
+  .hbtn{display:flex}
+  .grid-2{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .panel{padding:16px}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<!-- Firebase Storage removed — using Cloudinary instead -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+</head>
+<body>
+
+<div id="loader">
+  <div class="loader-icon">👨‍🏫</div>
+  <div style="color:var(--gold);font-family:var(--font-head);font-size:1.1rem">Teacher Portal</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+
+
+<div id="dashboard">
+  <div class="dash-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-brand">
+        <div class="sb-logo-icon">🏫</div>
+        <div class="sb-logo-text">Angulugaha MV<span>Teacher Portal</span></div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar">👨‍🏫</div>
+        <div class="sb-user-info">
+          <div class="name" id="teacherName">Teacher</div>
+          <div class="role" id="teacherSubject">Subject</div>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <div class="nav-section">Main</div>
+        <div class="nav-item active" onclick="showPanel('home',this)"><span class="icon">📊</span>Dashboard</div>
+        <div class="nav-item" onclick="showPanel('homework',this)"><span class="icon">✏️</span>Homework Upload</div>
+        <div class="nav-item" onclick="showPanel('results',this)"><span class="icon">📈</span>Academic Results</div>
+        <div class="nav-item" onclick="showPanel('exammarks',this)"><span class="icon">🎯</span>Exam Marks</div>
+        <div class="nav-item" onclick="showPanel('notes',this)"><span class="icon">📒</span>Upload Notes</div>
+        <div class="nav-item" onclick="showPanel('videos',this)"><span class="icon">▶️</span>Add Videos</div>
+        <div class="nav-item" onclick="showPanel('pastpapers',this)"><span class="icon">📄</span>Past Papers</div>
+        <div class="nav-item" onclick="showPanel('applications',this)"><span class="icon">📂</span>Applications Upload</div>
+        <div class="nav-item" onclick="showPanel('gallery',this)"><span class="icon">🖼️</span>Gallery Upload</div>
+        <div class="nav-item" onclick="showPanel('news',this)"><span class="icon">📰</span>News Upload</div>
+        <div class="nav-item" onclick="showPanel('clubs',this)"><span class="icon">🎭</span>Clubs & Societies</div>
+        <div class="nav-section">Admin</div>
+        <div class="nav-item" onclick="showPanel('leave',this)"><span class="icon">🗓️</span>Leave Management</div>
+        <div class="nav-item" onclick="showPanel('notice',this)"><span class="icon">📢</span>Notice Board</div>
+      </nav>
+      <div class="sb-footer">
+        <button class="sb-btn" onclick="cycleTheme()">🎨 Theme</button>
+        <button class="sb-btn logout" onclick="localStorage.removeItem('amv_saved_user'); sessionStorage.clear(); window.location.href='login.html';">🚪 Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="hbtn" onclick="toggleSb()">☰</button>
+          <div class="topbar-title" id="topbarTitle">📊 Dashboard</div>
+        </div>
+        <div class="topbar-right">
+          <span class="live-dot">LIVE</span>
+          <button class="tb-btn" onclick="showPanel('leave',document.querySelectorAll('.nav-item')[6])">🗓️ Book Leave</button>
+          <button class="notif-btn" onclick="toggleNotifPanel()" id="notifBtn" title="Notifications">
+            🔔
+            <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- HOME -->
+      <div class="panel active" id="panel-home">
+        <div class="panel-header">
+          <h2>👋 Welcome, <span id="welcomeName">Teacher</span></h2>
+          <p id="welcomeSub">Loading your portal…</p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-item"><div class="stat-num" id="hwCount">0</div><div class="stat-label">Homework</div></div>
+          <div class="stat-item"><div class="stat-num" id="notesCount">0</div><div class="stat-label">Notes</div></div>
+          <div class="stat-item"><div class="stat-num" id="videosCount">0</div><div class="stat-label">Videos</div></div>
+          <div class="stat-item"><div class="stat-num" id="leaveCount">0/2</div><div class="stat-label">Pool Leaves</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🗓️ School Leave Pool</div>
+            <div id="homeLeaveStatus"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📢 Recent Notices</div>
+            <div id="homeNotices"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚡ Quick Actions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:8px">
+            <div class="nav-item" onclick="showPanel('homework',document.querySelectorAll('.nav-item')[1])" style="flex-direction:column;padding:14px;text-align:center;cursor:pointer">
+              <div style="font-size:1.4rem;margin-bottom:4px">✏️</div><div>Add Homework</div>
+            </div>
+            <div class="nav-item" onclick="showPanel('results',document.querySelectorAll('.nav-item')[2])" style="flex-direction:column;padding:14px;text-align:center;cursor:pointer">
+              <div style="font-size:1.4rem;margin-bottom:4px">📈</div><div>Upload Results</div>
+            </div>
+            <div class="nav-item" onclick="showPanel('notes',document.querySelectorAll('.nav-item')[4])" style="flex-direction:column;padding:14px;text-align:center;cursor:pointer">
+              <div style="font-size:1.4rem;margin-bottom:4px">📒</div><div>Upload Notes</div>
+            </div>
+            <div class="nav-item" onclick="showPanel('leave',document.querySelectorAll('.nav-item')[6])" style="flex-direction:column;padding:14px;text-align:center;cursor:pointer">
+              <div style="font-size:1.4rem;margin-bottom:4px">🗓️</div><div>Book Leave</div>
+            </div>
+            <div class="nav-item" onclick="showPanel('applications',document.querySelectorAll('.nav-item')[8])" style="flex-direction:column;padding:14px;text-align:center;cursor:pointer">
+              <div style="font-size:1.4rem;margin-bottom:4px">📄</div><div>Applications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOMEWORK -->
+      <div class="panel" id="panel-homework">
+        <div class="panel-header">
+          <h2>✏️ Homework Upload</h2>
+          <p>Assign homework to your classes — real-time sync to LMS</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ New Homework</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Subject</label>
+                <select id="hw_subject" onchange="toggleOtherSubject('hw_subject','hw_subject_other')">
+                  <option>Buddhism</option>
+                  <option>Sinhala</option>
+                  <option>English</option>
+                  <option>Mathematics</option>
+                  <option>History</option>
+                  <option>Science</option>
+                  <option>G - I</option>
+                  <option>G - II (AESTHETICS)</option>
+                  <option>G - III</option>
+                  <option>ART (A/L ONLY)</option>
+                  <option>COMMERCE (A/L ONLY)</option>
+                  <option value="Other">Other</option>
+                </select>
+                <input type="text" id="hw_subject_other" placeholder="Type subject name…" style="display:none;margin-top:8px" oninput="syncOtherSubject(this,'hw_subject')">
+              </div>
+              <div class="form-group">
+                <label>Class</label>
+                <select id="hw_class">
+                  <option>1A</option><option>1B</option>
+                  <option>2A</option><option>2B</option>
+                  <option>3A</option><option>3B</option>
+                  <option>4A</option><option>4B</option>
+                  <option>5A</option><option>5B</option>
+                  <option>6A</option><option>6B</option>
+                  <option>7A</option><option>7B</option>
+                  <option>8A</option><option>8B</option>
+                  <option>9A</option><option>9B</option>
+                  <option>10A</option><option>10B</option>
+                  <option>11A</option><option>11B</option>
+                  <option>A/L</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="hw_desc" placeholder="Describe the homework assignment..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Due Date</label>
+              <input type="date" id="hw_due">
+            </div>
+            <!-- FILE UPLOAD for homework -->
+            <div class="form-group">
+              <label>Attach File / Photo (optional)</label>
+              <label class="file-drop-zone" id="hwDropZone" for="hw_file">
+                <input type="file" id="hw_file" accept="image/*,.pdf,.doc,.docx,.pptx" onchange="previewFile('hw')" multiple>
+                <div class="drop-icon">📎</div>
+                <div class="drop-text">Click or drag a photo / PDF / document here</div>
+              </label>
+              <div id="hw_file_preview" style="display:none"></div>
+            </div>
+            <button class="btn btn-primary" onclick="addHomework()">📤 Upload Homework</button>
+            <div class="alert" id="hw_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Uploaded Homework</div>
+            <div id="hwList"><div class="empty-state"><div class="icon">📝</div>No homework uploaded yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="panel" id="panel-results">
+        <div class="panel-header">
+          <h2>📈 Academic Results</h2>
+          <p>Upload and manage examination results</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add Result</div>
+            <div class="form-group">
+              <label>Exam Type</label>
+              <select id="res_type" onchange="toggleResultType()"><option>O/L Results</option><option>A/L Results</option><option>Grade 5 Scholarship</option></select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="res_name" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label>Index Number</label>
+                <input type="text" id="res_index" placeholder="e.g. 01OL2023001">
+              </div>
+            </div>
+            <div class="form-group" id="res_subjects_group">
+              <label>Subjects & Grades</label>
+              <textarea id="res_grades" placeholder="Mathematics: A&#10;English: B&#10;Science: A" style="min-height:110px"></textarea>
+            </div>
+            <div class="form-row" id="res_scholarship_group" style="display:none">
+              <div class="form-group">
+                <label>Mark Obtained</label>
+                <input type="number" id="res_mark" placeholder="e.g. 159">
+              </div>
+              <div class="form-group">
+                <label>Cutoff / Target Mark</label>
+                <input type="number" id="res_target" placeholder="e.g. 159">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-primary" onclick="addResult()">📤 Save Result</button>
+              <button class="btn btn-outline" onclick="clearResults()">🗑 Clear All</button>
+            </div>
+            <div class="alert" id="res_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📊 Saved Results</div>
+            <div id="resultsList"><div class="empty-state"><div class="icon">📊</div>No results uploaded yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAM MARKS -->
+      <div class="panel" id="panel-exammarks">
+        <div class="panel-header">
+          <h2>🎯 Exam Marks</h2>
+          <p>Upload subject marks for your classes — auto-synced to the LMS with ranking &amp; grading, no manual work needed</p>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>📋 Class Roster — shared by all teachers</span>
+            <button class="btn btn-outline" onclick="copyClassRoster()" style="padding:7px 16px;font-size:0.8rem">📋 Copy Names</button>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text2);margin:-8px 0 12px">The first teacher to enter names for a class shares them here — everyone else can copy &amp; paste instead of retyping, so names stay consistent across subjects.</p>
+          <div id="rosterList"><div class="empty-state"><div class="icon">📋</div>Enter an exam term, grade &amp; class to see the shared roster.</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Upload Marks</div>
+            <div class="form-group">
+              <label>Exam Term</label>
+              <input type="text" id="em_term" list="em_term_list" placeholder="e.g. First Term 2026" onblur="loadExamMarksList();loadClassRoster()">
+              <datalist id="em_term_list"></datalist>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Grade</label>
+                <select id="em_grade" onchange="loadExamMarksList();loadClassRoster()">
+                  <option value="1">Grade 1</option>
+                  <option value="2">Grade 2</option>
+                  <option value="3">Grade 3</option>
+                  <option value="4">Grade 4</option>
+                  <option value="5">Grade 5</option>
+                  <option value="6">Grade 6</option>
+                  <option value="7">Grade 7</option>
+                  <option value="8">Grade 8</option>
+                  <option value="9">Grade 9</option>
+                  <option value="10">Grade 10</option>
+                  <option value="11" selected>Grade 11</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Class</label>
+                <select id="em_class" onchange="loadExamMarksList();loadClassRoster()">
+                  <option value="A">Class A</option>
+                  <option value="B">Class B</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="em_subject" onchange="toggleOtherSubject('em_subject','em_subject_other');loadExamMarksList()">
+                <option>Buddhism</option>
+                <option>Sinhala Language &amp; Literature</option>
+                <option>English Language</option>
+                <option>Mathematics</option>
+                <option>History</option>
+                <option>Science</option>
+                <option>Category I</option>
+                <option>Category II - AES</option>
+                <option>Category III</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="em_subject_other" placeholder="Type subject name…" style="display:none;margin-top:8px" oninput="syncOtherSubject(this,'em_subject');loadExamMarksList()">
+            </div>
+            <div class="form-group">
+              <label>Student Marks — one per line: <code>Name, Mark</code></label>
+              <textarea id="em_marks" placeholder="Kasun Perera, 78&#10;Nimali Silva, 65" style="min-height:160px"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="saveExamMarks()">📤 Save Marks</button>
+              <button class="btn btn-danger" onclick="clearSubjectMarks()">🗑 Clear This Subject</button>
+            </div>
+            <div class="alert" id="em_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📊 Saved Marks — Current Selection</div>
+            <div id="emList"><div class="empty-state"><div class="icon">🎯</div>Enter an exam term and pick a subject to view saved marks.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel" id="panel-notes">
+        <div class="panel-header">
+          <h2>📒 Upload Notes</h2>
+          <p>Add study notes to the LMS — appears instantly for students</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add Notes</div>
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="note_subject" onchange="toggleOtherSubject('note_subject','note_subject_other')">
+                <option>Buddhism</option>
+                <option>Sinhala</option>
+                <option>English</option>
+                <option>Mathematics</option>
+                <option>History</option>
+                <option>Science</option>
+                <option>G - I</option>
+                <option>G - II (AESTHETICS)</option>
+                <option>G - III</option>
+                <option>ART (A/L ONLY)</option>
+                <option>COMMERCE (A/L ONLY)</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="note_subject_other" placeholder="Type subject name…" style="display:none;margin-top:8px" oninput="syncOtherSubject(this,'note_subject')">
+              <div class="form-group"><br>
+  <label>Target Grade</label>
+  <select id="note_grade">
+    <option value="">— Select target grade —</option>
+    <option value="All">📣 All Grades</option>
+    <option value="1">Grade 1</option>
+    <option value="2">Grade 2</option>
+    <option value="3">Grade 3</option>
+    <option value="4">Grade 4</option>
+    <option value="5">Grade 5</option>
+    <option value="6">Grade 6</option>
+    <option value="7">Grade 7</option>
+    <option value="8">Grade 8</option>
+    <option value="9">Grade 9</option>
+    <option value="10">Grade 10</option>
+    <option value="11">Grade 11</option>
+    <option value="A/L">A/L</option>
+  </select>
+</div>
+            </div>
+            <div class="form-group">
+              <label>Notes Title</label>
+              <input type="text" id="note_title" placeholder="e.g. Algebra Chapter 3 Notes">
+            </div>
+            <div class="form-group">
+              <label>Link (Google Drive / PDF URL)</label>
+              <input type="url" id="note_link" placeholder="https://drive.google.com/...">
+            </div>
+            <!-- FILE UPLOAD for notes -->
+            <div class="form-group">
+              <label>Or Upload File Directly</label>
+              <label class="file-drop-zone" for="note_file">
+                <input type="file" id="note_file" accept=".pdf,.doc,.docx,image/*" onchange="previewFile('note')" multiple>
+                <div class="drop-icon">📄</div>
+                <div class="drop-text">PDF, Word document, or image</div>
+              </label>
+              <div id="note_file_preview" style="display:none"></div>
+            </div>
+            <button class="btn btn-primary" onclick="addNote()">📤 Upload Note</button>
+            <div class="alert" id="note_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📒 Uploaded Notes</div>
+            <div id="notesList"><div class="empty-state"><div class="icon">📒</div>No notes uploaded.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div class="panel" id="panel-videos">
+        <div class="panel-header">
+          <h2>▶️ Add Learning Videos</h2>
+          <p>Link YouTube videos to the student LMS — syncs in real-time</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add Video</div>
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="vid_subject" onchange="toggleOtherSubject('vid_subject','vid_subject_other')">
+                <option>Buddhism</option>
+                <option>Sinhala</option>
+                <option>English</option>
+                <option>Mathematics</option>
+                <option>History</option>
+                <option>Science</option>
+                <option>G - I</option>
+                <option>G - II (AESTHETICS)</option>
+                <option>G - III</option>
+                <option>ART (A/L ONLY)</option>
+                <option>COMMERCE (A/L ONLY)</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="vid_subject_other" placeholder="Type subject name…" style="display:none;margin-top:8px" oninput="syncOtherSubject(this,'vid_subject')">
+            </div>
+            <div class="form-group">
+              <label>Target Grade</label>
+              <select id="vid_grade">
+                <option value="">— Select target grade —</option>
+                <option value="All">📣 All Grades</option>
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+                <option value="7">Grade 7</option>
+                <option value="8">Grade 8</option>
+                <option value="9">Grade 9</option>
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+                <option value="A/L">A/L</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Video Title</label>
+              <input type="text" id="vid_title" placeholder="e.g. Quadratic Equations Explained">
+            </div>
+            <div class="form-group">
+              <label>YouTube URL</label>
+              <input type="url" id="vid_url" placeholder="https://youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+              <label>Duration (optional)</label>
+              <input type="text" id="vid_dur" placeholder="e.g. 35 min">
+            </div>
+            <button class="btn btn-primary" onclick="addVideo()">📤 Add Video</button>
+            <div class="alert" id="vid_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">▶️ Added Videos</div>
+            <div id="videosList"><div class="empty-state"><div class="icon">▶️</div>No videos added yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEAVE -->
+      <div class="panel" id="panel-leave">
+        <div class="panel-header">
+          <h2>🗓️ Leave Management</h2>
+          <p>School-wide leave pool — <strong>2 leaves shared across all teachers per month</strong></p>
+        </div>
+        <!-- Global pool banner -->
+        <div class="leave-pool-banner" id="globalLeaveBanner">
+          <div class="leave-pool-count" id="poolCountBig">2</div>
+          <div class="leave-pool-info">
+            <div class="title">Leaves remaining in <span id="poolMonthName">this month</span></div>
+            <div class="sub">All teachers share this pool. When it reaches 0, no more leaves can be booked.</div>
+            <div class="who" id="poolWhoUsed"></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📊 Leave Tracker</div>
+            <div class="leave-tracker">
+              <div id="leaveStats" style="text-align:center">
+                <div style="font-family:var(--font-head);font-size:2.5rem;color:var(--gold)" id="leaveUsedNum">0</div>
+                <div style="color:var(--text2);font-size:0.85rem">school leaves used this month</div>
+                <div class="leave-progress">
+                  <div class="leave-bar" id="leaveBar" style="width:0%"></div>
+                </div>
+                <div id="leaveMonthLabel" style="font-size:0.78rem;color:var(--text2)"></div>
+              </div>
+              <div class="divider"></div>
+              <div id="leaveForm">
+                <div class="form-group">
+                  <label>Leave Date</label>
+                  <input type="date" id="leave_date">
+                </div>
+                <div class="form-group">
+                  <label>Reason</label>
+                  <textarea id="leave_reason" placeholder="Reason for leave..." style="min-height:70px"></textarea>
+                </div>
+                <button class="btn btn-primary" id="leaveBookBtn" onclick="bookLeave()">📝 Book Leave</button>
+                <div style="margin-top:10px;font-size:0.75rem;color:var(--text2)">
+                  A notification will be sent automatically to the principal upon booking.
+                </div>
+              </div>
+              <div class="alert" id="leave_alert"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 All Booked Leaves This Month</div>
+            <div id="leaveList"><div class="empty-state"><div class="icon">🗓️</div>No leaves booked this month.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTICE -->
+      <div class="panel" id="panel-notice">
+        <div class="panel-header">
+          <h2>📢 Notice Board</h2>
+          <p>Post announcements — instantly visible to all students in the LMS</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add Announcement</div>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" id="ann_title" placeholder="Announcement title...">
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="ann_text" placeholder="Write the announcement..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Target Grade</label>
+              <select id="ann_grade">
+                <option value="All">📣 All Grades</option>
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+                <option value="7">Grade 7</option>
+                <option value="8">Grade 8</option>
+                <option value="9">Grade 9</option>
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+                <option value="A/L">A/L</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="ann_urgent">
+                <option value="false">Normal</option>
+                <option value="true">Urgent</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="addAnnouncement()">📢 Post Announcement</button>
+            <div class="alert" id="ann_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Posted Notices</div>
+            <div id="noticeList"><div class="empty-state"><div class="icon">📢</div>No notices posted yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div class="panel" id="panel-applications">
+        <div class="panel-header">
+          <h2>📂 Student Applications</h2>
+          <p>Upload applications and forms for students</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Upload Application</div>
+            <div class="form-group">
+              <label>Application Type</label>
+              <select id="app_type">
+  <option>Prefect Board Application</option>
+  <option>Media Unit Registration</option>
+  <option>Sports Team Registration</option>
+  <option>Club Membership Form</option>
+  <option>Competition Registration</option>
+  <option>Scholarship Application</option>
+  <option>Other Student Form</option>
+</select>
+            </div>
+            <div class="form-group">
+              <label>Subject / Title</label>
+              <input type="text" id="app_title" placeholder="Brief description...">
+            </div>
+            <div class="form-group">
+              <label>Upload Document</label>
+              <label class="file-drop-zone" for="app_file">
+                <input type="file" id="app_file" accept=".pdf,.doc,.docx,image/*" onchange="previewFile('app')">
+                <div class="drop-icon">📎</div>
+                <div class="drop-text">PDF, Word document, or image (max 5MB)</div>
+              </label>
+              <div id="app_file_preview" style="display:none"></div>
+            </div>
+            <div class="form-group">
+              <label>Notes (optional)</label>
+              <textarea id="app_notes" placeholder="Any additional notes..." style="min-height:60px"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="uploadApplication()">📤 Submit Application</button>
+            <div class="alert" id="app_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Submitted Applications</div>
+            <div id="appList"><div class="empty-state"><div class="icon">📄</div>No applications submitted yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="panel" id="panel-gallery">
+        <div class="panel-header">
+          <h2>🖼️ Gallery Upload</h2>
+          <p>Upload photos to the school gallery — visible to all students in real-time</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add to Gallery</div>
+            <div style="display:flex;gap:8px;margin-bottom:14px">
+              <button type="button" id="gal_mode_upload_btn" class="btn btn-primary" style="flex:1" onclick="setGalleryMode('upload')">📤 Upload Photos</button>
+              <button type="button" id="gal_mode_drive_btn" class="btn" style="flex:1" onclick="setGalleryMode('drive')">🔗 Google Drive Link</button>
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="gal_category">
+                <option>School Events</option>
+                <option>Sports Day</option>
+                <option>Prize Giving</option>
+                <option>Science Fair</option>
+                <option>Cultural Events</option>
+                <option>Classroom Activities</option>
+                <option>Trips & Excursions</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Caption</label>
+              <input type="text" id="gal_caption" placeholder="e.g. Annual Sports Day 2025…">
+            </div>
+              <div class="form-group">
+  <label>Collection Title</label>
+  <input type="text" id="gal_collection" placeholder="e.g. Prize Giving 2024, Sports Day…">
+</div>
+<div id="gal_upload_fields">
+<div class="form-group">
+  <label>Photos (select multiple)</label>
+  <label class="file-drop-zone" for="gal_file">
+    <input type="file" id="gal_file" accept="image/*" multiple onchange="previewGalleryFiles()">
+    <div class="drop-icon">📷</div>
+    <div class="drop-text">Click or drag images here — select as many as you want</div>
+  </label>
+  <div id="gal_file_preview" style="display:none"></div>
+</div>
+</div>
+<div id="gal_drive_fields" style="display:none">
+  <div class="form-group">
+    <label>Google Drive Folder Link</label>
+    <input type="text" id="gal_drive_link" placeholder="https://drive.google.com/drive/folders/…">
+    <div style="font-size:0.75rem;color:var(--text2);margin-top:6px;line-height:1.5">
+      In Google Drive: right-click the folder → <b>Share</b> → set to <b>"Anyone with the link" (Viewer)</b> → Copy link, then paste it here. Visitors will browse the photos right on the website — no need to open Drive.
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label>Date Taken (optional)</label>
+  <input type="date" id="gal_date">
+</div>
+<button class="btn btn-primary" id="gal_submit_btn" onclick="addGalleryCollection()">📤 Upload Collection</button>
+            <div class="alert" id="gal_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">🖼️ Uploaded Photos</div>
+            <div id="galleryList"><div class="empty-state"><div class="icon">🖼️</div>No photos uploaded yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="panel" id="panel-news">
+        <div class="panel-header">
+          <h2>📰 News Upload</h2>
+          <p>Post school news and updates — appears instantly on the student LMS</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Post News Article</div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="news_category">
+                <option>School News</option>
+                <option>Sports</option>
+                <option>Academic</option>
+                <option>Events</option>
+                <option>Achievements</option>
+                <option>Notices</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Headline</label>
+              <input type="text" id="news_title" placeholder="Enter news headline…">
+            </div>
+            <div class="form-group">
+              <label>Content</label>
+              <textarea id="news_content" placeholder="Write the full news content here…" style="min-height:120px"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="news_urgent">
+                <option value="false">Normal</option>
+                <option value="true">Breaking / Urgent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cover Image (optional)</label>
+              <label class="file-drop-zone" for="news_file">
+                <input type="file" id="news_file" accept="image/*" onchange="previewNewsFile()">
+                <div class="drop-icon">🗞️</div>
+                <div class="drop-text">Attach a cover image (optional)</div>
+              </label>
+              <div id="news_file_preview" style="display:none"></div>
+            </div>
+            <button class="btn btn-primary" onclick="addNews()">📰 Publish News</button>
+            <div class="alert" id="news_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Published Articles</div>
+            <div id="newsList"><div class="empty-state"><div class="icon">📰</div>No news published yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLUBS & SOCIETIES -->
+      <div class="panel" id="panel-clubs">
+        <div class="panel-header">
+          <h2>🎭 Clubs & Societies</h2>
+          <p>Add or remove student clubs — changes appear instantly on the school website</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Add a Club</div>
+            <div class="form-group">
+              <label>Icon (emoji)</label>
+              <input type="text" id="club_icon" placeholder="e.g. 🎸" maxlength="4">
+            </div>
+            <div class="form-group">
+              <label>Club Name</label>
+              <input type="text" id="club_name" placeholder="e.g. Music Club">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="club_desc" placeholder="What the club does, and what it's available for…" style="min-height:100px"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addClub()">🎭 Add Club</button>
+            <div class="alert" id="club_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Active Clubs</div>
+            <div id="clubsList"><div class="empty-state"><div class="icon">🎭</div>No clubs added yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAST PAPERS -->
+      <div class="panel" id="panel-pastpapers">
+        <div class="panel-header">
+          <h2>📄 Past Papers Upload</h2>
+          <p>Upload past examination papers — instantly visible to students in the LMS</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Upload Past Paper</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Subject</label>
+                <select id="pp_subject">
+                  <option>Buddhism</option>
+                  <option>Sinhala</option>
+                  <option>English</option>
+                  <option>Mathematics</option>
+                  <option>History</option>
+                  <option>Science</option>
+                  <option>G - I</option>
+                  <option>G - II (AESTHETICS)</option>
+                  <option>G - III</option>
+                  <option>ART (A/L ONLY)</option>
+                  <option>COMMERCE (A/L ONLY)</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Target Grade</label>
+                <select id="pp_grade">
+                  <option value="">— Select target grade —</option>
+                  <option value="All">📣 All Grades</option>
+                  <option value="1">Grade 1</option>
+                  <option value="2">Grade 2</option>
+                  <option value="3">Grade 3</option>
+                  <option value="4">Grade 4</option>
+                  <option value="5">Grade 5</option>
+                  <option value="6">Grade 6</option>
+                  <option value="7">Grade 7</option>
+                  <option value="8">Grade 8</option>
+                  <option value="9">Grade 9</option>
+                  <option value="10">Grade 10</option>
+                  <option value="11">Grade 11</option>
+                  <option value="A/L">A/L</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Year</label>
+                <input type="text" id="pp_year" placeholder="e.g. 2024" maxlength="4">
+              </div>
+              <div class="form-group">
+                <label>Exam Type</label>
+                <select id="pp_type">
+                  <option>Term Test</option>
+                  <option>O/L</option>
+                  <option>A/L</option>
+                  <option>Provincial</option>
+                  <option>National</option>
+                  <option>Scholarship</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Upload File (PDF / Image)</label>
+              <label class="file-drop-zone" for="pp_file">
+                <input type="file" id="pp_file" accept=".pdf,image/*" onchange="previewFile('pp')">
+                <div class="drop-icon">📄</div>
+                <div class="drop-text">Click or drag a PDF or image here</div>
+              </label>
+              <div id="pp_file_preview" style="display:none"></div>
+            </div>
+            <button class="btn btn-primary" onclick="addPastPaper()">📤 Upload Past Paper</button>
+            <div class="alert" id="pp_alert"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📋 Uploaded Past Papers</div>
+            <div id="ppList"><div class="empty-state"><div class="icon">📄</div>No past papers uploaded yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /dash-layout -->
+</div><!-- /dashboard -->
+
+<!-- Real-time Toast Container -->
+<div class="rt-toast" id="rtToast"></div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-close" onclick="toggleNotifPanel()">✕</button>
+  </div>
+  <div class="notif-body" id="notifBody">
+    <div class="notif-empty">No notifications yet.</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// FIREBASE SETUP (compat SDK — no ES module imports needed)
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDeznPuFsqSdbrPFA1F3AMI-8paNd2syZ0",
+  authDomain: "amvofficial00.firebaseapp.com",
+  databaseURL: "https://amvofficial00-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "amvofficial00",
+  storageBucket: "amvofficial00.firebasestorage.app",
+  messagingSenderId: "575639657506",
+  appId: "1:575639657506:web:0fec6335fac07bcc3c7e7b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ============================================================
+// CLOUDINARY CONFIG (replaces Firebase Storage)
+// ============================================================
+const CLOUDINARY_CLOUD_NAME = "dxgou0z9a";
+const CLOUDINARY_UPLOAD_PRESET = "amvofficial";
+
+// Compat wrappers to match the modular API used below
+const ref         = (db, path) => db.ref(path);
+const push        = (r)        => r.push();
+const fbSet       = (r, val)   => r.set(val);
+const remove      = (r)        => r.remove();
+const onValue     = (r, cb)    => r.on('value', snap => cb(snap));
+const fbGet       = (r)        => r.once('value');
+const serverTimestamp = ()     => firebase.database.ServerValue.TIMESTAMP;
+
+const _fbCache = {
+  hw: [],
+  notes: [],
+  videos: [],
+  notices: [],
+  leaves: [],
+  leaveRequests: [],
+  gallery: [],
+  news: [],
+  pastpapers: [],
+  clubs: [],
+  examMeta: [],
+  _seenStatuses: {},  // track seen statuses to detect changes
+};
+
+// Firebase paths
+const FB = {
+  hw:            'amv/shared/homework',
+  notes:         'amv/shared/notes',
+  videos:        'amv/shared/videos',
+  announces:     'announcements',
+  leaves:        'amv/shared/leaves',
+  leaveRequests: 'leaveRequests',
+  gallery:       'amv/shared/gallery',
+  news:          'amv/shared/news',
+  applications:  'amv/shared/applications',
+  pastpapers:    'amv/shared/pastpapers',
+  clubs:         'amv/shared/clubs',
+  examMarks:     'amv/shared/examMarks',
+  examMeta:      'amv/shared/examMeta',
+  examRoster:    'amv/shared/examRoster',
+};
+
+// Push an object to a Firebase list; returns the new key
+async function fbPush(path, data){
+  const r = db.ref(path).push();
+  await r.set({...data, _fbKey: r.key});
+  return r.key;
+}
+
+// Upload a single file to Cloudinary, returns { url, name, size, isImage }
+async function uploadToCloudinary(file, folder) {
+  const formData = new FormData();
+  formData.append("file", file.rawFile);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("folder", "amv/" + folder);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || "Cloudinary upload failed");
+  }
+
+  const data = await res.json();
+  return {
+    name:    file.name,
+    size:    file.size,
+    url:     data.secure_url,
+    isImage: file.isImage
+  };
+}
+
+// Upload multiple files to Cloudinary, returns array of { url, name, size, isImage }
+async function uploadFilesToStorage(files, folder) {
+  const results = [];
+  for (const file of files) {
+    const result = await uploadToCloudinary(file, folder);
+    results.push(result);
+  }
+  return results;
+}
+
+
+// Delete a Firebase node by key
+async function fbDelete(path, key){
+  try{
+    await db.ref(path + '/' + key).remove();
+  }catch(e){
+    console.error('fbDelete failed [' + path + '/' + key + ']:', e.code || e.message || e);
+    throw e;
+  }
+}
+
+// ============================================================
+// AUTO-CLEANUP — deletes entries older than 7 days from
+// Firebase + Cloudinary on every login.
+// Covers: Past Papers, Applications, Notes, Videos, Announcements
+// ============================================================
+const AUTO_DELETE_DAYS = 7;
+
+function isExpired(item){
+  // Try numeric createdAt first (Date.now() timestamp)
+  if(item.createdAt && typeof item.createdAt === 'number'){
+    return (Date.now() - item.createdAt) > AUTO_DELETE_DAYS * 86400000;
+  }
+  // Parse "DD Mon YYYY" date string (e.g. "19 Jun 2026")
+  const dateStr = item.date || item.createdAt;
+  if(dateStr && typeof dateStr === 'string'){
+    const parsed = new Date(dateStr);
+    if(!isNaN(parsed)){
+      return (Date.now() - parsed.getTime()) > AUTO_DELETE_DAYS * 86400000;
+    }
+  }
+  return false; // can't determine age — keep it
+}
+
+// Extract Cloudinary public_id from a secure_url so we can delete it.
+// e.g. "https://res.cloudinary.com/dxgou0z9a/image/upload/v123/amv/notes/abc.pdf"
+//   → resource_type "image", public_id "amv/notes/abc"
+// For raw: "https://res.cloudinary.com/dxgou0z9a/raw/upload/v123/amv/applications/abc.pdf"
+//   → resource_type "raw", public_id "amv/applications/abc.pdf"
+function parseCloudinaryUrl(url){
+  if(!url || !url.includes('res.cloudinary.com')) return null;
+  try{
+    const match = url.match(/res\.cloudinary\.com\/[^/]+\/(image|video|raw)\/upload\/(?:v\d+\/)?(.+)$/);
+    if(!match) return null;
+    const resourceType = match[1];
+    let publicId = match[2];
+    // For image/video, strip extension from public_id
+    if(resourceType !== 'raw') publicId = publicId.replace(/\.[^.]+$/, '');
+    return { resourceType, publicId };
+  }catch(e){ return null; }
+}
+
+// Delete a single file from Cloudinary using the destroy endpoint.
+// Unsigned deletion requires "Enable unsigned deletion" on the upload preset in Cloudinary.
+// If that's not enabled, this silently fails — Firebase record is still deleted.
+async function deleteFromCloudinary(url){
+  const parsed = parseCloudinaryUrl(url);
+  if(!parsed) return;
+  try{
+    const formData = new FormData();
+    formData.append('public_id', parsed.publicId);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${parsed.resourceType}/destroy`,
+      { method: 'POST', body: formData }
+    );
+  }catch(e){
+    console.warn('Cloudinary delete skipped for', url, e.message);
+  }
+}
+
+// Collect all Cloudinary URLs from a record (handles single fileUrl, attachments array, cover, etc.)
+function extractUrls(item){
+  const urls = [];
+  if(item.fileUrl)  urls.push(item.fileUrl);
+  if(item.fileData && item.fileData.startsWith('http')) urls.push(item.fileData);
+  if(item.attachment?.url)  urls.push(item.attachment.url);
+  if(Array.isArray(item.attachments)) item.attachments.forEach(a=>{ if(a?.url) urls.push(a.url); });
+  if(item.cover?.url) urls.push(item.cover.url);
+  return urls;
+}
+
+async function runAutoCleanup(){
+  const TASKS = [
+    { label: 'Past Papers',    path: FB.pastpapers,   cache: ()=>_fbCache.pastpapers },
+    { label: 'Applications',   path: FB.applications, cache: ()=>_fbCache.applications || [] },
+    { label: 'Notes',          path: FB.notes,        cache: ()=>_fbCache.notes },
+    { label: 'Videos',         path: FB.videos,       cache: ()=>_fbCache.videos },
+    { label: 'Announcements',  path: FB.announces,    cache: ()=>_fbCache.announces || [] },
+  ];
+
+  let totalDeleted = 0;
+
+  for(const task of TASKS){
+    // Only auto-delete items that actually have an uploaded file attached.
+    // Link-only entries (e.g. a Google Drive URL with no file upload) are
+    // kept forever — only files (PDF/image uploads) expire after 7 days.
+    const items = task.cache().filter(item => extractUrls(item).length > 0 && isExpired(item));
+    if(!items.length) continue;
+
+    console.log(`[AutoCleanup] ${task.label}: found ${items.length} expired item(s)`);
+
+    for(const item of items){
+      try{
+        // 1. Delete files from Cloudinary
+        const urls = extractUrls(item);
+        for(const url of urls) await deleteFromCloudinary(url);
+
+        // 2. Delete record from Firebase
+        await db.ref(task.path + '/' + item._fbKey).remove();
+        totalDeleted++;
+        console.log(`[AutoCleanup] Deleted ${task.label} key=${item._fbKey}`);
+      }catch(e){
+        console.warn(`[AutoCleanup] Failed to delete ${task.label} key=${item._fbKey}:`, e.message);
+      }
+    }
+  }
+
+  if(totalDeleted > 0){
+    showToast(`🧹 Auto-cleaned ${totalDeleted} expired item${totalDeleted>1?'s':''} (7-day limit)`);
+    console.log('[AutoCleanup] Done. Total deleted:', totalDeleted);
+  }
+}
+
+// ============================================================
+// THEME
+// ============================================================
+const themes=['default','dark','light'];
+function themeManager(){document.documentElement.setAttribute('data-theme',localStorage.getItem('amv_theme')||'default');}
+function cycleTheme(){
+  const c=document.documentElement.getAttribute('data-theme')||'default';
+  const n=themes[(themes.indexOf(c)+1)%themes.length];
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('amv_theme',n);
+}
+themeManager();
+
+// ============================================================
+// LOADER
+// ============================================================
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hidden'),2000);});
+
+// ============================================================
+// AUTH — Firebase-based (no hardcoded teacher list)
+// ============================================================
+let currentTeacher=null;
+let currentTeacherName='Teacher';
+let currentTeacherSubject='Teacher';
+
+async function checkSession(){
+  // 1. Coming from login.html via sessionStorage (first-time redirect)
+  const fromLogin=sessionStorage.getItem('amv_login_id');
+  if(fromLogin){
+    sessionStorage.removeItem('amv_login_id');
+    const snap=await db.ref(`teachers/${fromLogin}`).once('value');
+    if(snap.exists()){
+      const t=snap.val();
+      localStorage.setItem('amv_teacher_session',JSON.stringify({id:fromLogin,name:t.name,loginTime:Date.now()}));
+      startDashboard(fromLogin,t);
+      return;
+    }
+  }
+  // 2. Returning visitor — validate session against Firebase
+  const s=localStorage.getItem('amv_teacher_session');
+  if(s){
+    try{
+      const d=JSON.parse(s);
+      if(Date.now()-d.loginTime<168*60*60*1000){
+        const snap=await db.ref(`teachers/${d.id}`).once('value');
+        if(snap.exists()){startDashboard(d.id,snap.val());return;}
+      }
+    }catch(e){}
+    localStorage.removeItem('amv_teacher_session');
+  }
+  // 3. No valid session — back to login
+  window.location.href='login.html';
+}
+
+function startDashboard(id,t){
+  currentTeacher=id;
+  currentTeacherName=t.name||id;
+  currentTeacherSubject=t.subject||'Teacher';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('teacherName').textContent=currentTeacherName;
+  document.getElementById('teacherSubject').textContent=currentTeacherSubject;
+  document.getElementById('welcomeName').textContent=currentTeacherName;
+  document.getElementById('welcomeSub').textContent=`${currentTeacherSubject} · Welcome to your portal`;
+  attachFirebaseListeners();
+  updateStats();
+  // Run auto-cleanup once on login (7-day expiry for Past Papers, Applications, Notes, Videos, Announcements)
+  setTimeout(runAutoCleanup, 4000); // delay 4s to let Firebase listeners populate the cache first
+  startPresence(id, currentTeacherName, currentTeacherSubject);
+}
+
+// ============================================================
+// PRESENCE — lets the webteam admin panel see who's logged in
+// and force-logout a session in real time.
+// ============================================================
+let _presenceRef = null;
+let _presenceInterval = null;
+function startPresence(id, name, subject){
+  _presenceRef = db.ref('presence/teachers/'+id);
+  _presenceRef.set({name, subject, loginTime: Date.now(), lastSeen: Date.now(), kick:false});
+  _presenceRef.onDisconnect().remove();
+  _presenceRef.child('kick').on('value', snap=>{
+    if(snap.val()===true){
+      if(_presenceRef) _presenceRef.off();
+      alert('You have been logged out by the webteam admin.');
+      localStorage.removeItem('amv_teacher_session');
+      localStorage.removeItem('amv_saved_user');
+      window.location.href='login.html';
+    }
+  });
+  if(_presenceInterval) clearInterval(_presenceInterval);
+  _presenceInterval = setInterval(()=>{ if(_presenceRef) _presenceRef.child('lastSeen').set(Date.now()); }, 30000);
+}
+function logout(){
+  if(_presenceRef) _presenceRef.remove();
+  if(_presenceInterval) clearInterval(_presenceInterval);
+  localStorage.removeItem('amv_teacher_session');localStorage.removeItem('amv_saved_user');window.location.href='login.html';
+}
+checkSession();
+
+// ============================================================
+// LOCAL STORAGE HELPERS (for teacher-private data)
+// ============================================================
+function get(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch{return [];}}
+function set(key,val){localStorage.setItem(key,JSON.stringify(val));}
+function getTeacherKey(base){return `amv_teacher_${currentTeacher}_${base}`;}
+
+// ============================================================
+// FIREBASE REALTIME LISTENERS (for shared data)
+// ============================================================
+
+function attachFirebaseListeners(){
+  // HOMEWORK
+  onValue(ref(db, FB.hw), snap=>{
+    _fbCache.hw = objToArr(snap.val());
+    // Auto-expire past-due homework
+    autoExpireHW(_fbCache.hw);
+    renderHW();
+    updateStats();
+    renderHomeWidgets();
+  });
+  // NOTES
+  onValue(ref(db, FB.notes), snap=>{
+    _fbCache.notes = objToArr(snap.val());
+    renderNotes();
+    updateStats();
+  });
+  // RESULTS
+  onValue(ref(db, 'amv/shared/results'), snap=>{
+  _fbCache.results = objToArr(snap.val());
+  renderResults2();
+});
+  // VIDEOS
+  onValue(ref(db, FB.videos), snap=>{
+    _fbCache.videos = objToArr(snap.val());
+    renderVideos();
+    updateStats();
+  });
+  // EXAM MARKS — term-name suggestions (prevents duplicate/typo'd exam keys)
+  onValue(ref(db, FB.examMeta), snap=>{
+    _fbCache.examMeta = objToArr(snap.val());
+    populateExamTermSuggestions();
+  });
+  // ANNOUNCEMENTS
+  onValue(ref(db, FB.announces), snap=>{
+    _fbCache.announces = objToArr(snap.val());
+    renderAnnouncements();
+    renderHomeWidgets();
+    updateNotifications();
+  });
+  // LEAVES
+  onValue(ref(db, FB.leaves), snap=>{
+    _fbCache.leaves = objToArr(snap.val());
+    renderLeave();
+    updateStats();
+    renderHomeWidgets();
+    showToast('🗓️ Leave data updated');
+  });
+  // GALLERY
+  onValue(ref(db, FB.gallery), snap=>{
+    _fbCache.gallery = objToArr(snap.val());
+    renderGallery();
+  });
+  // NEWS
+  onValue(ref(db, FB.news), snap=>{
+    _fbCache.news = objToArr(snap.val());
+    renderNews();
+  });
+  // APPLICATIONS — real-time sync; teacher sees live list, students see it too
+  onValue(ref(db, FB.applications), snap=>{
+    const apps = objToArr(snap.val());
+    _fbCache.applications = apps; // cache for auto-cleanup
+    renderApps(apps);
+  });
+  // PAST PAPERS
+  onValue(ref(db, FB.pastpapers), snap=>{
+    _fbCache.pastpapers = objToArr(snap.val());
+    renderPastPapers();
+    updateStats();
+  });
+  // CLUBS & SOCIETIES
+  onValue(ref(db, FB.clubs), snap=>{
+    _fbCache.clubs = objToArr(snap.val());
+    renderClubs();
+  });
+  // LEAVE REQUESTS — for notification center
+  onValue(ref(db, FB.leaveRequests), snap=>{
+    const prev = _fbCache.leaveRequests || [];
+    _fbCache.leaveRequests = objToArr(snap.val());
+    updateNotifications();
+
+    // AUTO-DELETE: if principal dismissed a leave request belonging to this teacher,
+    // remove the matching entry from amv/shared/leaves
+    const myDismissed = _fbCache.leaveRequests.filter(
+      r => r.teacherId === currentTeacher && r.status === 'dismissed'
+    );
+    myDismissed.forEach(async dismissed => {
+      // Find the corresponding entry in amv/shared/leaves
+      const matchingLeave = _fbCache.leaves.find(
+        l => l.teacherId === currentTeacher && l.date === dismissed.date
+      );
+      if(matchingLeave){
+        try{
+          await fbDelete(FB.leaves, matchingLeave._fbKey);
+          // Remove the dismissed leaveRequest itself to keep things clean
+          await fbDelete(FB.leaveRequests, dismissed._fbKey);
+        }catch(e){}
+      }
+    });
+  });
+}
+
+function objToArr(obj){
+  if(!obj) return [];
+  return Object.entries(obj).map(([k,v])=>({...v,_fbKey:k}));
+}
+
+// ============================================================
+// REAL-TIME TOAST
+// ============================================================
+function showToast(msg){
+  const c=document.getElementById('rtToast');
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  c.appendChild(t);
+  requestAnimationFrame(()=>{t.classList.add('show');});
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3500);
+}
+
+// ============================================================
+// LEAVE SYSTEM — 2 teachers max PER DAY (not per month)
+// ============================================================
+function getDayKey(dateStr){
+  // dateStr like "2024-06-15"; if not provided use today
+  return dateStr || new Date().toISOString().split('T')[0];
+}
+
+function getLeavesForDay(dateStr){
+  return _fbCache.leaves.filter(l=>l.date===dateStr);
+}
+
+function getPoolRemainingForDay(dateStr){
+  return Math.max(0, 2 - getLeavesForDay(dateStr).length);
+}
+
+async function bookLeave(){
+  const date=document.getElementById('leave_date').value;
+  const reason=document.getElementById('leave_reason').value.trim();
+  if(!date||!reason){showAlert('leave_alert','error','⚠️ Please enter date and reason.');return;}
+  const today=new Date().toISOString().split('T')[0];
+  if(date<today){showAlert('leave_alert','error','❌ Cannot book leave for a past date.');return;}
+
+  const dayLeaves = getLeavesForDay(date);
+  if(dayLeaves.length>=2){
+    showAlert('leave_alert','error',`🔒 Leave pool full for ${date} — 2 teachers already booked for that day.`);
+    return;
+  }
+  // Check if this teacher already has leave on that date
+  const already = dayLeaves.find(l=>l.teacherId===currentTeacher);
+  if(already){
+    showAlert('leave_alert','error','⚠️ You already have a leave booked on that date.');
+    return;
+  }
+
+  const teacherName=currentTeacherName;
+  const newLeave={teacherId:currentTeacher,teacherName,date,reason,bookedAt:new Date().toISOString()};
+
+  try{
+    await fbPush(FB.leaves, newLeave);
+    // Also push to leaveRequests for principal approval workflow
+    await fbPush(FB.leaveRequests, {
+      teacherId: currentTeacher,
+      teacherName,
+      date,
+      reason,
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+    document.getElementById('leave_date').value='';
+    document.getElementById('leave_reason').value='';
+    const remaining = 2 - dayLeaves.length - 1;
+    showAlert('leave_alert','success',
+      remaining===0 ? `✅ Leave booked for ${date}. 🔒 No more slots for that day.`
+                    : `✅ Leave booked for ${date}. ${remaining} slot(s) remaining for that day.`
+    );
+    showToast(`📧 Leave request sent to Principal for ${date}`);
+  }catch(e){
+    showAlert('leave_alert','error','❌ Failed to book leave: '+e.message);
+  }
+}
+
+function sendLeaveEmail(teacherName,date,reason){
+  const subject=encodeURIComponent(`Leave Booking: ${teacherName} — ${date}`);
+  const body=encodeURIComponent(
+    `Dear Principal,\n\nThis is an automated notification.\n\n`+
+    `Teacher: ${teacherName}\nLeave Date: ${date}\nReason: ${reason}\n\n`+
+    `Pool Status: ${getLeavesForDay(date).length}/2 teachers booked for this day.\n\n`+
+    `— Angulugaha Maha Vidyalaya Teacher Portal`
+  );
+  const a=document.createElement('a');
+  a.href=`mailto:principal@angulugahamv.lk?subject=${subject}&body=${body}`;
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>a.remove(),500);
+}
+
+async function deleteLeave(fbKey){
+  // 1. Find the leave in cache and verify ownership
+  const leave = _fbCache.leaves.find(l=>l._fbKey===fbKey);
+  if(!leave){showToast('❌ Leave not found');return;}
+  if(leave.teacherId !== currentTeacher){
+    showToast('🚫 You can only cancel your own leaves');
+    return;
+  }
+
+  // 2. Ask for password to confirm identity
+  const pwd = prompt(`🔒 Enter your password to cancel this leave (${leave.date}):`);
+  if(pwd === null) return;
+  const snap = await db.ref(`teachers/${currentTeacher}`).once('value');
+  if(!snap.exists() || snap.val().password !== pwd){
+    showToast('❌ Wrong password — leave not cancelled');
+    return;
+  }
+
+  // 3. Delete from both paths
+  try{
+    await fbDelete(FB.leaves, fbKey);
+    // Also remove any matching leaveRequest for this teacher+date
+    const matching = _fbCache.leaveRequests.find(r=>r.teacherId===currentTeacher && r.date===leave.date);
+    if(matching) await fbDelete(FB.leaveRequests, matching._fbKey);
+    showToast('🗓️ Leave cancelled');
+  }catch(e){showToast('❌ Failed to cancel leave: '+e.message);}
+}
+
+function renderLeave(){
+  const leaves=_fbCache.leaves;
+  // Group by date for display
+  const today=new Date().toISOString().split('T')[0];
+  // Show upcoming leaves only (today and future), sorted by date
+  const upcoming=leaves.filter(l=>l.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Leave banner — show for selected date or today
+  const selDate=document.getElementById('leave_date')?.value||today;
+  const dayLeaves=getLeavesForDay(selDate);
+  const remaining=2-dayLeaves.length;
+  const barColor=remaining===0?'#f87171':remaining===1?'#fbbf24':'#4ade80';
+
+  document.getElementById('poolCountBig').textContent=remaining;
+  document.getElementById('poolCountBig').style.color=barColor;
+  document.getElementById('poolMonthName').textContent=selDate||today;
+  if(dayLeaves.length>0){
+    const names=dayLeaves.map(l=>l.teacherName).join(', ');
+    document.getElementById('poolWhoUsed').textContent='⚠️ Booked by: '+names;
+  } else {
+    document.getElementById('poolWhoUsed').textContent='✅ No leaves booked for this date.';
+  }
+
+  document.getElementById('leaveUsedNum').textContent=upcoming.length;
+  document.getElementById('leaveBar').style.cssText=`width:${Math.min(upcoming.length*25,100)}%;background:${barColor}`;
+  document.getElementById('leaveMonthLabel').textContent=`Upcoming leaves — ${upcoming.length} total`;
+
+  const btn=document.getElementById('leaveBookBtn');
+  btn.disabled=false;btn.textContent='📝 Book Leave';
+
+  const list=document.getElementById('leaveList');
+  if(!upcoming.length){
+    list.innerHTML='<div class="empty-state"><div class="icon">🗓️</div>No upcoming leaves booked.</div>';return;
+  }
+  list.innerHTML=upcoming.map(l=>`
+    <div class="leave-card">
+      <div>
+        <div class="leave-date">📅 ${l.date} — <strong>${l.teacherName}</strong></div>
+        <div class="leave-reason">${l.reason}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="leave-status approved">✓ Booked</span>
+        ${l.teacherId===currentTeacher
+          ? `<button class="del-btn" title="Cancel your leave (password required)" onclick="window._deleteLeave('${l._fbKey}')">🗑</button>`
+          : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// FILE PREVIEW HELPER
+// ============================================================
+let uploadedFiles = { hw: [], note: [], app: null, pp: null };
+
+function previewFile(prefix) {
+  const input = document.getElementById(prefix + '_file');
+  const previewEl = document.getElementById(prefix + '_file_preview');
+
+  if (!input.files || !input.files.length) {
+    uploadedFiles[prefix] = (prefix === 'app' || prefix === 'pp') ? null : [];
+    previewEl.style.display = 'none';
+    return;
+  }
+
+  if (prefix === 'app' || prefix === 'pp') {
+    // single-file prefixes
+    const file = input.files[0];
+    const sizeStr = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+    const isImage = file.type.startsWith('image/');
+    const isPDF   = file.type === 'application/pdf';
+    const reader  = new FileReader();
+    reader.onload = e => {
+      uploadedFiles[prefix] = { name: file.name, size: sizeStr, type: file.type, dataUrl: e.target.result, isImage, isPDF, rawFile: file };
+      previewEl.style.display = 'block';
+      previewEl.innerHTML = `<div class="file-preview"><span>${isImage?'🖼️':isPDF?'📄':'📎'}</span><span class="fp-name">${file.name}</span><span class="fp-size">${sizeStr}</span><button class="fp-remove" onclick="window._clearFilePreview('${prefix}')">✕</button></div>`;
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  // hw and note — multiple files
+  uploadedFiles[prefix] = [];
+  previewEl.style.display = 'block';
+  previewEl.innerHTML = '';
+
+  Array.from(input.files).forEach(file => {
+    const sizeStr = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+    const isImage = file.type.startsWith('image/');
+    const isPDF   = file.type === 'application/pdf';
+
+    // Store raw File object for Storage upload later
+    uploadedFiles[prefix].push({ name: file.name, size: sizeStr, isImage, isPDF, rawFile: file });
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      const thumb = isImage
+        ? `<img src="${e.target.result}" style="max-width:100%;max-height:120px;margin-top:4px;border-radius:8px;border:1px solid var(--border);display:block">`
+        : `<div style="padding:6px 10px;background:rgba(212,175,55,0.05);border-radius:8px;font-size:0.75rem;color:var(--text2);margin-top:4px">📄 ${file.name} — ready</div>`;
+      previewEl.innerHTML += `<div class="file-preview" style="margin-bottom:6px"><span>${isImage?'🖼️':isPDF?'📄':'📎'}</span><span class="fp-name">${file.name}</span><span class="fp-size">${sizeStr}</span></div>${thumb}`;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function _base64ToArrayBuffer(dataUrl){
+  const base64=dataUrl.split(',')[1];
+  const binary=atob(base64);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function clearFilePreview(prefix) {
+  uploadedFiles[prefix] = (prefix === 'app' || prefix === 'pp') ? null : [];
+  document.getElementById(prefix + '_file').value = '';
+  document.getElementById(prefix + '_file_preview').style.display = 'none';
+  document.getElementById(prefix + '_file_preview').innerHTML = '';
+}
+
+// ============================================================
+// HOMEWORK — Firebase realtime, with due-date auto-expire
+// ============================================================
+function getMyHW(){
+  return _fbCache.hw.filter(h=>h.teacherId===currentTeacher);
+}
+
+async function addHomework() {
+  const sub  = getSubjectValue('hw_subject');
+  const cls  = document.getElementById('hw_class').value;
+  const desc = document.getElementById('hw_desc').value.trim();
+  const due  = document.getElementById('hw_due').value;
+  if (!desc || !due) { showAlert('hw_alert','error','⚠️ Please fill all fields.'); return; }
+
+  // Validate subject-class combination
+  const isALOnlySubject = sub.includes('(A/L ONLY)');
+  const isALClass = cls === 'A/L';
+  if (isALOnlySubject && !isALClass) {
+    showAlert('hw_alert','error','⚠️ A/L-only subjects can only be assigned to A/L classes.');
+    return;
+  }
+  if (!isALOnlySubject && isALClass) {
+    showAlert('hw_alert','error','⚠️ Regular subjects cannot be assigned to A/L classes. Use A/L-only subjects instead.');
+    return;
+  }
+
+  const btn = document.querySelector('#panel-homework .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Uploading...';
+
+  try {
+    // Upload files to Storage if any
+    let attachments = null;
+    if (uploadedFiles.hw.length > 0) {
+      showAlert('hw_alert','warn','⏳ Uploading files...');
+      attachments = await uploadFilesToStorage(uploadedFiles.hw, 'homework');
+    }
+
+    const teacherName = currentTeacherName;
+    // Also write singular `attachment` (first file) so LMS can read h.attachment.url
+    const attachmentSingle = attachments && attachments.length > 0 ? attachments[0] : null;
+    const entry = {
+      subject: sub, class: cls, desc, due, status: 'pending',
+      teacherName, teacherId: currentTeacher,
+      createdAt: new Date().toISOString(),
+      attachments: attachments,       // full array
+      attachment: attachmentSingle,   // first file — LMS reads h.attachment.url / .name
+    };
+
+    await fbPush(FB.hw, entry);
+    document.getElementById('hw_desc').value = '';
+    document.getElementById('hw_due').value  = '';
+    clearFilePreview('hw');
+    showAlert('hw_alert','success',`✅ Homework uploaded! (${attachments ? attachments.length + ' file(s)' : 'no files'})`);
+    showToast('✏️ Homework synced to LMS');
+  } catch(e) {
+    showAlert('hw_alert','error','❌ Failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '📤 Upload Homework';
+  }
+}
+
+// Auto-expire homework whose due date has passed — removes from Firebase
+async function autoExpireHW(hwList){
+  const today=new Date().toISOString().split('T')[0];
+  const expired=hwList.filter(h=>h.due && h.due < today);
+  for(const h of expired){
+    try{ await remove(ref(db,`${FB.hw}/${h._fbKey}`)); }catch(e){}
+  }
+}
+
+function renderHW(){
+  const hw=getMyHW();
+  const list=document.getElementById('hwList');
+  if(!hw.length){list.innerHTML='<div class="empty-state"><div class="icon">📝</div>No homework uploaded.</div>';return;}
+  const today=new Date().toISOString().split('T')[0];
+  list.innerHTML=hw.sort((a,b)=>b.due.localeCompare(a.due)).map(h=>`
+    <div class="list-item">
+      <div class="list-item-icon">${h.attachment?.isImage?'🖼️':'✏️'}</div>
+      <div class="list-item-info">
+        <div class="name">${h.subject} – ${h.class}</div>
+        <div class="meta">📅 Due: <strong style="color:${h.due<today?'#f87171':h.due===today?'#fbbf24':'inherit'}">${h.due}</strong>
+          ${h.due<today?' <span style="color:#f87171;font-size:0.7rem">⚠️ EXPIRED</span>':''}
+          · ${h.desc.substring(0,55)}${h.desc.length>55?'...':''}
+          ${h.attachment?`<br>📎 <em>${h.attachment.name}</em> (${h.attachment.size})`:''}
+        </div>
+      </div>
+      <button class="del-btn" onclick="window._deleteHW('${h._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteHW(fbKey){
+  try{
+    await fbDelete(FB.hw, fbKey);
+    showToast('🗑️ Homework deleted from LMS');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function getResults(){return get(getTeacherKey('results'));}
+
+// saves to Firebase realtime database
+
+function toggleResultType(){
+  const isScholarship = document.getElementById('res_type').value === 'Grade 5 Scholarship';
+  document.getElementById('res_subjects_group').style.display = isScholarship ? 'none' : '';
+  document.getElementById('res_scholarship_group').style.display = isScholarship ? '' : 'none';
+}
+
+async function addResult(){
+  const type=document.getElementById('res_type').value;
+  const name=document.getElementById('res_name').value.trim();
+  const index=document.getElementById('res_index').value.trim();
+  const isScholarship = type === 'Grade 5 Scholarship';
+
+  let entry;
+  if(isScholarship){
+    const markRaw=document.getElementById('res_mark').value.trim();
+    const targetRaw=document.getElementById('res_target').value.trim();
+    if(!name||!index||markRaw===''||targetRaw===''){showAlert('res_alert','error','⚠️ Please fill all fields.');return;}
+    const mark=Number(markRaw), target=Number(targetRaw);
+    if(isNaN(mark)||isNaN(target)){showAlert('res_alert','error','⚠️ Mark and target must be numbers.');return;}
+    const status = mark>=target ? 'Pass' : 'Weak';
+    entry={
+      type, name, index, mark, target, status,
+      teacherId: currentTeacher,
+      teacherName: currentTeacherName,
+      createdAt: Date.now()
+    };
+  } else {
+    const gradesRaw=document.getElementById('res_grades').value.trim();
+    if(!name||!index||!gradesRaw){showAlert('res_alert','error','⚠️ Please fill all fields.');return;}
+    const subjects=gradesRaw.split('\n').filter(l=>l.includes(':')).map(l=>{const[s,g]=l.split(':');return[s.trim(),g.trim()];});
+    entry={
+      type, name, index, subjects,
+      teacherId: currentTeacher,
+      teacherName: currentTeacherName,
+      createdAt: Date.now()
+    };
+  }
+
+  try{
+    await fbPush('amv/shared/results', entry);
+    document.getElementById('res_name').value='';
+    document.getElementById('res_index').value='';
+    document.getElementById('res_grades').value='';
+    if(document.getElementById('res_mark')) document.getElementById('res_mark').value='';
+    if(document.getElementById('res_target')) document.getElementById('res_target').value='';
+    showAlert('res_alert','success','✅ Result saved and synced to Index!');
+    showToast('📈 Result synced to Index in real-time');
+  }catch(e){
+    showAlert('res_alert','error','❌ Failed: '+e.message);
+  }
+}
+ 
+// reads from Firebase cache
+function renderResults2(){
+  const results = (_fbCache.results||[]);
+  const list=document.getElementById('resultsList');
+  if(!results.length){list.innerHTML='<div class="empty-state"><div class="icon">📊</div>No results uploaded.</div>';return;}
+  list.innerHTML=results.map(r=>`
+    <div class="result-row">
+      <div>
+        <div class="name">${r.name}</div>
+        <div class="index">${r.index} · ${r.type}</div>
+      </div>
+      <div class="grade-badge">${r.type==='Grade 5 Scholarship' ? `${r.mark}/${r.target} — ${r.status}` : `${r.subjects?.length||0} subjects`}</div>
+      <button class="del-btn" onclick="window._deleteResult('${r._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+async function deleteResult(fbKey){
+  try{
+    await fbDelete('amv/shared/results', fbKey);
+    showToast('🗑️ Result deleted from LMS');
+  }catch(e){showToast('❌ Delete failed');}
+}
+async function clearResults(){
+  if(!confirm('Clear ALL results from the LMS?')) return;
+  const keys=(_fbCache.results||[]).map(r=>r._fbKey);
+  for(const k of keys) await fbDelete('amv/shared/results', k);
+  showToast('🗑️ All results cleared');
+}
+
+// ============================================================
+// EXAM MARKS — numeric per-subject marks. The LMS turns these
+// into class rankings and (for Grade 10 & 11) letter grades,
+// entirely automatically — nothing to configure on the LMS side.
+//
+// Firebase shape:
+//   amv/shared/examMarks/{examKey}/{grade}/{class}/{subjectSlug}/{studentKey}
+//     = { name, index, mark, teacherId, teacherName, updatedAt }
+//   amv/shared/examMeta/{examKey} = { label, updatedAt }   (for the term dropdown)
+// ============================================================
+let _emMarksRef = null; // currently-attached listener, so we can detach on selection change
+
+// Turns free text into a safe Firebase key (no . # $ [ ] /)
+function slugify(str){
+  return String(str||'').trim().toLowerCase().replace(/[.#$\[\]\/]/g,'_').replace(/\s+/g,'_');
+}
+function sanitizeKey(str){
+  const s = String(str||'').trim().replace(/[.#$\[\]\/]/g,'_');
+  return s || ('idx_'+Date.now());
+}
+
+function populateExamTermSuggestions(){
+  const dl = document.getElementById('em_term_list');
+  if(!dl) return;
+  const meta = _fbCache.examMeta||[];
+  dl.innerHTML = meta.map(m=>`<option value="${(m.label||'').replace(/"/g,'&quot;')}">`).join('');
+}
+
+function currentExamSelection(){
+  return {
+    termLabel: document.getElementById('em_term').value.trim(),
+    grade:     document.getElementById('em_grade').value,
+    cls:       document.getElementById('em_class').value,
+    subject:   getSubjectValue('em_subject'),
+  };
+}
+function examSubjectPath(sel){
+  return `${FB.examMarks}/${slugify(sel.termLabel)}/${sel.grade}/${sel.cls}/${slugify(sel.subject)}`;
+}
+
+async function saveExamMarks(){
+  const sel = currentExamSelection();
+  const raw = document.getElementById('em_marks').value.trim();
+
+  if(!sel.termLabel){ showAlert('em_alert','error','⚠️ Please enter the exam term.'); return; }
+  if(!sel.subject){ showAlert('em_alert','error','⚠️ Please select a subject.'); return; }
+  if(!raw){ showAlert('em_alert','error','⚠️ Please enter at least one student mark.'); return; }
+
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const entries = {};
+  const errors = [];
+  lines.forEach((line,i)=>{
+    const parts = line.split(',').map(p=>p.trim());
+    if(parts.length<2){ errors.push(`Line ${i+1}: use "Name, Mark"`); return; }
+    const [name, markRaw] = parts;
+    const mark = Number(markRaw);
+    if(!name){ errors.push(`Line ${i+1}: missing name`); return; }
+    if(isNaN(mark)||mark<0||mark>100){ errors.push(`Line ${i+1}: mark must be a number 0-100`); return; }
+    entries[sanitizeKey(name)] = {
+      name, mark,
+      teacherId: currentTeacher,
+      teacherName: currentTeacherName,
+      updatedAt: Date.now()
+    };
+  });
+
+  if(errors.length){ showAlert('em_alert','error','⚠️ '+errors.slice(0,4).join(' | ')); return; }
+  if(!Object.keys(entries).length){ showAlert('em_alert','error','⚠️ No valid entries found.'); return; }
+
+  try{
+    await db.ref(examSubjectPath(sel)).update(entries);
+    await db.ref(`${FB.examMeta}/${slugify(sel.termLabel)}`).update({label: sel.termLabel, updatedAt: Date.now()});
+    // Share these student names with every teacher marking this class — so
+    // nobody has to retype (and potentially misspell) the same names twice.
+    const rosterUpdate = {};
+    Object.values(entries).forEach(e=>{ rosterUpdate[sanitizeKey(e.name)] = e.name; });
+    await db.ref(`${FB.examRoster}/${slugify(sel.termLabel)}/${sel.grade}/${sel.cls}`).update(rosterUpdate);
+    showAlert('em_alert','success',`✅ Saved ${Object.keys(entries).length} marks — synced to the LMS!`);
+    showToast('🎯 Exam marks synced to LMS');
+    document.getElementById('em_marks').value='';
+    loadExamMarksList();
+  }catch(e){
+    showAlert('em_alert','error','❌ Failed: '+e.message);
+  }
+}
+
+async function clearSubjectMarks(){
+  const sel = currentExamSelection();
+  if(!sel.termLabel||!sel.subject){ showAlert('em_alert','error','⚠️ Enter the exam term and pick a subject first.'); return; }
+  if(!confirm(`Clear ALL ${sel.subject} marks for Grade ${sel.grade}${sel.cls}, "${sel.termLabel}"?`)) return;
+  try{
+    await db.ref(examSubjectPath(sel)).remove();
+    showToast('🗑️ Subject marks cleared');
+    loadExamMarksList();
+  }catch(e){ showToast('❌ Clear failed'); }
+}
+
+function loadExamMarksList(){
+  const sel = currentExamSelection();
+  const list = document.getElementById('emList');
+  if(!list) return;
+  if(_emMarksRef){ _emMarksRef.off(); _emMarksRef=null; }
+  if(!sel.termLabel||!sel.subject){
+    list.innerHTML='<div class="empty-state"><div class="icon">🎯</div>Enter an exam term and pick a subject to view saved marks.</div>';
+    return;
+  }
+  _emMarksRef = db.ref(examSubjectPath(sel));
+  _emMarksRef.on('value', snap=>{
+    const rows = objToArr(snap.val());
+    if(!rows.length){ list.innerHTML='<div class="empty-state"><div class="icon">🎯</div>No marks saved yet for this selection.</div>'; return; }
+    rows.sort((a,b)=>b.mark-a.mark);
+    list.innerHTML = rows.map(r=>`
+      <div class="list-item">
+        <div class="list-item-icon">📝</div>
+        <div class="list-item-info">
+          <div class="name">${r.name} — ${r.mark}/100</div>
+        </div>
+        <button class="del-btn" onclick="window._deleteExamMark('${r._fbKey}')">🗑</button>
+      </div>
+    `).join('');
+  });
+}
+
+async function deleteExamMark(fbKey){
+  const sel = currentExamSelection();
+  try{
+    await db.ref(examSubjectPath(sel)+'/'+fbKey).remove();
+    showToast('🗑️ Mark entry deleted');
+  }catch(e){ showToast('❌ Delete failed'); }
+}
+
+// ============================================================
+// CLASS ROSTER — the first teacher to enter names for a Grade+Class
+// (in a given exam term) shares them with every other teacher marking
+// that same class, so names stay consistent across subjects instead of
+// being retyped (and misspelled) differently each time.
+//   amv/shared/examRoster/{examKey}/{grade}/{class}/{studentKey} = "Full Name"
+// ============================================================
+let _rosterRef = null;
+let _rosterNames = [];
+
+function classRosterPath(){
+  const termLabel = document.getElementById('em_term').value.trim();
+  const grade = document.getElementById('em_grade').value;
+  const cls   = document.getElementById('em_class').value;
+  if(!termLabel) return null;
+  return `${FB.examRoster}/${slugify(termLabel)}/${grade}/${cls}`;
+}
+
+function loadClassRoster(){
+  const list = document.getElementById('rosterList');
+  if(!list) return;
+  if(_rosterRef){ _rosterRef.off(); _rosterRef=null; }
+  const path = classRosterPath();
+  if(!path){
+    _rosterNames = [];
+    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div>Enter an exam term, grade &amp; class to see the shared roster.</div>';
+    return;
+  }
+  _rosterRef = db.ref(path);
+  _rosterRef.on('value', snap=>{
+    const val = snap.val() || {};
+    _rosterNames = Object.values(val).sort((a,b)=>String(a).localeCompare(String(b)));
+    if(!_rosterNames.length){
+      list.innerHTML = '<div class="empty-state"><div class="icon">📋</div>No students entered yet for this class — be the first to add names when you save marks below.</div>';
+      return;
+    }
+    list.innerHTML =
+      `<div style="font-size:0.8rem;color:var(--text2);margin-bottom:10px">${_rosterNames.length} student${_rosterNames.length===1?'':'s'} already entered — click "📋 Copy Names" above, paste into the marks box below, then just type each mark.</div>` +
+      `<div style="display:flex;flex-wrap:wrap;gap:8px">` +
+      _rosterNames.map(n=>`<span style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:0.82rem">${n}</span>`).join('') +
+      `</div>`;
+  });
+}
+
+// Copies "Name, " per line so a teacher can paste straight into the marks
+// textarea and only needs to type each mark — no retyping of names.
+async function copyClassRoster(){
+  if(!_rosterNames.length){ showToast('⚠️ No names to copy yet for this class'); return; }
+  const text = _rosterNames.map(n=>`${n}, `).join('\n');
+  try{
+    await copyTextToClipboard(text);
+    showToast('📋 Names copied — paste into the marks box & add marks');
+  }catch(e){
+    showToast('❌ Copy failed — select & copy the names manually');
+  }
+}
+
+function copyTextToClipboard(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for file:// / non-secure contexts where the Clipboard API is unavailable
+  return new Promise((resolve,reject)=>{
+    try{
+      const ta=document.createElement('textarea');
+      ta.value=text;
+      ta.style.position='fixed'; ta.style.left='-9999px'; ta.style.top='0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      const ok=document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('execCommand copy failed'));
+    }catch(e){ reject(e); }
+  });
+}
+
+// ============================================================
+// NOTES — Firebase realtime
+// ============================================================
+function getMyNotes(){
+  return _fbCache.notes.filter(n=>n.teacherId===currentTeacher);
+}
+
+async function addNote() {
+  const sub   = getSubjectValue('note_subject');
+  const grade = document.getElementById('note_grade').value;
+  const title = document.getElementById('note_title').value.trim();
+  const link  = document.getElementById('note_link').value.trim();
+  if (!title) { showAlert('note_alert','error','⚠️ Please enter a title.'); return; }
+  if (!grade) { showAlert('note_alert','error','⚠️ Please select a target grade.'); return; }
+
+  // Validate subject-grade combination
+  const isALOnlySubject = sub.includes('(A/L ONLY)');
+  const isALGrade = grade === 'A/L';
+  if (isALOnlySubject && !isALGrade) {
+    showAlert('note_alert','error','⚠️ A/L-only subjects can only be assigned to A/L grade.');
+    return;
+  }
+  if (!isALOnlySubject && isALGrade) {
+    showAlert('note_alert','error','⚠️ Regular subjects cannot be assigned to A/L grade. Use A/L-only subjects instead.');
+    return;
+  }
+
+  const btn = document.querySelector('#panel-notes .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Uploading...';
+
+  try {
+    let attachments = null;
+    if (uploadedFiles.note.length > 0) {
+      showAlert('note_alert','warn','⏳ Uploading files...');
+      attachments = await uploadFilesToStorage(uploadedFiles.note, 'notes');
+    }
+
+    const teacherName = currentTeacherName;
+    // Also write singular `attachment` (first file) so LMS can read n.attachment.url
+    const attachmentSingleNote = attachments && attachments.length > 0 ? attachments[0] : null;
+    const note = {
+      subject: sub, targetGrade: grade, title, link,
+      date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      teacher: teacherName, teacherId: currentTeacher,
+      attachments: attachments,           // full array
+      attachment: attachmentSingleNote,   // first file — LMS reads n.attachment.url / .name
+    };
+
+    await fbPush(FB.notes, note);
+    document.getElementById('note_title').value = '';
+    document.getElementById('note_link').value  = '';
+    clearFilePreview('note');
+    showAlert('note_alert','success',`✅ Note uploaded! (${attachments ? attachments.length + ' file(s)' : 'no files'})`);
+    showToast('📒 Notes synced to LMS');
+  } catch(e) {
+    showAlert('note_alert','error','❌ Failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '📤 Upload Note';
+  }
+}
+
+function renderNotes(){
+  const notes=getMyNotes();
+  const list=document.getElementById('notesList');
+  if(!notes.length){list.innerHTML='<div class="empty-state"><div class="icon">📒</div>No notes uploaded.</div>';return;}
+  list.innerHTML=notes.map(n=>`
+    <div class="list-item">
+      <div class="list-item-icon">📒</div>
+      <div class="list-item-info">
+        <div class="name">${n.title}</div>
+        <div class="meta">📚 ${n.subject} · 📅 ${n.date}
+          ${n.link?` · <a href="${n.link}" target="_blank" style="color:var(--gold);text-decoration:none">🔗 Link</a>`:''}
+          ${n.attachment?`<br>📎 <em>${n.attachment.name}</em>`:''}
+        </div>
+      </div>
+      <button class="del-btn" onclick="window._deleteNote('${n._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteNote(fbKey){
+  try{
+    await fbDelete(FB.notes, fbKey);
+    showToast('🗑️ Note deleted from LMS');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// VIDEOS — Firebase realtime
+// ============================================================
+function getMyVideos(){
+  return _fbCache.videos.filter(v=>v.teacherId===currentTeacher);
+}
+
+async function addVideo(){
+  const sub=getSubjectValue('vid_subject');
+  const grade = document.getElementById('vid_grade').value;
+  const title=document.getElementById('vid_title').value.trim();
+  const url=document.getElementById('vid_url').value.trim();
+  const dur=document.getElementById('vid_dur').value.trim();
+  if(!title||!url){showAlert('vid_alert','error','⚠️ Please enter title and URL.');return;}
+  if(!grade){showAlert('vid_alert','error','⚠️ Please select a target grade.');return;}
+
+  // Validate subject-grade combination
+  const isALOnlySubject = sub.includes('(A/L ONLY)');
+  const isALGrade = grade === 'A/L';
+  if (isALOnlySubject && !isALGrade) {
+    showAlert('vid_alert','error','⚠️ A/L-only subjects can only be assigned to A/L grade.');
+    return;
+  }
+  if (!isALOnlySubject && isALGrade) {
+    showAlert('vid_alert','error','⚠️ Regular subjects cannot be assigned to A/L grade. Use A/L-only subjects instead.');
+    return;
+  }
+
+  const vid={subject:sub,
+             targetGrade: grade,
+             title,url,duration:dur||'N/A',icon:'▶️',thumb:'#2a0020',teacherId:currentTeacher};
+  try{
+    await fbPush(FB.videos, vid);
+    document.getElementById('vid_title').value='';
+    document.getElementById('vid_url').value='';
+    document.getElementById('vid_dur').value='';
+    showAlert('vid_alert','success','✅ Video added to LMS in real-time!');
+    showToast('▶️ Video synced to LMS');
+  }catch(e){
+    showAlert('vid_alert','error','❌ Failed: '+e.message);
+  }
+}
+
+function renderVideos(){
+  const vids=getMyVideos();
+  const list=document.getElementById('videosList');
+  if(!vids.length){list.innerHTML='<div class="empty-state"><div class="icon">▶️</div>No videos added yet.</div>';return;}
+  list.innerHTML=vids.map(v=>`
+    <div class="list-item">
+      <div class="list-item-icon">▶️</div>
+      <div class="list-item-info">
+        <div class="name">${v.title}</div>
+        <div class="meta">📚 ${v.subject} · ⏱ ${v.duration} · <a href="${v.url}" target="_blank" style="color:var(--gold);text-decoration:none">🔗 View</a></div>
+      </div>
+      <button class="del-btn" onclick="window._deleteVideo('${v._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteVideo(fbKey){
+  try{
+    await fbDelete(FB.videos, fbKey);
+    showToast('🗑️ Video deleted from LMS');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// ANNOUNCEMENTS — Firebase realtime
+// ============================================================
+function getMyAnnouncements(){
+  return _fbCache.announces;
+}
+
+async function addAnnouncement(){
+  const title=document.getElementById('ann_title').value.trim();
+  const text=document.getElementById('ann_text').value.trim();
+  const urgent=document.getElementById('ann_urgent').value==='true';
+  const targetGrade=document.getElementById('ann_grade').value||'All';
+  if(!title||!text){showAlert('ann_alert','error','⚠️ Please fill all fields.');return;}
+  const ann={
+    title,text,urgent,targetGrade,
+    date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+    teacher:currentTeacherName,
+    teacherId:currentTeacher
+  };
+  try{
+    await fbPush(FB.announces, ann);
+    document.getElementById('ann_title').value='';
+    document.getElementById('ann_text').value='';
+    document.getElementById('ann_grade').value='All';
+    showAlert('ann_alert','success','✅ Announcement posted to LMS in real-time!');
+    showToast('📢 Announcement synced to LMS');
+  }catch(e){
+    showAlert('ann_alert','error','❌ Failed: '+e.message);
+  }
+}
+
+function renderAnnouncements(){
+  const anns=getMyAnnouncements();
+  const list=document.getElementById('noticeList');
+  if(!anns.length){list.innerHTML='<div class="empty-state"><div class="icon">📢</div>No notices posted.</div>';return;}
+  list.innerHTML=anns.map(a=>{
+    const isFromPrincipal = !a.teacherId;
+    const displayTitle = isFromPrincipal ? '📌 Principal' : (a.title||'Untitled');
+    const displayText  = a.text || '';
+    const displayDate  = a.date || (a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—');
+    const urgent       = !isFromPrincipal && a.urgent;
+    const gradeBadge   = a.targetGrade && a.targetGrade !== 'All'
+      ? `<span style="background:rgba(212,175,55,0.15);color:var(--gold);padding:2px 8px;border-radius:8px;font-size:0.68rem;margin-left:6px">🎓 ${a.targetGrade}</span>`
+      : `<span style="background:rgba(74,222,128,0.1);color:#4ade80;padding:2px 8px;border-radius:8px;font-size:0.68rem;margin-left:6px">📣 All Grades</span>`;
+    return `
+      <div class="list-item">
+        <div class="list-item-icon">${isFromPrincipal?'🏫':urgent?'🚨':'📢'}</div>
+        <div class="list-item-info">
+          <div class="name">${displayTitle}${urgent?' <span style="background:#7f1d1d;color:#fca5a5;padding:2px 8px;border-radius:8px;font-size:0.68rem">URGENT</span>':''}${isFromPrincipal?'':gradeBadge}</div>
+          <div class="meta">📅 ${displayDate} · ${displayText.substring(0,60)}${displayText.length>60?'...':''}</div>
+        </div>
+        ${isFromPrincipal ? '' : `<button class="del-btn" onclick="window._deleteAnn('${a._fbKey}')">🗑</button>`}
+      </div>
+    `;
+  }).join('');
+}
+
+async function deleteAnn(fbKey){
+  try{
+    await fbDelete(FB.announces, fbKey);
+    showToast('🗑️ Announcement deleted');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// APPLICATIONS (Firebase — real-time sync to student LMS)
+// ============================================================
+async function uploadApplication(){
+  const type=document.getElementById('app_type').value;
+  const title=document.getElementById('app_title').value.trim();
+  const notes=document.getElementById('app_notes').value.trim();
+  if(!title){showAlert('app_alert','error','⚠️ Please enter a title/subject.');return;}
+  if(!uploadedFiles.app){showAlert('app_alert','error','⚠️ Please attach a document.');return;}
+
+  const btn = document.querySelector('#panel-applications .btn-primary');
+  btn.disabled=true; btn.textContent='⏳ Uploading...';
+
+  try{
+    // Upload to Cloudinary
+    showAlert('app_alert','warn','⏳ Uploading file...');
+    const formData = new FormData();
+    formData.append("file", uploadedFiles.app.rawFile);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    formData.append("folder", "amv/applications");
+
+    // Use raw/upload for PDFs so Cloudinary serves them publicly without auth errors.
+    // image/upload rejects PDFs with HTTP 401 unless signed delivery is enabled.
+    const isPdf = uploadedFiles.app.rawFile.type === 'application/pdf';
+    const resourceType = isPdf ? 'raw' : 'auto';
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`, {
+      method: "POST", body: formData
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||"Upload failed"); }
+    const cData = await res.json();
+
+    // For raw uploads, secure_url already points to the publicly accessible file.
+    const fileUrl = cData.secure_url;
+
+    const app={
+      type, title, notes,
+      date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      teacherName: currentTeacherName,
+      fileName: uploadedFiles.app.name,
+      fileSize: uploadedFiles.app.size,
+      isImage: uploadedFiles.app.isImage,
+      fileUrl,   // ← Cloudinary URL (raw for PDF, auto for images)
+      status: 'pending',
+      createdAt: serverTimestamp()
+    };
+
+    const newRef = push(ref(db,'amv/shared/applications'));
+    await fbSet(newRef, app);
+    document.getElementById('app_title').value='';
+    document.getElementById('app_notes').value='';
+    clearFilePreview('app');
+    showAlert('app_alert','success','✅ Application uploaded — students can see it now!');
+    showToast('📄 Application synced to LMS');
+  }catch(e){
+    showAlert('app_alert','error','❌ Upload failed: '+e.message);
+  }finally{
+    btn.disabled=false; btn.textContent='📤 Submit Application';
+  }
+}
+
+function renderApps(apps){
+  const list=document.getElementById('appList');
+  if(!apps||!apps.length){list.innerHTML='<div class="empty-state"><div class="icon">📄</div>No applications uploaded yet.</div>';return;}
+  list.innerHTML=apps.map(a=>`
+    <div class="app-item">
+      <div class="app-icon">${a.isImage?'🖼️':'📄'}</div>
+      <div class="app-info">
+        <div class="name">${a.title}</div>
+        <div class="meta">📋 ${a.type} · 📅 ${a.date}${a.fileName?` · 📎 ${a.fileName}`:''}
+          ${a.fileUrl?`· <a href="${a.fileUrl}" target="_blank" style="color:var(--gold);text-decoration:none">🔗 View</a>`:''}
+          ${a.notes?`<br><em>${a.notes.substring(0,60)}${a.notes.length>60?'...':''}</em>`:''}
+        </div>
+      </div>
+      <span class="app-status">✅ Live</span>
+      <button class="del-btn" style="margin-left:8px" onclick="window._deleteApp('${a._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function deleteApp(fbKey){
+  remove(ref(db,'amv/shared/applications/'+fbKey))
+    .then(()=>showToast('🗑️ Application removed'))
+    .catch(e=>showToast('❌ Delete failed'));
+}
+
+// ============================================================
+// HOME WIDGETS
+// ============================================================
+function renderHomeWidgets(){
+  const today=new Date().toISOString().split('T')[0];
+  const dayLeaves=getLeavesForDay(today);
+  const used=dayLeaves.length;
+  const remaining=2-used;
+  const color=remaining===0?'#f87171':remaining===1?'#fbbf24':'#4ade80';
+  document.getElementById('homeLeaveStatus').innerHTML=`
+    <div style="text-align:center;padding:8px">
+      <div style="font-family:var(--font-head);font-size:2.2rem;color:${color}">${remaining}</div>
+      <div style="font-size:0.82rem;color:var(--text2);margin:4px 0">Leave slots remaining <strong>today</strong></div>
+      <div class="leave-progress"><div class="leave-bar" style="width:${(used/2)*100}%;background:${color}"></div></div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-top:4px">${used}/2 used today (${today})</div>
+      ${used>0?`<div style="font-size:0.73rem;color:var(--warn);margin-top:4px">By: ${dayLeaves.map(l=>l.teacherName).join(', ')}</div>`:''}
+    </div>
+  `;
+  const anns=_fbCache.announces.slice(0,3);
+  const homeNotices=document.getElementById('homeNotices');
+  if(!anns.length){
+    homeNotices.innerHTML='<div style="color:var(--text2);font-size:0.85rem;padding:8px">No notices yet. Post one in Notice Board.</div>';
+  } else {
+    homeNotices.innerHTML=anns.map(a=>{
+  const displayTitle = a.title || (a.text ? a.text.substring(0,40)+'...' : 'Principal Announcement');
+  const displayDate  = a.date  || (a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—');
+  return `
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:0.88rem;font-weight:600;color:var(--text)">${displayTitle}</div>
+      <div style="font-size:0.75rem;color:var(--text2)">${displayDate}</div>
+    </div>
+  `;
+}).join('');
+  }
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats(){
+  if(!currentTeacher)return;
+  document.getElementById('hwCount').textContent=getMyHW().length;
+  document.getElementById('notesCount').textContent=getMyNotes().length;
+  document.getElementById('videosCount').textContent=getMyVideos().length;
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('leaveCount').textContent=`${getLeavesForDay(today).length}/2`;
+}
+
+// ============================================================
+// RENDER ALL
+// ============================================================
+function renderAll(){
+  renderHW();renderResults2();renderNotes();renderVideos();
+  renderLeave();renderAnnouncements();renderHomeWidgets();
+  renderGallery();renderNews();renderPastPapers();renderClubs();
+  // renderApps is now driven by the Firebase real-time listener
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPanel(id,navEl){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl)navEl.classList.add('active');
+  const titles={
+    home:'📊 Dashboard',homework:'✏️ Homework Upload',
+    results:'📈 Academic Results',exammarks:'🎯 Exam Marks',notes:'📒 Upload Notes',
+    videos:'▶️ Add Videos',leave:'🗓️ Leave Management',
+    notice:'📢 Notice Board',applications:'📄 My Applications',
+    gallery:'🖼️ Gallery Upload',news:'📰 News Upload',
+    pastpapers:'📄 Past Papers Upload',clubs:'🎭 Clubs & Societies'
+  };
+  document.getElementById('topbarTitle').textContent=titles[id]||id;
+  if(id==='leave')renderLeave();
+  if(id==='exammarks'){loadExamMarksList();loadClassRoster();}
+  if(id==='home'){renderHomeWidgets();updateStats();}
+  if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');}
+
+// ============================================================
+// ALERTS
+// ============================================================
+function showAlert(id,type,msg){
+  const el=document.getElementById(id);
+  el.className=`alert alert-${type} show`;
+  el.textContent=msg;
+  setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+// ============================================================
+// GALLERY — Firebase realtime
+// ============================================================
+// ============================================================
+// GALLERY — bulk collection upload, Firebase realtime
+// ============================================================
+let _galFiles = []; // array of { name, dataUrl, rawFile }
+let _galMode = 'upload'; // 'upload' | 'drive'
+
+function setGalleryMode(mode){
+  _galMode = mode;
+  const upBtn = document.getElementById('gal_mode_upload_btn');
+  const drBtn = document.getElementById('gal_mode_drive_btn');
+  const upFields = document.getElementById('gal_upload_fields');
+  const drFields = document.getElementById('gal_drive_fields');
+  const submitBtn = document.getElementById('gal_submit_btn');
+  if(mode==='drive'){
+    upBtn.className='btn'; drBtn.className='btn btn-primary';
+    upFields.style.display='none'; drFields.style.display='block';
+    submitBtn.textContent='🔗 Add Drive Album';
+  } else {
+    upBtn.className='btn btn-primary'; drBtn.className='btn';
+    upFields.style.display='block'; drFields.style.display='none';
+    submitBtn.textContent='📤 Upload Collection';
+  }
+}
+
+// Extracts a Google Drive file/folder ID from any share-link format
+function extractDriveId(url){
+  if(!url) return null;
+  const m = url.match(/[-\w]{25,}/);
+  return m ? m[0] : null;
+}
+
+function previewGalleryFiles(){
+  const input = document.getElementById('gal_file');
+  const previewEl = document.getElementById('gal_file_preview');
+  _galFiles = [];
+  if(!input.files||!input.files.length){ previewEl.style.display='none'; return; }
+
+  previewEl.style.display='block';
+  previewEl.innerHTML=`<div style="font-size:0.8rem;color:var(--text2);margin-bottom:6px">📷 ${input.files.length} photo(s) selected — previewing below:</div>`;
+
+  const thumbsEl = document.createElement('div');
+  thumbsEl.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;margin-top:6px';
+  previewEl.appendChild(thumbsEl);
+
+  Array.from(input.files).forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      _galFiles.push({ name: file.name, dataUrl: e.target.result, rawFile: file });
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText='width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border)';
+      thumbsEl.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function clearGalleryFiles(){
+  _galFiles=[];
+  document.getElementById('gal_file').value='';
+  document.getElementById('gal_file_preview').style.display='none';
+  document.getElementById('gal_file_preview').innerHTML='';
+}
+
+async function addGalleryCollection(){
+  if(_galMode==='drive') return addGalleryDriveCollection();
+
+  const category   = document.getElementById('gal_category').value;
+  const collection = document.getElementById('gal_collection').value.trim();
+  const caption    = document.getElementById('gal_caption').value.trim();
+  const dateTaken  = document.getElementById('gal_date').value;
+
+  if(!collection){ showAlert('gal_alert','error','⚠️ Please enter a Collection Title.'); return; }
+  if(!_galFiles.length){ showAlert('gal_alert','error','⚠️ Please select at least one photo.'); return; }
+
+  const btn = document.querySelector('#panel-gallery .btn-primary');
+  btn.disabled=true; btn.textContent=`⏳ Uploading 0/${_galFiles.length}…`;
+
+  try{
+    const teacherName = currentTeacherName;
+    const uploaded = [];
+
+    for(let i=0;i<_galFiles.length;i++){
+      btn.textContent=`⏳ Uploading ${i+1}/${_galFiles.length}…`;
+      const f = _galFiles[i];
+      const formData = new FormData();
+      formData.append("file", f.rawFile);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      formData.append("folder", "amv/gallery");
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData
+      });
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||"Upload failed"); }
+      const data = await res.json();
+      uploaded.push({ name: f.name, url: data.secure_url });
+    }
+
+    // Save as ONE collection document
+    const entry = {
+      category,
+      collection,        // ← album/collection title, e.g. "Prize Giving 2024"
+      caption,
+      dateTaken,
+      teacherId: currentTeacher,
+      teacherName,
+      uploadedAt: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      photoCount: uploaded.length,
+      photos: uploaded   // ← array of { name, url }
+    };
+
+    await fbPush(FB.gallery, entry);
+
+    document.getElementById('gal_caption').value='';
+    document.getElementById('gal_collection').value='';
+    document.getElementById('gal_date').value='';
+    clearGalleryFiles();
+    showAlert('gal_alert','success',`✅ Collection "${collection}" uploaded with ${uploaded.length} photo(s) — live on student site!`);
+    showToast(`🖼️ "${collection}" synced to Index`);
+  }catch(e){
+    showAlert('gal_alert','error','❌ Failed: '+e.message);
+  }finally{
+    btn.disabled=false; btn.textContent='📤 Upload Collection';
+  }
+}
+
+async function addGalleryDriveCollection(){
+  const category   = document.getElementById('gal_category').value;
+  const collection = document.getElementById('gal_collection').value.trim();
+  const caption    = document.getElementById('gal_caption').value.trim();
+  const dateTaken  = document.getElementById('gal_date').value;
+  const driveLink  = document.getElementById('gal_drive_link').value.trim();
+
+  if(!collection){ showAlert('gal_alert','error','⚠️ Please enter a Collection Title.'); return; }
+  const folderId = extractDriveId(driveLink);
+  if(!driveLink || !folderId){ showAlert('gal_alert','error','⚠️ Please paste a valid Google Drive folder link.'); return; }
+
+  const btn = document.getElementById('gal_submit_btn');
+  btn.disabled=true; btn.textContent='⏳ Adding…';
+
+  try{
+    const teacherName = currentTeacherName;
+    const entry = {
+      isDriveFolder: true,
+      driveFolderId: folderId,
+      driveUrl: driveLink,
+      category,
+      collection,
+      caption,
+      dateTaken,
+      teacherId: currentTeacher,
+      teacherName,
+      uploadedAt: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+    };
+    await fbPush(FB.gallery, entry);
+
+    document.getElementById('gal_caption').value='';
+    document.getElementById('gal_collection').value='';
+    document.getElementById('gal_date').value='';
+    document.getElementById('gal_drive_link').value='';
+    showAlert('gal_alert','success',`✅ Drive album "${collection}" added — live on student site!`);
+    showToast(`🔗 "${collection}" synced to Index`);
+  }catch(e){
+    showAlert('gal_alert','error','❌ Failed: '+e.message);
+  }finally{
+    btn.disabled=false; btn.textContent='🔗 Add Drive Album';
+  }
+}
+
+function getMyGallery(){
+  return _fbCache.gallery.filter(g=>g.teacherId===currentTeacher);
+}
+
+function renderGallery(){
+  const collections = getMyGallery();
+  const list = document.getElementById('galleryList');
+  if(!list) return;
+  if(!collections.length){
+    list.innerHTML='<div class="empty-state"><div class="icon">🖼️</div>No collections uploaded yet.</div>';
+    return;
+  }
+  list.innerHTML = collections.slice().reverse().map(c=>`
+    <div class="list-item">
+      <div class="list-item-icon">${c.isDriveFolder ? '🔗' : '🗂️'}</div>
+      <div class="list-item-info">
+        <div class="name">${c.collection || c.caption || 'Untitled'}</div>
+        <div class="meta">📁 ${c.category} · ${c.isDriveFolder ? 'Google Drive Album' : `📷 ${c.photoCount||c.photos?.length||1} photo(s)`} · 📅 ${c.uploadedAt||''}</div>
+        ${c.isDriveFolder
+          ? `<div style="margin-top:6px"><a href="${c.driveUrl}" target="_blank" style="font-size:0.75rem;color:var(--gold)">🔗 Open in Google Drive ↗</a></div>`
+          : `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">
+              ${(c.photos||[]).slice(0,4).map(p=>`<img src="${p.url}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">`).join('')}
+              ${(c.photos?.length||0)>4?`<div style="width:48px;height:48px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--text2)">+${c.photos.length-4}</div>`:''}
+            </div>`}
+      </div>
+      <button class="del-btn" onclick="deleteGalleryPhoto('${c._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteGalleryPhoto(fbKey){
+  try{
+    await fbDelete(FB.gallery, fbKey);
+    showToast('🗑️ Collection deleted from gallery');
+  }catch(e){ showToast('❌ Delete failed'); }
+}
+// ============================================================
+// NEWS — Firebase realtime
+// ============================================================
+let _newsFile = null;
+
+function previewNewsFile(){
+  const input = document.getElementById('news_file');
+  const previewEl = document.getElementById('news_file_preview');
+  if(!input.files||!input.files[0]){_newsFile=null;previewEl.style.display='none';return;}
+  const file = input.files[0];
+  const sizeStr = file.size>1024*1024?(file.size/1024/1024).toFixed(1)+' MB':(file.size/1024).toFixed(0)+' KB';
+  const reader = new FileReader();
+  reader.onload = function(e){
+    _newsFile = {name:file.name,size:sizeStr,dataUrl:e.target.result,rawFile:file};
+    previewEl.style.display='block';
+    previewEl.innerHTML=`
+      <div class="file-preview">
+        <span>🖼️</span>
+        <span class="fp-name">${file.name}</span>
+        <span class="fp-size">${sizeStr}</span>
+        <button class="fp-remove" onclick="clearNewsFile()">✕</button>
+      </div>
+      <img src="${e.target.result}" style="max-width:100%;max-height:140px;margin-top:8px;border-radius:8px;border:1px solid var(--border);display:block" alt="preview">
+    `;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearNewsFile(){
+  _newsFile=null;
+  document.getElementById('news_file').value='';
+  document.getElementById('news_file_preview').style.display='none';
+}
+
+async function addNews(){
+  const category = document.getElementById('news_category').value;
+  const title    = document.getElementById('news_title').value.trim();
+  const content  = document.getElementById('news_content').value.trim();
+  const urgent   = document.getElementById('news_urgent').value==='true';
+  if(!title||!content){showAlert('news_alert','error','⚠️ Please fill in headline and content.');return;}
+
+  const btn = document.querySelector('#panel-news .btn-primary');
+  btn.disabled=true; btn.textContent='⏳ Publishing...';
+
+  try{
+    const teacherName = currentTeacherName;
+    let cover = null;
+
+    // Upload cover image to Cloudinary if one was selected
+    if(_newsFile && _newsFile.rawFile){
+      showAlert('news_alert','warn','⏳ Uploading cover image...');
+      const formData = new FormData();
+      formData.append("file", _newsFile.rawFile);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      formData.append("folder", "amv/news");
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST", body: formData
+      });
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||"Upload failed"); }
+      const cData = await res.json();
+      cover = { name: _newsFile.name, size: _newsFile.size, url: cData.secure_url };
+    }
+
+    const entry = {
+      category, title, content, urgent,
+      teacherId: currentTeacher, teacherName,
+      date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      createdAt: Date.now(),
+      cover: cover   // { name, size, url } or null
+    };
+
+    await fbPush(FB.news, entry);
+    document.getElementById('news_title').value='';
+    document.getElementById('news_content').value='';
+    document.getElementById('news_urgent').value='false';
+    clearNewsFile();
+    showAlert('news_alert','success','✅ News article published to LMS in real-time!');
+    showToast('📰 News synced to Index');
+  }catch(e){
+    showAlert('news_alert','error','❌ Failed: '+e.message);
+  }finally{
+    btn.disabled=false; btn.textContent='📰 Publish News';
+  }
+}
+
+function getMyNews(){
+  return _fbCache.news.filter(n=>n.teacherId===currentTeacher);
+}
+
+function renderNews(){
+  const articles = getMyNews();
+  const list = document.getElementById('newsList');
+  if(!list)return;
+  if(!articles.length){list.innerHTML='<div class="empty-state"><div class="icon">📰</div>No news published yet.</div>';return;}
+  list.innerHTML=articles.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(a=>`
+    <div class="news-item">
+      ${a.cover?`<img src="${a.cover.url||a.cover.dataUrl}" alt="cover" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px;border:1px solid var(--border)">`:''}
+      <div class="news-item-head">
+        <div class="news-badge ${a.urgent?'urgent':''}">${a.urgent?'🔴 BREAKING':a.category}</div>
+        <div class="news-item-title">${a.title}</div>
+        <button class="del-btn" onclick="deleteNews('${a._fbKey}')" title="Delete">🗑</button>
+      </div>
+      <div class="news-item-body">${a.content.substring(0,140)}${a.content.length>140?'…':''}</div>
+      <div class="news-item-meta">
+        <span>📅 ${a.date}</span>
+        <span>✍️ ${a.teacherName}</span>
+        ${!a.urgent?`<span style="color:var(--text2)">🏷️ ${a.category}</span>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteNews(fbKey){
+  try{
+    await fbDelete(FB.news, fbKey);
+    showToast('🗑️ News article deleted');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// CLUBS & SOCIETIES
+// ============================================================
+async function addClub(){
+  const icon = document.getElementById('club_icon').value.trim() || '🎯';
+  const name = document.getElementById('club_name').value.trim();
+  const desc = document.getElementById('club_desc').value.trim();
+  if(!name || !desc){ showAlert('club_alert','error','⚠️ Please fill in the club name and description.'); return; }
+
+  const btn = document.querySelector('#panel-clubs .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Adding...';
+  try{
+    await fbPush(FB.clubs, {
+      icon, name, desc,
+      teacherId: currentTeacher, teacherName: currentTeacherName,
+      createdAt: Date.now()
+    });
+    document.getElementById('club_icon').value = '';
+    document.getElementById('club_name').value = '';
+    document.getElementById('club_desc').value = '';
+    showAlert('club_alert','success','✅ Club added to the website!');
+    showToast('🎭 Club synced to Index');
+  }catch(e){
+    showAlert('club_alert','error','❌ Failed: '+e.message);
+  }finally{
+    btn.disabled = false; btn.textContent = '🎭 Add Club';
+  }
+}
+
+function renderClubs(){
+  const clubs = _fbCache.clubs || [];
+  const list = document.getElementById('clubsList');
+  if(!list) return;
+  if(!clubs.length){ list.innerHTML = '<div class="empty-state"><div class="icon">🎭</div>No clubs added yet.</div>'; return; }
+  list.innerHTML = clubs.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(c=>`
+    <div class="news-item">
+      <div class="news-item-head">
+        <div class="news-item-title">${c.icon||'🎯'} ${c.name}</div>
+        <button class="del-btn" onclick="deleteClub('${c._fbKey}')" title="Delete">🗑</button>
+      </div>
+      <div class="news-item-body">${c.desc}</div>
+      <div class="news-item-meta"><span>✍️ ${c.teacherName||'Staff'}</span></div>
+    </div>
+  `).join('');
+}
+
+async function deleteClub(fbKey){
+  if(!confirm('Remove this club from the website?')) return;
+  try{
+    await fbDelete(FB.clubs, fbKey);
+    showToast('🗑️ Club removed');
+  }catch(e){showToast('❌ Delete failed');}
+}
+
+// ============================================================
+// NOTIFICATION CENTER
+// ============================================================
+let _notifOpen = false;
+
+function toggleNotifPanel(){
+  _notifOpen = !_notifOpen;
+  const panel = document.getElementById('notifPanel');
+  panel.classList.toggle('open', _notifOpen);
+  if(_notifOpen){
+    // Mark leave requests as read
+    const reqs = getMyLeaveRequests();
+    reqs.forEach(r => { _fbCache._seenStatuses[r._fbKey] = r.status; });
+    localStorage.setItem('amv_seen_statuses_'+currentTeacher, JSON.stringify(_fbCache._seenStatuses));
+    // Mark principal announcements as read
+    const seenAnns = JSON.parse(localStorage.getItem('amv_seen_anns_'+currentTeacher)||'{}');
+    _fbCache.announces.forEach(a => { if(a._fbKey) seenAnns[a._fbKey] = true; });
+    localStorage.setItem('amv_seen_anns_'+currentTeacher, JSON.stringify(seenAnns));
+    updateNotifBadge(0);
+  }
+}
+
+// Close panel if clicking outside
+document.addEventListener('click', e=>{
+  if(_notifOpen && !e.target.closest('#notifPanel') && !e.target.closest('#notifBtn')){
+    _notifOpen=false;
+    document.getElementById('notifPanel').classList.remove('open');
+  }
+});
+
+function getMyLeaveRequests(){
+  if(!currentTeacher) return [];
+  return (_fbCache.leaveRequests||[]).filter(r=>r.teacherId===currentTeacher)
+    .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+}
+
+function updateNotifications(){
+  if(!currentTeacher) return;
+  try{
+    const stored = localStorage.getItem('amv_seen_statuses_'+currentTeacher);
+    if(stored) Object.assign(_fbCache._seenStatuses, JSON.parse(stored));
+  }catch(e){}
+
+  const reqs = getMyLeaveRequests();
+  let unread = 0;
+
+  reqs.forEach(r=>{
+    const prev = _fbCache._seenStatuses[r._fbKey];
+    if(!prev){
+      unread++;
+    } else if(prev !== r.status && r.status !== 'pending'){
+      unread++;
+      if(!_notifOpen){
+        const icon = r.status==='approved' ? '✅' : '❌';
+        showToast(`${icon} Leave ${r.status}: ${r.date}`);
+      }
+    }
+  });
+
+  // Count unread principal announcements (they have no teacherId)
+  let seenAnns = {};
+  try{ seenAnns = JSON.parse(localStorage.getItem('amv_seen_anns_'+currentTeacher)||'{}'); }catch(e){}
+  _fbCache.announces.forEach(a=>{
+    if(!a.teacherId && a._fbKey && !seenAnns[a._fbKey]){
+      unread++;
+      if(!_notifOpen) showToast('📢 New announcement from Principal');
+    }
+  });
+
+  updateNotifBadge(unread);
+  renderNotifPanel(reqs);
+}
+
+function updateNotifBadge(count){
+  const badge = document.getElementById('notifBadge');
+  if(!badge) return;
+  if(count > 0){
+    badge.style.display='flex';
+    badge.textContent = count > 9 ? '9+' : count;
+  } else {
+    badge.style.display='none';
+  }
+}
+
+function renderNotifPanel(reqs){
+  const body = document.getElementById('notifBody');
+  if(!body) return;
+
+  const seen = _fbCache._seenStatuses;
+  let seenAnns = {};
+  try{ seenAnns = JSON.parse(localStorage.getItem('amv_seen_anns_'+currentTeacher)||'{}'); }catch(e){}
+
+  // Principal announcement items
+  const principalAnns = _fbCache.announces.filter(a => !a.teacherId);
+  const annHTML = principalAnns.map(a => {
+    const isUnread = !seenAnns[a._fbKey];
+    const postedAt = a.createdAt ? new Date(a.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    return `
+      <div class="notif-item ${isUnread?'unread':''}">
+        <div class="notif-item-title">📢 Principal Announcement</div>
+        <div class="notif-item-meta">${a.text||''}</div>
+        ${postedAt?`<div class="notif-item-meta" style="margin-top:3px">📅 ${postedAt}</div>`:''}
+        <span class="notif-status-chip pending" style="background:rgba(212,175,55,0.15);color:var(--gold);border-color:rgba(212,175,55,0.3)">📌 From Principal</span>
+      </div>
+    `;
+  }).join('');
+
+  // Leave request items
+  const leaveHTML = reqs.map(r=>{
+    const isUnread = !seen[r._fbKey] || (seen[r._fbKey] !== r.status && r.status !== 'pending');
+    const statusIcon = r.status==='approved'?'✅':r.status==='dismissed'?'❌':'⏳';
+    const dateFormatted = r.date ? new Date(r.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const bookedAt = r.createdAt ? new Date(r.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    return `
+      <div class="notif-item ${isUnread?'unread':''} ${r.status}">
+        <div class="notif-item-title">${statusIcon} Leave Request — ${dateFormatted}</div>
+        <div class="notif-item-meta">${r.reason||'No reason provided'}</div>
+        ${bookedAt?`<div class="notif-item-meta" style="margin-top:3px">📅 Submitted: ${bookedAt}</div>`:''}
+        <span class="notif-status-chip ${r.status}">${r.status==='approved'?'✅ Approved':r.status==='dismissed'?'❌ Dismissed':'⏳ Pending Principal Approval'}</span>
+      </div>
+    `;
+  }).join('');
+
+  const combined = annHTML + leaveHTML;
+  body.innerHTML = combined || '<div class="notif-empty">📭 No notifications yet.</div>';
+}
+
+// ================================================================
+// WEB PUSH NOTIFICATIONS — AMV Teacher Portal
+// ================================================================
+
+const VAPID_KEY = 'BG6ndkAT4rFk15voGbi_fTWA3ugmysxMEvnT7a6gXBaOlhwrywOQIA8uUCTpBQiFMElJA65qDLTPTBH-ruHCLZM';
+let _messaging = null;
+let _fcmToken  = null;
+
+// ── INIT PUSH ─────────────────────────────────────────────────────
+async function initPush() {
+  try {
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      console.warn('[Push] Not supported in this browser/context.');
+      return;
+    }
+
+    // Register the service worker (must be in same folder as teacher.html)
+    const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+    console.log('[Push] Service worker registered:', reg.scope);
+
+    _messaging = firebase.messaging();
+
+    // Request permission if not already granted
+    let permission = Notification.permission;
+    if (permission === 'default') {
+      permission = await Notification.requestPermission();
+    }
+    if (permission !== 'granted') {
+      console.warn('[Push] Notification permission denied.');
+      updateBellIcon(false);
+      return;
+    }
+
+    // Get FCM token and save to Firebase so the principal can send to this device
+    _fcmToken = await _messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+    if (_fcmToken) {
+      await db.ref(`amv/fcmTokens/${currentTeacher}`).set({
+        token: _fcmToken,
+        updatedAt: Date.now(),
+        teacherName: currentTeacherName
+      });
+      updateBellIcon(true);
+      showToast('🔔 Push notifications enabled on this device!');
+    }
+
+    // Foreground messages (portal tab is open) — show as toast + refresh bell
+    _messaging.onMessage(function(payload) {
+      const { title, body } = payload.notification || {};
+      showToast(`🔔 ${title || 'AMV'}: ${body || 'New notification'}`);
+      updateNotifications(); // refresh bell badge & panel
+    });
+
+    // If FCM rotates the token, re-save it
+    _messaging.onTokenRefresh(async () => {
+      const newToken = await _messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      if (newToken && currentTeacher) {
+        await db.ref(`amv/fcmTokens/${currentTeacher}`).set({
+          token: newToken,
+          updatedAt: Date.now(),
+          teacherName: currentTeacherName
+        });
+        _fcmToken = newToken;
+      }
+    });
+
+  } catch (err) {
+    console.error('[Push] Init error:', err);
+  }
+}
+
+// ── BELL ICON — green dot = push ON, red dot = push OFF ───────────
+function updateBellIcon(enabled) {
+  const btn = document.getElementById('notifBtn');
+  if (!btn) return;
+  btn.title = enabled ? 'Notifications ON — click to view' : 'Click to enable push notifications';
+  let dot = document.getElementById('pushDot');
+  if (!dot) {
+    dot = document.createElement('span');
+    dot.id = 'pushDot';
+    dot.style.cssText = `
+      position:absolute;bottom:-3px;right:-3px;
+      width:9px;height:9px;border-radius:50%;
+      border:2px solid var(--bg);pointer-events:none;
+    `;
+    btn.appendChild(dot);
+  }
+  dot.style.background = enabled ? '#4ade80' : '#f87171';
+}
+
+// ── AUTO-START after session confirmed ────────────────────────────
+// Polls until currentTeacher is set (after checkSession runs), then inits push
+const _pushInitTimer = setInterval(() => {
+  if (currentTeacher) {
+    clearInterval(_pushInitTimer);
+    initPush();
+  }
+}, 300);
+
+// ── PATCH toggleNotifPanel to prompt push if blocked ─────────────
+const _origToggleNotifPanel = window.toggleNotifPanel;
+window.toggleNotifPanel = function() {
+  if (Notification.permission === 'denied') {
+    showToast('🔕 Push blocked — go to browser Settings → Site Settings → Notifications to allow');
+  } else if (Notification.permission === 'default') {
+    initPush(); // re-request permission on first bell click
+  }
+  if (_origToggleNotifPanel) _origToggleNotifPanel();
+};
+
+
+// ============================================================
+// PAST PAPERS — Firebase realtime
+// ============================================================
+function getMyPastPapers(){
+  return _fbCache.pastpapers.filter(p=>p.teacherId===currentTeacher);
+}
+
+async function addPastPaper(){
+  const subject = document.getElementById('pp_subject').value;
+  const grade   = document.getElementById('pp_grade').value;
+  const year    = document.getElementById('pp_year').value.trim();
+  const type    = document.getElementById('pp_type').value;
+  if(!year){ showAlert('pp_alert','error','⚠️ Please enter the exam year.'); return; }
+  if(!grade){ showAlert('pp_alert','error','⚠️ Please select a target grade.'); return; }
+  if(!uploadedFiles.pp){ showAlert('pp_alert','error','⚠️ Please attach a PDF or image.'); return; }
+
+  const btn = document.querySelector('#panel-pastpapers .btn-primary');
+  btn.disabled = true; btn.textContent = '⏳ Uploading...';
+
+  try {
+    showAlert('pp_alert','warn','⏳ Uploading file to cloud...');
+    const formData = new FormData();
+    formData.append('file', uploadedFiles.pp.rawFile);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('folder', 'amv/pastpapers');
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+      method: 'POST', body: formData
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||'Upload failed'); }
+    const cData = await res.json();
+
+    const entry = {
+      subject, targetGrade: grade, year, type,
+      fileName: uploadedFiles.pp.name,
+      fileSize: uploadedFiles.pp.size,
+      isImage:  uploadedFiles.pp.isImage,
+      fileUrl:  cData.secure_url,
+      teacherName: currentTeacherName,
+      teacherId:   currentTeacher,
+      date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+      createdAt: Date.now(),
+    };
+
+    await fbPush(FB.pastpapers, entry);
+    document.getElementById('pp_year').value = '';
+    clearFilePreview('pp');
+    showAlert('pp_alert','success','✅ Past paper uploaded — students can see it now!');
+    showToast('📄 Past paper synced to LMS');
+  } catch(e) {
+    showAlert('pp_alert','error','❌ Upload failed: '+e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '📤 Upload Past Paper';
+  }
+}
+
+function renderPastPapers(){
+  const papers = getMyPastPapers();
+  const list = document.getElementById('ppList');
+  if(!papers.length){ list.innerHTML='<div class="empty-state"><div class="icon">📄</div>No past papers uploaded yet.</div>'; return; }
+  list.innerHTML = papers.map(p=>`
+    <div class="list-item">
+      <div class="list-item-icon">${p.isImage?'🖼️':'📄'}</div>
+      <div class="list-item-info">
+        <div class="name">${p.subject} — ${p.year} (${p.type})</div>
+        <div class="meta">🎓 Grade ${p.targetGrade} · 📅 ${p.date} · 👤 ${p.teacherName}
+          ${p.fileUrl?` · <a href="${p.fileUrl}" target="_blank" style="color:var(--gold);text-decoration:none">🔗 View</a>`:''}
+        </div>
+      </div>
+      <button class="del-btn" onclick="window._deletePastPaper('${p._fbKey}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deletePastPaper(fbKey){
+  try{
+    await fbDelete(FB.pastpapers, fbKey);
+    showToast('🗑️ Past paper deleted from LMS');
+  }catch(e){ showToast('❌ Delete failed'); }
+}
+
+// ============================================================
+// OTHER SUBJECT HELPERS
+// ============================================================
+function toggleOtherSubject(selectId, inputId) {
+  const sel = document.getElementById(selectId);
+  const inp = document.getElementById(inputId);
+  if (!sel || !inp) return;
+  if (sel.value === 'Other') {
+    inp.style.display = 'block';
+    inp.focus();
+  } else {
+    inp.style.display = 'none';
+    inp.value = '';
+  }
+}
+
+function syncOtherSubject(inputEl, selectId) {
+  // Keep a custom data attribute so submit functions can read the typed name
+  const sel = document.getElementById(selectId);
+  if (sel) sel.dataset.customSubject = inputEl.value.trim();
+}
+
+// Patch: resolve the real subject value (typed name if "Other" is selected)
+function getSubjectValue(selectId) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return '';
+  if (sel.value === 'Other') {
+    const typed = (sel.dataset.customSubject || '').trim();
+    return typed || 'Other';
+  }
+  return sel.value;
+}
+
+// ============================================================
+// EXPOSE GLOBALS (module scope — must be on window)
+// ============================================================
+window.toggleOtherSubject=toggleOtherSubject;
+window.syncOtherSubject=syncOtherSubject;
+window.getSubjectValue=getSubjectValue;
+window.logout=logout;
+window.cycleTheme=cycleTheme;
+window.showPanel=showPanel;
+window.toggleSb=toggleSb;
+window.toggleNotifPanel=toggleNotifPanel;
+window.addHomework=addHomework;
+window.addResult=addResult;
+window.toggleResultType=toggleResultType;
+window.clearResults=clearResults;
+window.addNote=addNote;
+window.addVideo=addVideo;
+window.bookLeave=bookLeave;
+window.addAnnouncement=addAnnouncement;
+window.uploadApplication=uploadApplication;
+window.previewFile=previewFile;
+window._clearFilePreview=clearFilePreview;
+window._deleteHW=(k)=>deleteHW(k);
+window._deleteResult=(id)=>deleteResult(id);
+window._deleteNote=(k)=>deleteNote(k);
+window._deleteVideo=(k)=>deleteVideo(k);
+window._deleteLeave=(k)=>deleteLeave(k);
+window._deleteAnn=(k)=>deleteAnn(k);
+window._deleteApp=(id)=>deleteApp(id);
+window.addGalleryPhoto=addGalleryPhoto;
+window.previewGalleryFiles=previewGalleryFiles;
+window.clearGalleryFiles=clearGalleryFiles;
+window.addGalleryCollection=addGalleryCollection;
+window.addGalleryDriveCollection=addGalleryDriveCollection;
+window.setGalleryMode=setGalleryMode;
+window.deleteGalleryPhoto=(k)=>deleteGalleryPhoto(k);
+window.addNews=addNews;
+window.previewNewsFile=previewNewsFile;
+window.clearNewsFile=clearNewsFile;
+window.deleteNews=(k)=>deleteNews(k);
+window.addPastPaper=addPastPaper;
+window.runAutoCleanup=runAutoCleanup;
+window._deletePastPaper=(k)=>deletePastPaper(k);
+window.saveExamMarks=saveExamMarks;
+window.clearSubjectMarks=clearSubjectMarks;
+window.loadExamMarksList=loadExamMarksList;
+window._deleteExamMark=(k)=>deleteExamMark(k);
+window.loadClassRoster=loadClassRoster;
+window.copyClassRoster=copyClassRoster;
+</script>
+</body>
+</html>

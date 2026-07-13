@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(212, 175, 55, 0.25);
+      --glass-shadow: rgba(0, 0, 0, 0.4);
+      --accent: #d4af37;
+      --accent2: #f0d060;
+      --text: #f5e6c8;
+      --text-muted: rgba(245, 230, 200, 0.5);
+      --error: #ff8fa3;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      background: #1a0008;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.45;
+      animation: drift 12s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .orb1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, #800020, #3a0010);
+      top: -120px; left: -100px;
+      animation-delay: 0s;
+    }
+    .orb2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #b8860b, #5a3e00);
+      bottom: -80px; right: -80px;
+      animation-delay: -4s;
+    }
+    .orb3 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, #990030, #4a0018);
+      bottom: 10%; left: 20%;
+      animation-delay: -8s;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.08); }
+    }
+
+    /* Noise texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      padding: 52px 44px 48px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      box-shadow:
+        0 8px 40px var(--glass-shadow),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+      animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Inner glass shine */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Header */
+    .brand {
+      text-align: center;
+      margin-bottom: 38px;
+    }
+    .brand-icon {
+      width: 52px; height: 52px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
+      font-size: 24px;
+    }
+    .brand h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 28px;
+      color: var(--text);
+      letter-spacing: 0.5px;
+    }
+    .brand p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 5px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* Form */
+    .field {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    input::placeholder { color: rgba(255,255,255,0.22); }
+    input:focus {
+      border-color: rgba(212, 175, 55, 0.6);
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+    }
+
+    /* Error */
+    .error-msg {
+      font-size: 12px;
+      color: var(--error);
+      margin-top: 14px;
+      text-align: center;
+      min-height: 18px;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .error-msg.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.28), rgba(128,0,32,0.35));
+      border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, rgba(212,175,55,0.42), rgba(128,0,32,0.5));
+      box-shadow: 0 4px 24px rgba(212,175,55,0.2);
+      transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+
+    /* Footer hint */
+    .hint {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+    }
+    .hint span {
+      color: rgba(212,175,55,0.85);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand-icon">🏫</div>
+      <h1>Welcome Back</h1>
+      <p>School Portal</p>
+    </div>
+
+    <div class="field">
+      <label for="userId">User ID</label>
+      <input type="text" id="userId" placeholder="e.g. T001 or P001" autocomplete="off" />
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" />
+    </div>
+
+    <div class="error-msg" id="errorMsg">Incorrect ID or password. Please try again.</div>
+
+    <button class="btn" onclick="handleLogin()">Sign In</button>
+
+    <div class="hint">ID format: <span>P001</span> · <span>VP001</span> · <span>T001</span> · <span>T002…</span></div>
+    <div class="hint" id="forgetHint" style="margin-top:10px;display:none;">
+      Saved login detected. <span style="cursor:pointer;text-decoration:underline;color:rgba(212,175,55,0.85);" onclick="forgetDevice()">Sign in as someone else?</span>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeznPuFsqSdbrPFA1F3AMI-8paNd2syZ0",
+      authDomain: "amvofficial00.firebaseapp.com",
+      databaseURL: "https://amvofficial00-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "amvofficial00",
+      storageBucket: "amvofficial00.firebasestorage.app",
+      messagingSenderId: "575639657506",
+      appId: "1:575639657506:web:0fec6335fac07bcc3c7e7b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    // ── HARDCODED PRINCIPAL / VP ACCOUNTS (never stored in Firebase) ──
+    const principalAccounts = {
+      "P001":  { password: "principal123", role: "principal" },
+      "VP001": { password: "vp123",        role: "principal" },
+    };
+
+    const routes = {
+      principal: "principal-dashboard.html",
+      teacher:   "teacher.html",
+    };
+
+    // ── SHAKE ANIMATION ──
+    function shakeCard() {
+      const card = document.querySelector(".card");
+      card.animate([
+        { transform: "translateX(0)" },
+        { transform: "translateX(-8px)" },
+        { transform: "translateX(8px)" },
+        { transform: "translateX(-6px)" },
+        { transform: "translateX(6px)" },
+        { transform: "translateX(0)" },
+      ], { duration: 380, easing: "ease-in-out" });
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("errorMsg");
+      el.textContent = msg || "Incorrect ID or password. Please try again.";
+      el.classList.add("show");
+      shakeCard();
+    }
+
+    function hideError() {
+      document.getElementById("errorMsg").classList.remove("show");
+    }
+
+    // ── FORGET SAVED DEVICE ──
+    window.forgetDevice = function() {
+      localStorage.removeItem("amv_saved_user");
+      document.getElementById("forgetHint").style.display = "none";
+    };
+
+    // ── AUTO-LOGIN ──
+    (async function autoLogin() {
+      const saved = localStorage.getItem("amv_saved_user");
+      if (!saved) return;
+      document.getElementById("forgetHint").style.display = "block";
+      try {
+        const { id, password } = JSON.parse(saved);
+        const result = await attemptLogin(id, password, true);
+        if (!result) localStorage.removeItem("amv_saved_user");
+      } catch(e) {
+        localStorage.removeItem("amv_saved_user");
+      }
+    })();
+
+    // ── CORE LOGIN LOGIC ──
+    // Returns true if login succeeded, false otherwise
+    async function attemptLogin(id, password, silent = false) {
+      const upperID = id.toUpperCase();
+
+      // 1. Check principal accounts first (instant, no Firebase)
+      if (principalAccounts[upperID]) {
+        const acc = principalAccounts[upperID];
+        if (acc.password === password) {
+          localStorage.setItem("amv_saved_user", JSON.stringify({ id: upperID, password }));
+          sessionStorage.setItem("amv_principal_id", upperID);
+          window.location.href = routes.principal;
+          return true;
+        } else {
+          if (!silent) showError("Incorrect ID or password. Please try again.");
+          return false;
+        }
+      }
+
+      // 2. Check Firebase teachers
+      try {
+        const snap = await get(ref(db, `teachers/${upperID}`));
+        if (snap.exists()) {
+          const teacher = snap.val();
+          if (teacher.password === password) {
+            localStorage.setItem("amv_saved_user", JSON.stringify({ id: upperID, password }));
+            sessionStorage.setItem("amv_login_id", upperID);
+            window.location.href = routes.teacher;
+            return true;
+          } else {
+            if (!silent) showError("Incorrect ID or password. Please try again.");
+            return false;
+          }
+        } else {
+          if (!silent) showError("Account not found. Contact your principal.");
+          return false;
+        }
+      } catch(e) {
+        if (!silent) showError("Connection error. Please check your internet and try again.");
+        return false;
+      }
+    }
+
+    // ── MANUAL LOGIN BUTTON ──
+    window.handleLogin = async function() {
+      const id       = document.getElementById("userId").value.trim();
+      const password = document.getElementById("password").value;
+      hideError();
+
+      if (!id || !password) { showError("Please enter your ID and password."); return; }
+
+      const btn = document.querySelector(".btn");
+      btn.textContent = "Signing in…";
+      btn.disabled = true;
+
+      await attemptLogin(id, password, false);
+
+      btn.textContent = "Sign In";
+      btn.disabled = false;
+    };
+
+    // Allow Enter key
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") window.handleLogin();
+    });
+  </script>
+</body>
+</html>

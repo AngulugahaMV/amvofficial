@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WebTeam Admin Panel — Angulugaha Maha Vidyalaya</title>
+<link rel="icon" type="image/png" href="title_logo.png">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+/* ══════════ CSS VARIABLES (matches principal-dashboard theme) ══════════ */
+:root, [data-theme="default"] {
+  --bg-base:#1a0a0a; --bg-surface:#2a1010; --bg-card:#321515; --bg-sidebar:#200d0d;
+  --accent:#c8a832; --accent2:#e8c84a; --primary:#8b1a1a; --primary-h:#a52020;
+  --text-1:#f5e6c8; --text-2:#c9a87a; --text-3:#8a6a50; --border:#4a2020;
+  --shadow:0 4px 20px rgba(0,0,0,.5); --radius:12px; --sidebar-w:250px;
+}
+[data-theme="light"] {
+  --bg-base:#f9f4ee; --bg-surface:#fff8ef; --bg-card:#ffffff; --bg-sidebar:#f2e8da;
+  --accent:#b8921c; --accent2:#d4a820; --primary:#8b1a1a; --primary-h:#a52020;
+  --text-1:#2a1506; --text-2:#5a3820; --text-3:#9a7050; --border:#e0cbb0;
+  --shadow:0 4px 20px rgba(100,50,0,.1);
+}
+[data-theme="dark"] {
+  --bg-base:#0e0e0e; --bg-surface:#1a1a1a; --bg-card:#222222; --bg-sidebar:#111111;
+  --accent:#c8a832; --accent2:#e8c84a; --primary:#8b1a1a; --primary-h:#a52020;
+  --text-1:#e8e8e8; --text-2:#a0a0a0; --text-3:#606060; --border:#333333;
+  --shadow:0 4px 24px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:sans-serif;background:var(--bg-base);color:var(--text-1);transition:background .3s,color .3s}
+
+/* ══════════ LOGIN GATE ══════════ */
+#loginGate{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 30% 30%,rgba(139,26,26,.35),transparent 60%),linear-gradient(135deg,#1a0a0a,#2a1010,#150808);
+}
+.login-box{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:20px;
+  padding:44px;width:100%;max-width:400px;box-shadow:var(--shadow);
+  animation:slideUp .4s ease;
+}
+.login-crest{
+  width:64px;height:64px;border-radius:16px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+  margin:0 auto 18px;box-shadow:0 4px 20px rgba(139,26,26,.5);
+}
+.login-title{font-size:1.3rem;font-weight:bold;color:var(--accent);text-align:center;margin-bottom:4px}
+.login-sub{font-size:.8rem;color:var(--text-3);text-align:center;margin-bottom:26px;letter-spacing:.4px}
+.lg-group{margin-bottom:14px}
+.lg-group label{display:block;font-size:.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.lg-group input{
+  width:100%;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text-1);font-size:.9rem;outline:none;transition:border .2s;
+}
+.lg-group input:focus{border-color:var(--accent)}
+.lg-btn{
+  width:100%;padding:13px;border-radius:10px;border:none;background:var(--primary);
+  color:var(--accent2);font-weight:bold;font-size:.92rem;cursor:pointer;margin-top:6px;transition:background .2s;
+}
+.lg-btn:hover{background:var(--primary-h)}
+.lg-error{color:#f87171;font-size:.8rem;text-align:center;margin-top:12px;min-height:18px}
+.lg-note{margin-top:18px;padding:10px 12px;background:rgba(200,168,50,.08);border:1px solid rgba(200,168,50,.2);border-radius:8px;font-size:.72rem;color:var(--text-3);text-align:center;line-height:1.6}
+
+/* ══════════ LAYOUT ══════════ */
+#adminApp{display:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;
+  transition:transform .3s,background .3s;overflow-y:auto;
+}
+.sidebar-brand{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.brand-logo{width:42px;height:42px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;box-shadow:0 2px 8px rgba(139,26,26,.4)}
+.brand-name{font-size:15px;font-weight:bold;color:var(--accent);letter-spacing:.4px}
+.brand-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-3);padding:12px 20px 4px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 20px;cursor:pointer;color:var(--text-2);font-size:13.5px;border-left:3px solid transparent;transition:all .2s;user-select:none}
+.nav-item:hover{background:var(--bg-card);color:var(--text-1)}
+.nav-item.active{background:var(--bg-card);color:var(--accent);border-left-color:var(--accent)}
+.nav-icon{font-size:16px;width:18px;text-align:center}
+.sidebar-footer{padding:14px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3)}
+#conn-badge{font-size:11px}
+.conn-live{color:#4caf50}
+.conn-off{color:#f44336}
+
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg-surface);border-bottom:1px solid var(--border);padding:0 26px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;color:var(--text-1);font-size:22px;cursor:pointer}
+.page-title{font-size:17px;font-weight:bold}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.theme-switcher{display:flex;gap:6px}
+.theme-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-2);cursor:pointer;font-size:11px;transition:all .2s}
+.theme-btn:hover,.theme-btn.active{background:var(--accent);color:#1a0a0a;border-color:var(--accent);font-weight:bold}
+.admin-chip{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:6px 14px 6px 8px;font-size:13px}
+.avatar{width:26px;height:26px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.btn-logout{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(139,26,26,.25);border:1px solid rgba(139,26,26,.5);border-radius:8px;color:#f87171;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:var(--primary);color:#fff}
+
+.content{padding:26px;flex:1}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.section-title{font-size:21px;font-weight:bold;margin-bottom:5px}
+.section-sub{font-size:13px;color:var(--text-3);margin-bottom:22px}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.green::before{background:#4caf50}
+.stat-card.red::before{background:#f44336}
+.stat-card.gold::before{background:var(--accent)}
+.stat-card.blue::before{background:#4a9eda}
+.stat-label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px}
+.stat-value{font-size:32px;font-weight:bold;line-height:1.3}
+.stat-card.green .stat-value{color:#4caf50}
+.stat-card.red .stat-value{color:#f44336}
+.stat-card.gold .stat-value{color:var(--accent)}
+.stat-card.blue .stat-value{color:#4a9eda}
+.stat-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.15}
+
+.panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+.panel-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.panel-title{font-size:14.5px;font-weight:bold}
+.panel-body{padding:20px}
+.panel-body.tight{padding:0}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:var(--bg-surface);color:var(--text-3);font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:12px 14px;border-top:1px solid var(--border);color:var(--text-2);vertical-align:middle}
+tr:hover td{background:var(--bg-surface)}
+.empty-row{text-align:center;color:var(--text-3);font-style:italic;padding:30px!important}
+.name-cell{font-weight:600;color:var(--text-1)}
+.badge{padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:600}
+.badge-online{background:rgba(76,175,80,.2);color:#81c784}
+.action-cell{display:flex;gap:6px;flex-wrap:wrap}
+.btn-mini{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:11.5px;font-weight:600;transition:all .2s;white-space:nowrap}
+.btn-approve{background:rgba(76,175,80,.2);color:#81c784;border:1px solid #4caf5044}
+.btn-approve:hover{background:#4caf50;color:#fff}
+.btn-dismiss{background:rgba(244,67,54,.2);color:#e57373;border:1px solid #f4433644}
+.btn-dismiss:hover{background:#f44336;color:#fff}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.single{grid-template-columns:1fr}
+.f-group{margin-bottom:14px}
+.f-group label{display:block;font-size:11.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.f-group input,.f-group select,.f-group textarea{
+  width:100%;padding:10px 13px;background:var(--bg-surface);border:1px solid var(--border);
+  border-radius:8px;color:var(--text-1);font-size:13.5px;outline:none;transition:border .2s;font-family:inherit;
+}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--accent)}
+.f-group textarea{resize:vertical;min-height:80px}
+.f-hint{font-size:11px;color:var(--text-3);margin-top:5px}
+.btn-primary{padding:10px 22px;background:var(--primary);color:var(--accent2);border:none;border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer;transition:background .2s}
+.btn-primary:hover{background:var(--primary-h)}
+.btn-secondary{padding:10px 20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text-2);cursor:pointer;font-size:13.5px}
+.btn-secondary:hover{border-color:var(--accent);color:var(--text-1)}
+.btn-danger-outline{padding:9px 16px;background:transparent;border:1px solid #f4433666;border-radius:8px;color:#e57373;cursor:pointer;font-size:13px}
+.btn-danger-outline:hover{background:rgba(244,67,54,.15)}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+
+.avatar-preview{width:90px;height:90px;border-radius:50%;background:var(--bg-surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin-bottom:10px}
+.logo-preview{width:90px;height:90px;border-radius:16px;background:var(--bg-surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin-bottom:10px}
+
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.subtab-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-2);cursor:pointer;font-size:12.5px;font-weight:600;transition:all .2s}
+.subtab-btn.active,.subtab-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.subpanel{display:none}
+.subpanel.active{display:block}
+
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--accent);color:#1a0a0a;padding:11px 20px;border-radius:8px;font-size:13.5px;font-weight:bold;box-shadow:0 4px 16px rgba(0,0,0,.3);transform:translateY(60px);opacity:0;transition:all .3s;max-width:340px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+
+.mini-note{font-size:11.5px;color:var(--text-3);margin-top:4px}
+.pill-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:11.5px;color:var(--text-2)}
+
+@media (max-width:900px){.stat-grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
+@media (max-width:768px){
+  :root{--sidebar-w:0px}
+  .sidebar{transform:translateX(-260px);width:260px}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .overlay.open{display:block}
+  .content{padding:16px}
+  .theme-switcher .theme-btn span{display:none}
+}
+@media (max-width:480px){.stat-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN GATE ══════════ -->
+<div id="loginGate">
+  <div class="login-box">
+    <div class="login-crest">🛠️</div>
+    <div class="login-title">WebTeam Admin Panel</div>
+    <div class="login-sub">Angulugaha Maha Vidyalaya · Master Control</div>
+    <div class="lg-group">
+      <label>Username</label>
+      <input type="text" id="lg-user" placeholder="Enter webteam username" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <div class="lg-group">
+      <label>Password</label>
+      <input type="password" id="lg-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="lg-btn" onclick="doAdminLogin()">🔐 Enter Admin Panel</button>
+    <div class="lg-error" id="lg-error"></div>
+    
+  </div>
+</div>
+
+<!-- ══════════ ADMIN APP ══════════ -->
+<div id="adminApp">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">🛠️</div>
+      <div class="brand-name">WebTeam Admin</div>
+      <div class="brand-sub">Full Site Control Center</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" data-section="dashboard" onclick="navigate(this,'dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item" data-section="sessions" onclick="navigate(this,'sessions')"><span class="nav-icon">🟢</span> Active Sessions</div>
+
+      <div class="nav-label">People</div>
+      <div class="nav-item" data-section="teachers" onclick="navigate(this,'teachers')"><span class="nav-icon">👩‍🏫</span> Manage Teachers</div>
+      <div class="nav-item" data-section="leave" onclick="navigate(this,'leave')"><span class="nav-icon">📋</span> Leave Requests</div>
+
+      <div class="nav-label">Website Content</div>
+      <div class="nav-item" data-section="hero" onclick="navigate(this,'hero')"><span class="nav-icon">🏠</span> Hero & Logo</div>
+      <div class="nav-item" data-section="about" onclick="navigate(this,'about')"><span class="nav-icon">🏫</span> About Section</div>
+      <div class="nav-item" data-section="principal" onclick="navigate(this,'principal')"><span class="nav-icon">👤</span> Principal Profile</div>
+      <div class="nav-item" data-section="clubs" onclick="navigate(this,'clubs')"><span class="nav-icon">🎭</span> Clubs & Societies</div>
+      <div class="nav-item" data-section="contact" onclick="navigate(this,'contact')"><span class="nav-icon">📞</span> Contact & Footer</div>
+      <div class="nav-item" data-section="gallery" onclick="navigate(this,'gallery')"><span class="nav-icon">🖼️</span> Gallery</div>
+
+      <div class="nav-label">News & Results</div>
+      <div class="nav-item" data-section="news" onclick="navigate(this,'news')"><span class="nav-icon">📰</span> News</div>
+      <div class="nav-item" data-section="results" onclick="navigate(this,'results')"><span class="nav-icon">🏆</span> Exam Results</div>
+      <div class="nav-item" data-section="announcements" onclick="navigate(this,'announcements')"><span class="nav-icon">📢</span> Announcements</div>
+
+      <div class="nav-label">LMS Resources</div>
+      <div class="nav-item" data-section="lms" onclick="navigate(this,'lms')"><span class="nav-icon">📚</span> Papers / Notes / HW / Videos / Apps</div>
+
+      <div class="nav-label">System</div>
+      <div class="nav-item" data-section="settings" onclick="navigate(this,'settings')"><span class="nav-icon">⚙️</span> Settings</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div id="conn-badge" class="conn-live">● Connecting…</div>
+      <div style="margin-top:4px;font-size:10px">Firebase Realtime DB</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="theme-switcher">
+          <button class="theme-btn active" onclick="setTheme('default',this)">🎨 <span>School</span></button>
+          <button class="theme-btn" onclick="setTheme('light',this)">☀️ <span>Light</span></button>
+          <button class="theme-btn" onclick="setTheme('dark',this)">🌙 <span>Dark</span></button>
+        </div>
+        <div class="admin-chip"><div class="avatar">🛠️</div><span style="font-size:13px;color:var(--text-2)">WebTeam</span></div>
+        <button class="btn-logout" onclick="adminLogout()">🔒 Log Out</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <section class="section active" id="sec-dashboard">
+        <div class="section-title">Welcome back, WebTeam 👋</div>
+        <div class="section-sub">A complete real-time overview of everything on the AMV website, LMS, teacher portal and principal dashboard.</div>
+        <div class="stat-grid">
+          <div class="stat-card green"><div class="stat-label">Students Online</div><div class="stat-value" id="dash-students-online">—</div><div class="stat-icon">🟢</div></div>
+          <div class="stat-card blue"><div class="stat-label">Teachers Online</div><div class="stat-value" id="dash-teachers-online">—</div><div class="stat-icon">👩‍🏫</div></div>
+          <div class="stat-card gold"><div class="stat-label">Total Teachers</div><div class="stat-value" id="dash-teachers-total">—</div><div class="stat-icon">👥</div></div>
+          <div class="stat-card red"><div class="stat-label">Pending Leaves</div><div class="stat-value" id="dash-pending-leaves">—</div><div class="stat-icon">⏳</div></div>
+          <div class="stat-card gold"><div class="stat-label">News Articles</div><div class="stat-value" id="dash-news-count">—</div><div class="stat-icon">📰</div></div>
+          <div class="stat-card blue"><div class="stat-label">Results Uploaded</div><div class="stat-value" id="dash-results-count">—</div><div class="stat-icon">🏆</div></div>
+          <div class="stat-card green"><div class="stat-label">Gallery Collections</div><div class="stat-value" id="dash-gallery-count">—</div><div class="stat-icon">🖼️</div></div>
+          <div class="stat-card red"><div class="stat-label">Announcements</div><div class="stat-value" id="dash-ann-count">—</div><div class="stat-icon">📢</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Quick Links</span></div>
+          <div class="panel-body" style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="index.html" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-block">🌐 View Website</a>
+            <a href="lms.html" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-block">📚 View Student LMS</a>
+            <a href="teacher.html" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-block">👩‍🏫 View Teacher Portal</a>
+            <a href="principal-dashboard.html" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-block">👤 View Principal Dashboard</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ ACTIVE SESSIONS ═══ -->
+      <section class="section" id="sec-sessions">
+        <div class="section-title">Active Sessions</div>
+        <div class="section-sub">Live view of every student and teacher currently logged in. Force-logout ends their session immediately on their device.</div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🎓 Students Logged In (<span id="sessStudentsCount">0</span>)</span></div>
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Grade</th><th>Login Time</th><th>Last Seen</th><th>Action</th></tr></thead>
+              <tbody id="sessStudentsBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">👩‍🏫 Teachers Logged In (<span id="sessTeachersCount">0</span>)</span></div>
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Subject</th><th>Login Time</th><th>Last Seen</th><th>Action</th></tr></thead>
+              <tbody id="sessTeachersBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ TEACHERS ═══ -->
+      <section class="section" id="sec-teachers">
+        <div class="section-title">Manage Teachers</div>
+        <div class="section-sub">Add, edit or remove teacher login accounts. Changes take effect immediately across all devices.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add New Teacher</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Full Name</label><input id="nt-name" placeholder="e.g. Ms. Kumari Perera"></div>
+              <div class="f-group"><label>Login ID</label><input id="nt-id" placeholder="e.g. T003"></div>
+              <div class="f-group"><label>Subject</label><input id="nt-subject" placeholder="e.g. Mathematics"></div>
+              <div class="f-group"><label>Password</label><input id="nt-pass" placeholder="Min. 6 characters"></div>
+            </div>
+            <div class="lg-error" id="nt-error" style="text-align:left"></div>
+            <div class="form-actions"><button class="btn-primary" onclick="addTeacher()">➕ Add Teacher</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All Teachers</span></div>
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Login ID</th><th>Subject</th><th>Password</th><th>Action</th></tr></thead>
+              <tbody id="teachersBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ LEAVE REQUESTS ═══ -->
+      <section class="section" id="sec-leave">
+        <div class="section-title">Leave Requests</div>
+        <div class="section-sub">Same real-time data the Principal Dashboard uses — review and manage from here too.</div>
+        <div class="panel">
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>Teacher</th><th>Reason</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="leaveBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ HERO & LOGO ═══ -->
+      <section class="section" id="sec-hero">
+        <div class="section-title">Hero Section & School Logo</div>
+        <div class="section-sub">Controls the homepage banner text and the crest/logo shown site-wide.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Hero Text</span></div>
+          <div class="panel-body">
+            <div class="f-group"><label>Badge Text</label><input id="hero-badge-input" placeholder="⭐ Government School · Sri Lanka"></div>
+            <div class="f-group"><label>Title (first line becomes the gold highlight)</label><textarea id="hero-title-input" placeholder="Angulugaha&#10;Maha Vidyalaya"></textarea></div>
+            <div class="f-group"><label>Description</label><textarea id="hero-desc-input" placeholder="A proud legacy of educational excellence..."></textarea></div>
+            <div class="form-actions"><button class="btn-primary" onclick="saveHero()">💾 Save Hero Text</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">School Logo</span></div>
+          <div class="panel-body">
+            <div class="logo-preview" id="logo-preview">🏫</div>
+            <input type="file" accept="image/*" id="logo-file" onchange="previewLogo(this)">
+            <div class="f-hint">Max 1.2MB. Replaces the crest in the navbar, hero and footer.</div>
+            <div class="form-actions">
+              <button class="btn-danger-outline" onclick="removeLogo()">🗑 Remove Logo</button>
+              <button class="btn-primary" onclick="saveLogo()">💾 Save Logo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ ABOUT ═══ -->
+      <section class="section" id="sec-about">
+        <div class="section-title">About Section</div>
+        <div class="section-sub">Stats and achievements shown on the homepage About block.</div>
+        <div class="panel">
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Students</label><input id="about-students" placeholder="1,450"></div>
+              <div class="f-group"><label>Teachers</label><input id="about-teachers" placeholder="68"></div>
+              <div class="f-group"><label>Years of Service</label><input id="about-years" placeholder="72"></div>
+              <div class="f-group"><label>Pass Rate</label><input id="about-passrate" placeholder="98%"></div>
+            </div>
+            <div class="f-group"><label>Pass Rate Label</label><input id="about-passrate-label" placeholder="Pass Rate 2023"></div>
+            <div class="f-group"><label>Achievements (one per line)</label><textarea id="about-achievements" style="min-height:120px" placeholder="National Science Olympiad Champions 2023"></textarea></div>
+            <div class="form-actions">
+              <button class="btn-secondary" onclick="loadAboutData()">↺ Reload</button>
+              <button class="btn-primary" onclick="saveAboutData()">💾 Save to Website</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PRINCIPAL ═══ -->
+      <section class="section" id="sec-principal">
+        <div class="section-title">Principal Profile</div>
+        <div class="section-sub">Name, photo, quote and welcome message shown on the Principal's Message section.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Photo</span></div>
+          <div class="panel-body">
+            <div class="avatar-preview" id="pp-avatar-preview">👨‍💼</div>
+            <input type="file" accept="image/*" id="pp-photo-file" onchange="previewPPPhoto(this)">
+            <div class="f-hint">Max 1.2MB.</div>
+            <div class="form-actions">
+              <button class="btn-danger-outline" onclick="removePrincipalPhoto()">🗑 Remove Photo</button>
+              <button class="btn-primary" onclick="savePrincipalPhoto()">💾 Save Photo</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Profile Details</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Full Name</label><input id="pp-name" placeholder="Mr. K. D. Perera"></div>
+              <div class="f-group"><label>Qualifications (separate with ·)</label><input id="pp-quals" placeholder="M.Ed (Colombo) · B.Ed (Kelaniya) · 30+ Years"></div>
+            </div>
+            <div class="f-group"><label>Quote</label><input id="pp-quote" placeholder="Education is not the filling of a pail..."></div>
+            <div class="f-group"><label>Welcome Message (blank line = new paragraph)</label><textarea id="pp-message" style="min-height:160px"></textarea></div>
+            <div class="f-group"><label>Vision Badges (comma separated)</label><input id="pp-badges" placeholder="Excellence, Integrity, Leadership"></div>
+            <div class="form-actions">
+              <button class="btn-secondary" onclick="loadPrincipalData()">↺ Reload</button>
+              <button class="btn-primary" onclick="savePrincipalMessage()">💾 Save to Website</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ CLUBS ═══ -->
+      <section class="section" id="sec-clubs">
+        <div class="section-title">Clubs & Societies</div>
+        <div class="section-sub">Manage the clubs listed on the homepage.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add Club</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Icon (emoji)</label><input id="club-icon" placeholder="📸"></div>
+              <div class="f-group"><label>Name</label><input id="club-name" placeholder="Photography Club"></div>
+            </div>
+            <div class="f-group"><label>Description</label><textarea id="club-desc" placeholder="What this club does..."></textarea></div>
+            <div class="form-actions"><button class="btn-primary" onclick="addClub()">➕ Add Club</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All Clubs</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Icon</th><th>Name</th><th>Description</th><th>Action</th></tr></thead>
+              <tbody id="clubsBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ CONTACT & FOOTER ═══ -->
+      <section class="section" id="sec-contact">
+        <div class="section-title">Contact Info & Footer</div>
+        <div class="section-sub">Address, email, hours, social links, footer text, and the "Created By" team list.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Contact Info</span></div>
+          <div class="panel-body">
+            <div class="f-group"><label>Address</label><textarea id="contact-address-input" placeholder="G/Angulugaha Maha Vidyalaya, Angulugaha, Galle, Sri Lanka"></textarea></div>
+            <div class="f-group"><label>Email</label><input id="contact-email-input" placeholder="info@angulugahamv.lk"></div>
+            <div class="f-group"><label>School Hours</label><textarea id="contact-hours-input" placeholder="Monday – Friday: 7:30 AM – 1:30 PM"></textarea></div>
+            <div class="form-actions"><button class="btn-primary" onclick="saveContact()">💾 Save Contact Info</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Footer & Social Links</span></div>
+          <div class="panel-body">
+            <div class="f-group"><label>Footer Description</label><textarea id="footer-desc-input"></textarea></div>
+            <div class="form-grid">
+              <div class="f-group"><label>Facebook URL</label><input id="footer-facebook"></div>
+              <div class="f-group"><label>TikTok URL</label><input id="footer-tiktok"></div>
+              <div class="f-group"><label>YouTube URL</label><input id="footer-youtube"></div>
+              <div class="f-group"><label>WhatsApp URL</label><input id="footer-whatsapp"></div>
+            </div>
+            <div class="form-actions"><button class="btn-primary" onclick="saveFooter()">💾 Save Footer</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add "Created By" Member</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Name</label><input id="creator-name" placeholder="Full name"></div>
+              <div class="f-group"><label>Role</label><input id="creator-role" placeholder="Developer"></div>
+            </div>
+            <div class="f-group"><label>Photo URL (optional — paste an image link)</label><input id="creator-photo" placeholder="https://..."></div>
+            <div class="form-actions"><button class="btn-primary" onclick="addCreator()">➕ Add Member</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Created By Team</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+              <tbody id="creatorsBody"><tr><td colspan="3" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ GALLERY ═══ -->
+      <section class="section" id="sec-gallery">
+        <div class="section-title">Photo Gallery</div>
+        <div class="section-sub">Same gallery shown to teachers and on the homepage. Add photo collections directly.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add Collection</span></div>
+          <div class="panel-body">
+            <div style="display:flex;gap:8px;margin-bottom:14px">
+              <button type="button" id="gal-mode-upload-btn" class="btn-primary" style="flex:1" onclick="setGalleryModeAdmin('upload')">📤 Upload Photos</button>
+              <button type="button" id="gal-mode-drive-btn" style="flex:1;padding:10px 22px;background:transparent;color:var(--primary);border:1px solid var(--primary);border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer" onclick="setGalleryModeAdmin('drive')">🔗 Google Drive Link</button>
+            </div>
+            <div class="form-grid">
+              <div class="f-group"><label>Collection Name</label><input id="gal-name" placeholder="Sports Day 2026"></div>
+              <div class="f-group"><label>Category</label><input id="gal-category" placeholder="Events"></div>
+            </div>
+            <div id="gal-upload-fields">
+              <div class="f-group"><label>Photos</label><input type="file" accept="image/*" multiple id="gal-files"></div>
+              <div class="f-hint">Uploads to Cloudinary under amv/gallery.</div>
+            </div>
+            <div id="gal-drive-fields" style="display:none">
+              <div class="f-group"><label>Google Drive Folder Link</label><input id="gal-drive-link" placeholder="https://drive.google.com/drive/folders/…"></div>
+              <div class="f-hint">Set the folder to "Anyone with the link" (Viewer) in Drive first. Visitors browse it inline on the site — no need to open Drive.</div>
+            </div>
+            <div class="form-actions"><button class="btn-primary" id="gal-submit-btn" onclick="addGallery()">📤 Upload Collection</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All Collections</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Collection</th><th>Category</th><th>Photos</th><th>Action</th></tr></thead>
+              <tbody id="galleryBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ NEWS ═══ -->
+      <section class="section" id="sec-news">
+        <div class="section-title">News</div>
+        <div class="section-sub">Articles shown on the homepage News section.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add News Article</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Title</label><input id="news-title" placeholder="Science Fair 2026"></div>
+              <div class="f-group"><label>Category</label><input id="news-category" placeholder="Events"></div>
+            </div>
+            <div class="f-group"><label>Content</label><textarea id="news-content" style="min-height:100px"></textarea></div>
+            <div class="f-group"><label>Cover Image (optional)</label><input type="file" accept="image/*" id="news-cover"></div>
+            <div class="form-actions"><button class="btn-primary" onclick="addNews()">📤 Publish News</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All News</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="newsBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ RESULTS ═══ -->
+      <section class="section" id="sec-results">
+        <div class="section-title">Exam Results</div>
+        <div class="section-sub">O/L, A/L and Grade 5 Scholarship results shown on the homepage Results section.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Add Result</span></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="f-group"><label>Student Name</label><input id="res-name"></div>
+              <div class="f-group"><label>Index Number</label><input id="res-index"></div>
+            </div>
+            <div class="f-group"><label>Type</label>
+              <select id="res-type" onchange="toggleResultFields()">
+                <option value="O/L">O/L</option><option value="A/L">A/L</option><option value="Grade 5">Grade 5 Scholarship</option>
+              </select>
+            </div>
+            <div id="res-subjects-wrap" class="f-group"><label>Subjects & Grades (Subject: Grade — one per line)</label><textarea id="res-grades" placeholder="Mathematics: A&#10;Science: B"></textarea></div>
+            <div id="res-g5-wrap" class="form-grid" style="display:none">
+              <div class="f-group"><label>Mark</label><input id="res-mark" type="number"></div>
+              <div class="f-group"><label>Target Cutoff</label><input id="res-target" type="number"></div>
+              <div class="f-group"><label>Status</label><select id="res-status"><option>Pass</option><option>Weak</option></select></div>
+            </div>
+            <div class="form-actions"><button class="btn-primary" onclick="addResult()">➕ Add Result</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All Results</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Name</th><th>Index</th><th>Type</th><th>Action</th></tr></thead>
+              <tbody id="resultsBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ ANNOUNCEMENTS ═══ -->
+      <section class="section" id="sec-announcements">
+        <div class="section-title">Announcements</div>
+        <div class="section-sub">Posts instantly to the LMS Notices panel and the homepage News feed.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">➕ Post Announcement</span></div>
+          <div class="panel-body">
+            <div class="f-group"><label>Title</label><input id="ann-title-input" placeholder="School Notice"></div>
+            <div class="form-grid">
+              <div class="f-group"><label>Target Grade</label>
+                <select id="ann-grade">
+                  <option value="All">All Grades</option>
+                  <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                  <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>A/L</option>
+                </select>
+              </div>
+              <div class="f-group"><label>Urgent?</label><select id="ann-urgent"><option value="false">No</option><option value="true">Yes — mark as urgent</option></select></div>
+            </div>
+            <div class="f-group"><label>Message</label><textarea id="ann-text-input" style="min-height:100px"></textarea></div>
+            <div class="form-actions"><button class="btn-primary" onclick="postAdminAnnouncement()">📢 Post Announcement</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All Announcements</span></div>
+          <div class="panel-body tight table-wrap">
+            <table><thead><tr><th>Title</th><th>Grade</th><th>Date</th><th>Action</th></tr></thead>
+              <tbody id="annBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ LMS RESOURCES ═══ -->
+      <section class="section" id="sec-lms">
+        <div class="section-title">LMS Resources</div>
+        <div class="section-sub">Upload and manage everything students see in the LMS — Past Papers, Notes, Homework, Videos and Downloads/Applications.</div>
+
+        <div class="subtabs">
+          <button class="subtab-btn active" data-sub="papers" onclick="showSub(this,'papers')">📄 Past Papers</button>
+          <button class="subtab-btn" data-sub="notes" onclick="showSub(this,'notes')">📒 Notes</button>
+          <button class="subtab-btn" data-sub="hw" onclick="showSub(this,'hw')">✏️ Homework</button>
+          <button class="subtab-btn" data-sub="videos" onclick="showSub(this,'videos')">▶️ Videos</button>
+          <button class="subtab-btn" data-sub="apps" onclick="showSub(this,'apps')">📂 Downloads / Applications</button>
+        </div>
+
+        <!-- PAST PAPERS -->
+        <div class="subpanel active" id="sub-papers">
+          <div class="panel"><div class="panel-header"><span class="panel-title">➕ Add Past Paper</span></div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="f-group"><label>Subject</label><input id="pp2-subject" placeholder="Mathematics"></div>
+                <div class="f-group"><label>Target Grade</label>
+                  <select id="pp2-grade">
+                    <option value="All">📣 All Grades</option>
+                    <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="A/L">A/L</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="f-group"><label>Year</label><input id="pp2-year" placeholder="2026"></div>
+                <div class="f-group"><label>Type</label>
+                  <select id="pp2-type"><option>Term Test</option><option>O/L</option><option>A/L</option><option>Provincial</option><option>National</option></select>
+                </div>
+              </div>
+              <div class="f-group"><label>File (optional)</label><input type="file" id="pp2-file"></div>
+              <div class="f-group"><label>Or Link (Google Drive / PDF URL — optional)</label><input type="url" id="pp2-link" placeholder="https://drive.google.com/..."></div>
+              <div class="f-hint">Provide a file upload OR a link — at least one is required.</div>
+              <div class="form-actions"><button class="btn-primary" onclick="addResource('papers')">📤 Upload</button></div>
+            </div>
+          </div>
+          <div class="panel"><div class="panel-body tight table-wrap"><table><thead><tr><th>Subject</th><th>Grade</th><th>Year</th><th>Date</th><th>Action</th></tr></thead><tbody id="papersBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody></table></div></div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="subpanel" id="sub-notes">
+          <div class="panel"><div class="panel-header"><span class="panel-title">➕ Add Note</span></div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="f-group"><label>Subject</label><input id="note2-subject" placeholder="Mathematics"></div>
+                <div class="f-group"><label>Target Grade</label>
+                  <select id="note2-grade">
+                    <option value="All">📣 All Grades</option>
+                    <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="A/L">A/L</option>
+                  </select>
+                </div>
+              </div>
+              <div class="f-group"><label>Title</label><input id="note2-title" placeholder="Algebra Chapter 3 Notes"></div>
+              <div class="f-group"><label>File (optional)</label><input type="file" id="note2-file"></div>
+              <div class="f-group"><label>Or Link (Google Drive / PDF URL — optional)</label><input type="url" id="note2-link" placeholder="https://drive.google.com/..."></div>
+              <div class="f-hint">Provide a file upload OR a link — at least one is required.</div>
+              <div class="form-actions"><button class="btn-primary" onclick="addResource('notes')">📤 Upload</button></div>
+            </div>
+          </div>
+          <div class="panel"><div class="panel-body tight table-wrap"><table><thead><tr><th>Title</th><th>Subject</th><th>Grade</th><th>Date</th><th>Action</th></tr></thead><tbody id="notesBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody></table></div></div>
+        </div>
+
+        <!-- HOMEWORK -->
+        <div class="subpanel" id="sub-hw">
+          <div class="panel"><div class="panel-header"><span class="panel-title">➕ Add Homework</span></div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="f-group"><label>Subject</label><input id="hw2-subject"></div>
+                <div class="f-group"><label>Target Grade</label>
+                  <select id="hw2-grade">
+                    <option value="All">📣 All Grades</option>
+                    <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="A/L">A/L</option>
+                  </select>
+                </div>
+              </div>
+              <div class="f-group"><label>Description</label><textarea id="hw2-desc"></textarea></div>
+              <div class="f-group"><label>Due Date</label><input type="date" id="hw2-due"></div>
+              <div class="f-group"><label>File (optional)</label><input type="file" id="hw2-file"></div>
+              <div class="f-group"><label>Or Link (optional)</label><input type="url" id="hw2-link" placeholder="https://drive.google.com/..."></div>
+              <div class="form-actions"><button class="btn-primary" onclick="addResource('hw')">📤 Upload</button></div>
+            </div>
+          </div>
+          <div class="panel"><div class="panel-body tight table-wrap"><table><thead><tr><th>Subject</th><th>Grade</th><th>Due</th><th>Action</th></tr></thead><tbody id="hwBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table></div></div>
+        </div>
+
+        <!-- VIDEOS -->
+        <div class="subpanel" id="sub-videos">
+          <div class="panel"><div class="panel-header"><span class="panel-title">➕ Add Video Link</span></div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="f-group"><label>Subject</label><input id="vid2-subject"></div>
+                <div class="f-group"><label>Target Grade</label>
+                  <select id="vid2-grade">
+                    <option value="All">📣 All Grades</option>
+                    <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="A/L">A/L</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="f-group"><label>Title</label><input id="vid2-title"></div>
+                <div class="f-group"><label>Duration (optional)</label><input id="vid2-dur" placeholder="12:34"></div>
+              </div>
+              <div class="f-group"><label>Video Link (YouTube etc.)</label><input id="vid2-url" placeholder="https://youtube.com/..."></div>
+              <div class="form-actions"><button class="btn-primary" onclick="addResource('videos')">➕ Add Video</button></div>
+            </div>
+          </div>
+          <div class="panel"><div class="panel-body tight table-wrap"><table><thead><tr><th>Title</th><th>Subject</th><th>Grade</th><th>Date</th><th>Action</th></tr></thead><tbody id="videosBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody></table></div></div>
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div class="subpanel" id="sub-apps">
+          <div class="panel"><div class="panel-header"><span class="panel-title">➕ Add Download / Application Form</span></div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="f-group"><label>Title</label><input id="app2-title" placeholder="Leave Application Form"></div>
+                <div class="f-group"><label>Target Grade</label>
+                  <select id="app2-grade">
+                    <option value="All">📣 All Grades</option>
+                    <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="A/L">A/L</option>
+                  </select>
+                </div>
+              </div>
+              <div class="f-group"><label>Notes (optional)</label><input id="app2-notes" placeholder="Short description"></div>
+              <div class="f-group"><label>File (optional)</label><input type="file" id="app2-file"></div>
+              <div class="f-group"><label>Or Link (optional)</label><input type="url" id="app2-link" placeholder="https://drive.google.com/..."></div>
+              <div class="f-hint">Provide a file upload OR a link — at least one is required.</div>
+              <div class="form-actions"><button class="btn-primary" onclick="addResource('apps')">📤 Upload</button></div>
+            </div>
+          </div>
+          <div class="panel"><div class="panel-body tight table-wrap"><table><thead><tr><th>Title</th><th>Grade</th><th>Date</th><th>Action</th></tr></thead><tbody id="appsBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody></table></div></div>
+        </div>
+      </section>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <section class="section" id="sec-settings">
+        <div class="section-title">Settings</div>
+        <div class="section-sub">Panel preferences.</div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Connection</span></div>
+          <div class="panel-body">
+            <div class="db-badge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(76,175,80,.1);border:1px solid #4caf5044;color:#81c784;border-radius:8px;padding:8px 14px;font-size:12px">
+              🟢 Connected to amvofficial00 Firebase Realtime Database
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Credentials</span></div>
+          <div class="panel-body">
+            <p class="mini-note">To change the WebTeam login username/password, edit the <code>WEBTEAM_USER</code> and <code>WEBTEAM_PASS</code> constants near the top of this file's script, then re-upload it.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// FIREBASE SETUP
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDeznPuFsqSdbrPFA1F3AMI-8paNd2syZ0",
+  authDomain: "amvofficial00.firebaseapp.com",
+  databaseURL: "https://amvofficial00-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "amvofficial00",
+  storageBucket: "amvofficial00.firebasestorage.app",
+  messagingSenderId: "575639657506",
+  appId: "1:575639657506:web:0fec6335fac07bcc3c7e7b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const CLOUDINARY_CLOUD_NAME = "dxgou0z9a";
+const CLOUDINARY_UPLOAD_PRESET = "amvofficial";
+
+const FB = {
+  teachers: 'teachers',
+  hero: 'amv/hero',
+  about: 'amv/about',
+  clubs: 'amv/shared/clubs',
+  contact: 'amv/contact',
+  footer: 'amv/footer',
+  creators: 'amv/creators',
+  news: 'amv/shared/news',
+  results: 'amv/shared/results',
+  gallery: 'amv/shared/gallery',
+  pastpapers: 'amv/shared/pastpapers',
+  notes: 'amv/shared/notes',
+  hw: 'amv/shared/homework',
+  videos: 'amv/shared/videos',
+  applications: 'amv/shared/applications',
+  announcements: 'announcements',
+  leaveRequests: 'leaveRequests',
+};
+
+// ============================================================
+// AUTH — hardcoded WebTeam gate (change these before going live)
+// ============================================================
+const WEBTEAM_USER = "adminwebteamamv";
+const WEBTEAM_PASS = "amv@webteamadmin";
+
+function doAdminLogin(){
+  const u = document.getElementById('lg-user').value.trim();
+  const p = document.getElementById('lg-pass').value.trim();
+  const err = document.getElementById('lg-error');
+  if(!u || !p){ err.textContent = '⚠️ Enter both username and password.'; return; }
+  if(u !== WEBTEAM_USER || p !== WEBTEAM_PASS){ err.textContent = '❌ Invalid credentials.'; return; }
+  err.textContent = '';
+  localStorage.setItem('amv_webteam_session', JSON.stringify({loginTime: Date.now()}));
+  enterAdmin();
+}
+function adminLogout(){
+  if(!confirm('Log out of the WebTeam Admin Panel?')) return;
+  localStorage.removeItem('amv_webteam_session');
+  location.reload();
+}
+function checkAdminSession(){
+  const s = localStorage.getItem('amv_webteam_session');
+  if(s){
+    try{
+      const d = JSON.parse(s);
+      if(Date.now() - d.loginTime < 12*60*60*1000){ enterAdmin(); return; }
+    }catch(e){}
+    localStorage.removeItem('amv_webteam_session');
+  }
+}
+function enterAdmin(){
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  initAdmin();
+}
+checkAdminSession();
+
+// ============================================================
+// THEME
+// ============================================================
+function setTheme(name, btn){
+  document.documentElement.setAttribute('data-theme', name);
+  localStorage.setItem('amv_webteam_theme', name);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+(function(){
+  const saved = localStorage.getItem('amv_webteam_theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const titles = {
+  dashboard:'Dashboard', sessions:'Active Sessions', teachers:'Manage Teachers', leave:'Leave Requests',
+  hero:'Hero & Logo', about:'About Section', principal:'Principal Profile', clubs:'Clubs & Societies',
+  contact:'Contact & Footer', gallery:'Gallery', news:'News', results:'Exam Results',
+  announcements:'Announcements', lms:'LMS Resources', settings:'Settings'
+};
+function navigate(el, section){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sec-'+section).classList.add('active');
+  document.getElementById('page-title').textContent = titles[section] || section;
+  if(window.innerWidth <= 768) closeSidebar();
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+function showSub(btn, sub){
+  document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sub-'+sub).classList.add('active');
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function esc(s){ const d=document.createElement('div'); d.textContent = s==null?'':s; return d.innerHTML; }
+function objToArr(obj){ if(!obj) return []; return Object.entries(obj).map(([k,v])=>({...v,_fbKey:k})); }
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = new Date(typeof ts==='number' ? ts : ts);
+  if(isNaN(d)) return String(ts);
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDateTime(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  if(isNaN(d)) return '—';
+  return d.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform='translateY(0)'; t.style.opacity='1';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>{ t.style.transform='translateY(60px)'; t.style.opacity='0'; }, 2600);
+}
+async function deleteItem(path, key, label){
+  if(!confirm(`Delete this ${label||'item'}? This cannot be undone.`)) return;
+  try{ await db.ref(path+'/'+key).remove(); showToast('🗑 Deleted'); }
+  catch(e){ showToast('❌ Failed: '+e.message); }
+}
+async function fbPush(path, data){
+  const r = db.ref(path).push();
+  await r.set({...data, _fbKey: r.key});
+  return r.key;
+}
+async function uploadToCloudinary(file, folder){
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  formData.append('folder', 'amv/'+folder);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,{method:'POST',body:formData});
+  if(!res.ok){ const err = await res.json().catch(()=>({})); throw new Error(err.error?.message || 'Cloudinary upload failed'); }
+  const data = await res.json();
+  return { name:file.name, size:file.size, url:data.secure_url, isImage: file.type && file.type.startsWith('image/') };
+}
+
+// ============================================================
+// INIT — attach all real-time listeners once logged in
+// ============================================================
+let _dashCounts = { newsCount:0, resultsCount:0, galleryCount:0, annCount:0, teacherCount:0, studentsOnline:0, teachersOnline:0, pendingLeaves:0 };
+function updateDashboard(){
+  document.getElementById('dash-students-online').textContent = _dashCounts.studentsOnline;
+  document.getElementById('dash-teachers-online').textContent = _dashCounts.teachersOnline;
+  document.getElementById('dash-teachers-total').textContent  = _dashCounts.teacherCount;
+  document.getElementById('dash-pending-leaves').textContent  = _dashCounts.pendingLeaves;
+  document.getElementById('dash-news-count').textContent      = _dashCounts.newsCount;
+  document.getElementById('dash-results-count').textContent   = _dashCounts.resultsCount;
+  document.getElementById('dash-gallery-count').textContent   = _dashCounts.galleryCount;
+  document.getElementById('dash-ann-count').textContent       = _dashCounts.annCount;
+}
+
+function initAdmin(){
+  db.ref('.info/connected').on('value', snap=>{
+    const badge = document.getElementById('conn-badge');
+    if(snap.val()===true){ badge.textContent='● Live'; badge.className='conn-live'; }
+    else{ badge.textContent='● Offline'; badge.className='conn-off'; }
+  });
+
+  listenSessions();
+  listenTeachers();
+  listenLeave();
+  loadHero();
+  loadAboutData();
+  loadPrincipalData();
+  listenClubs();
+  loadContact();
+  loadFooter();
+  listenCreators();
+  listenGallery();
+  listenNews();
+  listenResults();
+  listenAnnouncements();
+  listenResources('papers', FB.pastpapers, 'papersBody', renderPaperRow);
+  listenResources('notes', FB.notes, 'notesBody', renderNoteRow);
+  listenResources('hw', FB.hw, 'hwBody', renderHwRow);
+  listenResources('videos', FB.videos, 'videosBody', renderVideoRow);
+  listenResources('apps', FB.applications, 'appsBody', renderAppRow);
+}
+
+// ============================================================
+// SESSIONS
+// ============================================================
+function listenSessions(){
+  db.ref('presence/students').on('value', snap=>{
+    const obj = snap.val() || {};
+    const entries = Object.entries(obj);
+    _dashCounts.studentsOnline = entries.length;
+    document.getElementById('sessStudentsCount').textContent = entries.length;
+    const body = document.getElementById('sessStudentsBody');
+    body.innerHTML = entries.length ? entries.map(([sid,v])=>`
+      <tr>
+        <td class="name-cell">${esc(v.name)} <span class="badge badge-online">online</span></td>
+        <td>Grade ${esc(v.grade)}</td>
+        <td>${fmtDateTime(v.loginTime)}</td>
+        <td>${fmtDateTime(v.lastSeen)}</td>
+        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/students','${sid}')">🚫 Force Logout</button></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty-row">No students currently logged in.</td></tr>';
+    updateDashboard();
+  });
+  db.ref('presence/teachers').on('value', snap=>{
+    const obj = snap.val() || {};
+    const entries = Object.entries(obj);
+    _dashCounts.teachersOnline = entries.length;
+    document.getElementById('sessTeachersCount').textContent = entries.length;
+    const body = document.getElementById('sessTeachersBody');
+    body.innerHTML = entries.length ? entries.map(([id,v])=>`
+      <tr>
+        <td class="name-cell">${esc(v.name||id)} <span class="badge badge-online">online</span></td>
+        <td>${esc(v.subject||'—')}</td>
+        <td>${fmtDateTime(v.loginTime)}</td>
+        <td>${fmtDateTime(v.lastSeen)}</td>
+        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/teachers','${id}')">🚫 Force Logout</button></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty-row">No teachers currently logged in.</td></tr>';
+    updateDashboard();
+  });
+}
+function kickSession(path, key){
+  if(!confirm('Force log out this session immediately?')) return;
+  db.ref(path+'/'+key+'/kick').set(true);
+  showToast('🚫 Logout signal sent');
+}
+
+// ============================================================
+// TEACHERS
+// ============================================================
+function listenTeachers(){
+  db.ref(FB.teachers).on('value', snap=>{
+    const data = snap.val() || {};
+    const entries = Object.entries(data);
+    _dashCounts.teacherCount = entries.length;
+    updateDashboard();
+    const body = document.getElementById('teachersBody');
+    if(!entries.length){ body.innerHTML = '<tr><td colspan="5" class="empty-row">No teachers added yet.</td></tr>'; return; }
+    body.innerHTML = entries.sort((a,b)=>(a[1].name||'').localeCompare(b[1].name||'')).map(([id,t])=>`
+      <tr>
+        <td class="name-cell">${esc(t.name||'—')}</td>
+        <td><code style="background:var(--bg-surface);padding:3px 8px;border-radius:6px;color:var(--accent)">${esc(id)}</code></td>
+        <td>${esc(t.subject||'—')}</td>
+        <td style="font-family:monospace;letter-spacing:1px;color:var(--text-3)">••••••••</td>
+        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="removeTeacher('${id}','${esc(t.name||id)}')">🗑 Remove</button></td>
+      </tr>`).join('');
+  });
+}
+async function addTeacher(){
+  const nameEl=document.getElementById('nt-name'), idEl=document.getElementById('nt-id'), subEl=document.getElementById('nt-subject'), pwEl=document.getElementById('nt-pass'), errEl=document.getElementById('nt-error');
+  const name=nameEl.value.trim(), id=idEl.value.trim().toUpperCase(), subject=subEl.value.trim(), pw=pwEl.value.trim();
+  errEl.textContent='';
+  if(!name||!id||!pw){ errEl.textContent='⚠️ Name, ID and password are required.'; return; }
+  if(!/^T\d+$/.test(id)){ errEl.textContent='⚠️ ID must start with T followed by numbers (e.g. T003).'; return; }
+  if(pw.length<6){ errEl.textContent='⚠️ Password must be at least 6 characters.'; return; }
+  const snap = await db.ref(FB.teachers+'/'+id).once('value');
+  if(snap.exists()){ errEl.textContent=`⚠️ ID "${id}" already exists.`; return; }
+  await db.ref(FB.teachers+'/'+id).set({ name, subject, password: pw, createdAt: Date.now() });
+  nameEl.value=''; idEl.value=''; subEl.value=''; pwEl.value='';
+  showToast(`✅ ${name} added successfully!`);
+}
+function removeTeacher(id, name){
+  if(!confirm(`Remove "${name}" (${id})? They will no longer be able to log in.`)) return;
+  db.ref(FB.teachers+'/'+id).remove().then(()=>showToast(`🗑 ${name} removed.`));
+}
+
+// ============================================================
+// LEAVE REQUESTS
+// ============================================================
+function listenLeave(){
+  db.ref(FB.leaveRequests).on('value', snap=>{
+    const data = snap.val() || {};
+    const entries = Object.entries(data);
+    _dashCounts.pendingLeaves = entries.filter(([,v])=>v.status==='pending').length;
+    updateDashboard();
+    const body = document.getElementById('leaveBody');
+    if(!entries.length){ body.innerHTML = '<tr><td colspan="5" class="empty-row">No leave requests yet.</td></tr>'; return; }
+    body.innerHTML = entries.sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0)).map(([id,req])=>{
+      const cls = req.status==='approved'?'badge-approved':req.status==='dismissed'?'badge-dismissed':'badge-pending';
+      return `<tr>
+        <td class="name-cell">${esc(req.teacherName||'—')}</td>
+        <td>${esc(req.reason||'—')}</td>
+        <td>${fmtDate(req.date)}</td>
+        <td><span class="badge ${cls}">${esc(req.status||'pending')}</span></td>
+        <td class="action-cell">${req.status==='pending' ? `
+          <button class="btn-mini btn-approve" onclick="db.ref('${FB.leaveRequests}/${id}').update({status:'approved'});showToast('✅ Approved')">✅ Approve</button>
+          <button class="btn-mini btn-dismiss" onclick="db.ref('${FB.leaveRequests}/${id}').update({status:'dismissed'});showToast('❌ Dismissed')">❌ Dismiss</button>` : '<span style="color:var(--text-3)">—</span>'}</td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+// ============================================================
+// HERO & LOGO
+// ============================================================
+function loadHero(){
+  db.ref(FB.hero).once('value').then(snap=>{
+    const h = snap.val() || {};
+    document.getElementById('hero-badge-input').value = h.badge || '⭐ Government School · Sri Lanka';
+    document.getElementById('hero-title-input').value = h.title || 'Angulugaha\nMaha Vidyalaya';
+    document.getElementById('hero-desc-input').value  = h.desc  || 'A proud legacy of educational excellence since 1977, dedicated to fostering knowledge, integrity, and leadership for future generations.';
+  });
+}
+function saveHero(){
+  const badge = document.getElementById('hero-badge-input').value.trim();
+  const title = document.getElementById('hero-title-input').value.trim();
+  const desc  = document.getElementById('hero-desc-input').value.trim();
+  db.ref(FB.hero).set({badge, title, desc, updatedAt: Date.now()}).then(()=>showToast('✅ Hero text saved to website!'));
+}
+let _logoData = null;
+function previewLogo(input){
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 1.2*1024*1024){ alert('⚠️ Image too large. Please choose a file under 1MB.'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = e => { _logoData = e.target.result; document.getElementById('logo-preview').innerHTML = `<img src="${_logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`; };
+  reader.readAsDataURL(file);
+}
+function saveLogo(){
+  if(!_logoData){ showToast('⚠️ No logo image selected'); return; }
+  db.ref('amv/branding/logo').set(_logoData).then(()=>showToast('✅ Logo saved to website!'));
+}
+function removeLogo(){
+  if(!confirm('Remove the custom logo and revert to the default school crest?')) return;
+  db.ref('amv/branding/logo').remove().then(()=>{ _logoData=null; document.getElementById('logo-preview').innerHTML='🏫'; showToast('🗑 Logo removed'); });
+}
+db.ref && null;
+
+// ============================================================
+// ABOUT
+// ============================================================
+function loadAboutData(){
+  db.ref(FB.about).once('value').then(snap=>{
+    const d = snap.val() || {};
+    document.getElementById('about-students').value = d.students || '';
+    document.getElementById('about-teachers').value = d.teachers || '';
+    document.getElementById('about-years').value = d.years || '';
+    document.getElementById('about-passrate').value = d.passrate || '';
+    document.getElementById('about-passrate-label').value = d.passrateLabel || '';
+    document.getElementById('about-achievements').value = d.achievements || '';
+  });
+}
+function saveAboutData(){
+  const payload = {
+    students: document.getElementById('about-students').value.trim(),
+    teachers: document.getElementById('about-teachers').value.trim(),
+    years: document.getElementById('about-years').value.trim(),
+    passrate: document.getElementById('about-passrate').value.trim(),
+    passrateLabel: document.getElementById('about-passrate-label').value.trim(),
+    achievements: document.getElementById('about-achievements').value.trim(),
+    updatedAt: Date.now()
+  };
+  db.ref(FB.about).set(payload).then(()=>showToast('✅ About section saved to website!'));
+}
+
+// ============================================================
+// PRINCIPAL
+// ============================================================
+let _ppPhotoData = null;
+function previewPPPhoto(input){
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 1.2*1024*1024){ alert('⚠️ Image too large. Please choose a file under 1MB.'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = e => { _ppPhotoData = e.target.result; document.getElementById('pp-avatar-preview').innerHTML = `<img src="${_ppPhotoData}" style="width:100%;height:100%;object-fit:cover">`; };
+  reader.readAsDataURL(file);
+}
+function savePrincipalPhoto(){
+  if(!_ppPhotoData){ showToast('⚠️ No photo selected'); return; }
+  db.ref('amv/principal/photo').set(_ppPhotoData).then(()=>showToast('✅ Photo saved to website!'));
+}
+function removePrincipalPhoto(){
+  if(!confirm("Remove the principal's photo from the website?")) return;
+  db.ref('amv/principal/photo').remove().then(()=>{ _ppPhotoData=null; document.getElementById('pp-avatar-preview').innerHTML='👨‍💼'; showToast('🗑 Photo removed'); });
+}
+function savePrincipalMessage(){
+  const name = document.getElementById('pp-name').value.trim();
+  const quals = document.getElementById('pp-quals').value.trim();
+  const quote = document.getElementById('pp-quote').value.trim();
+  const message = document.getElementById('pp-message').value.trim();
+  const badges = document.getElementById('pp-badges').value.trim();
+  if(!name || !message){ showToast('⚠️ Name and message are required'); return; }
+  db.ref('amv/principal/profile').set({name, quals, quote, message, badges, updatedAt: Date.now()}).then(()=>showToast('✅ Principal profile saved to website!'));
+}
+function loadPrincipalData(){
+  db.ref('amv/principal').once('value').then(snap=>{
+    const d = snap.val() || {}; const p = d.profile || {};
+    document.getElementById('pp-name').value = p.name || '';
+    document.getElementById('pp-quals').value = p.quals || '';
+    document.getElementById('pp-quote').value = p.quote || '';
+    document.getElementById('pp-message').value = p.message || '';
+    document.getElementById('pp-badges').value = p.badges || '';
+    const preview = document.getElementById('pp-avatar-preview');
+    preview.innerHTML = d.photo ? `<img src="${d.photo}" style="width:100%;height:100%;object-fit:cover">` : '👨‍💼';
+  });
+}
+
+// ============================================================
+// CLUBS
+// ============================================================
+function listenClubs(){
+  db.ref(FB.clubs).on('value', snap=>{
+    const clubs = objToArr(snap.val());
+    const body = document.getElementById('clubsBody');
+    body.innerHTML = clubs.length ? clubs.map(c=>`
+      <tr><td style="font-size:1.3rem">${esc(c.icon||'🎯')}</td><td class="name-cell">${esc(c.name)}</td><td>${esc(c.desc||'')}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.clubs}','${c._fbKey}','club')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="4" class="empty-row">No clubs yet.</td></tr>';
+  });
+}
+async function addClub(){
+  const icon = document.getElementById('club-icon').value.trim() || '🎯';
+  const name = document.getElementById('club-name').value.trim();
+  const desc = document.getElementById('club-desc').value.trim();
+  if(!name){ showToast('⚠️ Club name is required'); return; }
+  await fbPush(FB.clubs, {icon, name, desc, createdAt: Date.now()});
+  document.getElementById('club-icon').value=''; document.getElementById('club-name').value=''; document.getElementById('club-desc').value='';
+  showToast('✅ Club added');
+}
+
+// ============================================================
+// CONTACT & FOOTER & CREATORS
+// ============================================================
+function loadContact(){
+  db.ref(FB.contact).once('value').then(snap=>{
+    const c = snap.val() || {};
+    document.getElementById('contact-address-input').value = c.address || 'G/Angulugaha Maha Vidyalaya\nAngulugaha, Galle,\nSri Lanka';
+    document.getElementById('contact-email-input').value = c.email || 'info@angulugahamv.lk';
+    document.getElementById('contact-hours-input').value = c.hours || 'Monday – Friday: 7:30 AM – 1:30 PM\nSaturday: 7:30 AM – 12:00 PM';
+  });
+}
+function saveContact(){
+  const address = document.getElementById('contact-address-input').value.trim();
+  const email = document.getElementById('contact-email-input').value.trim();
+  const hours = document.getElementById('contact-hours-input').value.trim();
+  db.ref(FB.contact).set({address, email, hours, updatedAt: Date.now()}).then(()=>showToast('✅ Contact info saved!'));
+}
+function loadFooter(){
+  db.ref(FB.footer).once('value').then(snap=>{
+    const f = snap.val() || {};
+    document.getElementById('footer-desc-input').value = f.desc || '';
+    document.getElementById('footer-facebook').value = f.facebook || 'https://www.facebook.com/profile.php?id=61586902044163';
+    document.getElementById('footer-tiktok').value = f.tiktok || 'https://www.tiktok.com/@angulugahamv';
+    document.getElementById('footer-youtube').value = f.youtube || 'https://youtube.com/@AngulugahaMV';
+    document.getElementById('footer-whatsapp').value = f.whatsapp || 'https://whatsapp.com/channel/0029VbCthS58KMqc9TPyCh40';
+  });
+}
+function saveFooter(){
+  const desc = document.getElementById('footer-desc-input').value.trim();
+  const facebook = document.getElementById('footer-facebook').value.trim();
+  const tiktok = document.getElementById('footer-tiktok').value.trim();
+  const youtube = document.getElementById('footer-youtube').value.trim();
+  const whatsapp = document.getElementById('footer-whatsapp').value.trim();
+  db.ref(FB.footer).set({desc, facebook, tiktok, youtube, whatsapp, updatedAt: Date.now()}).then(()=>showToast('✅ Footer saved!'));
+}
+function listenCreators(){
+  db.ref(FB.creators).on('value', snap=>{
+    const list = objToArr(snap.val());
+    _dashCounts.creatorsCount = list.length;
+    const body = document.getElementById('creatorsBody');
+    body.innerHTML = list.length ? list.map(c=>`
+      <tr><td class="name-cell">${esc(c.name)}</td><td>${esc(c.role||'')}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.creators}','${c._fbKey}','member')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="3" class="empty-row">No members added yet — the default hardcoded list on the site is shown until you add one here.</td></tr>';
+  });
+}
+async function addCreator(){
+  const name = document.getElementById('creator-name').value.trim();
+  const role = document.getElementById('creator-role').value.trim();
+  const photo = document.getElementById('creator-photo').value.trim();
+  if(!name){ showToast('⚠️ Name is required'); return; }
+  await fbPush(FB.creators, {name, role, photo, createdAt: Date.now()});
+  document.getElementById('creator-name').value=''; document.getElementById('creator-role').value=''; document.getElementById('creator-photo').value='';
+  showToast('✅ Member added');
+}
+
+// ============================================================
+// GALLERY
+// ============================================================
+function listenGallery(){
+  db.ref(FB.gallery).on('value', snap=>{
+    const cols = objToArr(snap.val());
+    _dashCounts.galleryCount = cols.length;
+    updateDashboard();
+    const body = document.getElementById('galleryBody');
+    body.innerHTML = cols.length ? cols.map(c=>`
+      <tr><td class="name-cell">${esc(c.collection||c.caption||'Gallery')}</td><td>${esc(c.category||'—')}</td><td>${c.isDriveFolder ? '🔗 Drive Album' : (c.photos||[]).length}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.gallery}','${c._fbKey}','collection')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="4" class="empty-row">No gallery collections yet.</td></tr>';
+  });
+}
+let _galModeAdmin = 'upload'; // 'upload' | 'drive'
+
+function setGalleryModeAdmin(mode){
+  _galModeAdmin = mode;
+  const upBtn = document.getElementById('gal-mode-upload-btn');
+  const drBtn = document.getElementById('gal-mode-drive-btn');
+  const upFields = document.getElementById('gal-upload-fields');
+  const drFields = document.getElementById('gal-drive-fields');
+  const submitBtn = document.getElementById('gal-submit-btn');
+  if(mode==='drive'){
+    upBtn.className=''; upBtn.style.cssText='flex:1;padding:10px 22px;background:transparent;color:var(--primary);border:1px solid var(--primary);border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer';
+    drBtn.className='btn-primary'; drBtn.style.cssText='flex:1';
+    upFields.style.display='none'; drFields.style.display='block';
+    submitBtn.textContent='🔗 Add Drive Album';
+  } else {
+    upBtn.className='btn-primary'; upBtn.style.cssText='flex:1';
+    drBtn.className=''; drBtn.style.cssText='flex:1;padding:10px 22px;background:transparent;color:var(--primary);border:1px solid var(--primary);border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer';
+    upFields.style.display='block'; drFields.style.display='none';
+    submitBtn.textContent='📤 Upload Collection';
+  }
+}
+
+function extractDriveIdAdmin(url){
+  if(!url) return null;
+  const m = url.match(/[-\w]{25,}/);
+  return m ? m[0] : null;
+}
+
+async function addGallery(){
+  const name = document.getElementById('gal-name').value.trim();
+  const category = document.getElementById('gal-category').value.trim();
+
+  if(_galModeAdmin==='drive'){
+    const driveLink = document.getElementById('gal-drive-link').value.trim();
+    const folderId = extractDriveIdAdmin(driveLink);
+    if(!name || !driveLink || !folderId){ showToast('⚠️ Collection name and a valid Drive folder link are required'); return; }
+    try{
+      await fbPush(FB.gallery, { isDriveFolder: true, driveFolderId: folderId, driveUrl: driveLink, collection: name, category, teacherName: 'WebTeam', uploadedAt: Date.now() });
+      document.getElementById('gal-name').value=''; document.getElementById('gal-category').value=''; document.getElementById('gal-drive-link').value='';
+      showToast('✅ Drive album added!');
+    }catch(e){ showToast('❌ Failed: '+e.message); }
+    return;
+  }
+
+  const files = document.getElementById('gal-files').files;
+  if(!name || !files.length){ showToast('⚠️ Collection name and at least one photo are required'); return; }
+  showToast('⏳ Uploading photos...');
+  try{
+    const photos = [];
+    for(const file of files){ const up = await uploadToCloudinary(file, 'gallery'); photos.push({url: up.url, name: up.name}); }
+    await fbPush(FB.gallery, { collection: name, category, photos, photoCount: photos.length, teacherName: 'WebTeam', uploadedAt: Date.now() });
+    document.getElementById('gal-name').value=''; document.getElementById('gal-category').value=''; document.getElementById('gal-files').value='';
+    showToast('✅ Gallery collection uploaded!');
+  }catch(e){ showToast('❌ Failed: '+e.message); }
+}
+
+// ============================================================
+// NEWS
+// ============================================================
+function listenNews(){
+  db.ref(FB.news).on('value', snap=>{
+    const items = objToArr(snap.val());
+    _dashCounts.newsCount = items.length;
+    updateDashboard();
+    const body = document.getElementById('newsBody');
+    body.innerHTML = items.length ? items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(n=>`
+      <tr><td class="name-cell">${esc(n.title)}</td><td>${esc(n.category||'—')}</td><td>${fmtDate(n.createdAt)}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.news}','${n._fbKey}','article')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="4" class="empty-row">No news articles yet.</td></tr>';
+  });
+}
+async function addNews(){
+  const title = document.getElementById('news-title').value.trim();
+  const category = document.getElementById('news-category').value.trim();
+  const content = document.getElementById('news-content').value.trim();
+  const file = document.getElementById('news-cover').files[0];
+  if(!title || !content){ showToast('⚠️ Title and content are required'); return; }
+  try{
+    let cover = null;
+    if(file){ showToast('⏳ Uploading cover image...'); const up = await uploadToCloudinary(file, 'news'); cover = {dataUrl: up.url}; }
+    await fbPush(FB.news, { title, category, content, cover, teacherName: 'WebTeam', createdAt: Date.now(), date: fmtDate(Date.now()) });
+    document.getElementById('news-title').value=''; document.getElementById('news-category').value=''; document.getElementById('news-content').value=''; document.getElementById('news-cover').value='';
+    showToast('✅ News published!');
+  }catch(e){ showToast('❌ Failed: '+e.message); }
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function toggleResultFields(){
+  const type = document.getElementById('res-type').value;
+  document.getElementById('res-subjects-wrap').style.display = type==='Grade 5' ? 'none' : 'block';
+  document.getElementById('res-g5-wrap').style.display = type==='Grade 5' ? 'grid' : 'none';
+}
+function listenResults(){
+  db.ref(FB.results).on('value', snap=>{
+    const items = objToArr(snap.val());
+    _dashCounts.resultsCount = items.length;
+    updateDashboard();
+    const body = document.getElementById('resultsBody');
+    body.innerHTML = items.length ? items.map(r=>`
+      <tr><td class="name-cell">${esc(r.name)}</td><td>${esc(r.index||'—')}</td><td>${esc(r.type||'—')}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.results}','${r._fbKey}','result')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="4" class="empty-row">No results uploaded yet.</td></tr>';
+  });
+}
+async function addResult(){
+  const name = document.getElementById('res-name').value.trim();
+  const index = document.getElementById('res-index').value.trim();
+  const type = document.getElementById('res-type').value;
+  if(!name){ showToast('⚠️ Student name is required'); return; }
+  const entry = { name, index, type, teacherName:'WebTeam', createdAt: Date.now() };
+  if(type === 'Grade 5'){
+    entry.mark = Number(document.getElementById('res-mark').value)||0;
+    entry.target = Number(document.getElementById('res-target').value)||0;
+    entry.status = document.getElementById('res-status').value;
+  } else {
+    const lines = document.getElementById('res-grades').value.split('\n').map(l=>l.trim()).filter(Boolean);
+    entry.subjects = lines.map(l=>{ const [s,g] = l.split(':'); return [ (s||'').trim(), (g||'').trim() ]; });
+  }
+  await fbPush(FB.results, entry);
+  document.getElementById('res-name').value=''; document.getElementById('res-index').value=''; document.getElementById('res-grades').value='';
+  document.getElementById('res-mark').value=''; document.getElementById('res-target').value='';
+  showToast('✅ Result added');
+}
+
+// ============================================================
+// ANNOUNCEMENTS
+// ============================================================
+function listenAnnouncements(){
+  db.ref(FB.announcements).on('value', snap=>{
+    const items = objToArr(snap.val());
+    _dashCounts.annCount = items.length;
+    updateDashboard();
+    const body = document.getElementById('annBody');
+    body.innerHTML = items.length ? items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(a=>`
+      <tr><td class="name-cell">${esc(a.title||'Announcement')}</td><td>${esc(a.targetGrade||'All')}</td><td>${fmtDate(a.createdAt)}</td>
+      <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${FB.announcements}','${a._fbKey}','announcement')">🗑 Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="4" class="empty-row">No announcements yet.</td></tr>';
+  });
+}
+async function postAdminAnnouncement(){
+  const title = document.getElementById('ann-title-input').value.trim() || 'School Notice';
+  const targetGrade = document.getElementById('ann-grade').value;
+  const urgent = document.getElementById('ann-urgent').value === 'true';
+  const text = document.getElementById('ann-text-input').value.trim();
+  if(!text){ showToast('⚠️ Message is required'); return; }
+  await fbPush(FB.announcements, { title, text, targetGrade, urgent, teacher:'WebTeam', date: fmtDate(Date.now()), createdAt: Date.now() });
+  document.getElementById('ann-title-input').value=''; document.getElementById('ann-text-input').value='';
+  showToast('📢 Announcement posted!');
+}
+
+// ============================================================
+// LMS RESOURCES (papers / notes / hw / videos / apps)
+// ============================================================
+function listenResources(key, path, bodyId, rowFn){
+  db.ref(path).on('value', snap=>{
+    const items = objToArr(snap.val());
+    const body = document.getElementById(bodyId);
+    body.innerHTML = items.length ? items.map(i=>rowFn(i, path)).join('') : `<tr><td colspan="4" class="empty-row">No items yet.</td></tr>`;
+  });
+}
+function renderPaperRow(p, path){ return `<tr><td class="name-cell">${esc(p.subject||p.title||'—')}</td><td>${esc(p.targetGrade||'All')}</td><td>${esc(p.year||'—')}</td><td>${fmtDate(p.createdAt)}</td><td class="action-cell">${p.fileUrl?`<a href="${p.fileUrl}" target="_blank" class="btn-mini btn-approve" style="text-decoration:none">🔗 Open</a>`:''}<button class="btn-mini btn-dismiss" onclick="deleteItem('${path}','${p._fbKey}','paper')">🗑 Delete</button></td></tr>`; }
+function renderNoteRow(n, path){ return `<tr><td class="name-cell">${esc(n.title)}</td><td>${esc(n.subject||'—')}</td><td>${esc(n.targetGrade||'All')}</td><td>${fmtDate(n.createdAt)}</td><td class="action-cell">${n.link?`<a href="${n.link}" target="_blank" class="btn-mini btn-approve" style="text-decoration:none">🔗 Open</a>`:''}<button class="btn-mini btn-dismiss" onclick="deleteItem('${path}','${n._fbKey}','note')">🗑 Delete</button></td></tr>`; }
+function renderHwRow(h, path){ return `<tr><td class="name-cell">${esc(h.subject)}</td><td>${esc(h.targetGrade||h.class||'—')}</td><td>${esc(h.due||'—')}</td><td class="action-cell">${h.link?`<a href="${h.link}" target="_blank" class="btn-mini btn-approve" style="text-decoration:none">🔗 Open</a>`:''}<button class="btn-mini btn-dismiss" onclick="deleteItem('${path}','${h._fbKey}','homework')">🗑 Delete</button></td></tr>`; }
+function renderVideoRow(v, path){ return `<tr><td class="name-cell">${esc(v.title)}</td><td>${esc(v.subject||'—')}</td><td>${esc(v.targetGrade||'All')}</td><td>${fmtDate(v.createdAt)}</td><td class="action-cell"><button class="btn-mini btn-dismiss" onclick="deleteItem('${path}','${v._fbKey}','video')">🗑 Delete</button></td></tr>`; }
+function renderAppRow(a, path){ return `<tr><td class="name-cell">${esc(a.title)}</td><td>${esc(a.targetGrade||'All')}</td><td>${fmtDate(a.createdAt)}</td><td class="action-cell">${a.link?`<a href="${a.link}" target="_blank" class="btn-mini btn-approve" style="text-decoration:none">🔗 Open</a>`:''}<button class="btn-mini btn-dismiss" onclick="deleteItem('${path}','${a._fbKey}','file')">🗑 Delete</button></td></tr>`; }
+
+async function addResource(kind){
+  try{
+    if(kind==='papers'){
+      const subject=document.getElementById('pp2-subject').value.trim(), grade=document.getElementById('pp2-grade').value,
+            year=document.getElementById('pp2-year').value.trim(), type=document.getElementById('pp2-type').value,
+            file=document.getElementById('pp2-file').files[0], link=document.getElementById('pp2-link').value.trim();
+      if(!subject){ showToast('⚠️ Subject is required'); return; }
+      if(!file && !link){ showToast('⚠️ Provide a file or a link'); return; }
+      let fileUrl = link || null, fileName = subject+(year?' '+year:''), isImage = false;
+      if(file){ showToast('⏳ Uploading...'); const up = await uploadToCloudinary(file, 'pastpapers'); fileUrl = up.url; fileName = up.name; isImage = up.isImage; }
+      await fbPush(FB.pastpapers, { subject, targetGrade: grade, year, type, fileUrl, fileName, isImage, teacherName:'WebTeam', date: fmtDate(Date.now()), createdAt: Date.now() });
+      document.getElementById('pp2-subject').value=''; document.getElementById('pp2-year').value=''; document.getElementById('pp2-file').value=''; document.getElementById('pp2-link').value='';
+      showToast('✅ Past paper uploaded!');
+    } else if(kind==='notes'){
+      const subject=document.getElementById('note2-subject').value.trim(), grade=document.getElementById('note2-grade').value,
+            title=document.getElementById('note2-title').value.trim(), file=document.getElementById('note2-file').files[0], link=document.getElementById('note2-link').value.trim();
+      if(!title){ showToast('⚠️ Title is required'); return; }
+      if(!file && !link){ showToast('⚠️ Provide a file or a link'); return; }
+      let attachment = null;
+      if(file){ showToast('⏳ Uploading...'); const up = await uploadToCloudinary(file, 'notes'); attachment = {url:up.url, name:up.name, isImage:up.isImage}; }
+      await fbPush(FB.notes, { subject, targetGrade: grade, title, link: link||null, attachment, date: fmtDate(Date.now()), teacher:'WebTeam', createdAt: Date.now() });
+      document.getElementById('note2-subject').value=''; document.getElementById('note2-title').value=''; document.getElementById('note2-file').value=''; document.getElementById('note2-link').value='';
+      showToast('✅ Note uploaded!');
+    } else if(kind==='hw'){
+      const subject=document.getElementById('hw2-subject').value.trim(), grade=document.getElementById('hw2-grade').value,
+            desc=document.getElementById('hw2-desc').value.trim(), due=document.getElementById('hw2-due').value,
+            file=document.getElementById('hw2-file').files[0], link=document.getElementById('hw2-link').value.trim();
+      if(!subject||!desc||!due){ showToast('⚠️ Subject, description and due date are required'); return; }
+      let attachment = null;
+      if(file){ showToast('⏳ Uploading...'); const up = await uploadToCloudinary(file, 'homework'); attachment = {url:up.url, name:up.name, isImage:up.isImage}; }
+      await fbPush(FB.hw, { subject, class: grade, targetGrade: grade, desc, due, status:'pending', attachment, link: link||null, teacherName:'WebTeam', createdAt: new Date().toISOString() });
+      document.getElementById('hw2-subject').value=''; document.getElementById('hw2-desc').value=''; document.getElementById('hw2-due').value=''; document.getElementById('hw2-file').value=''; document.getElementById('hw2-link').value='';
+      showToast('✅ Homework posted!');
+    } else if(kind==='videos'){
+      const subject=document.getElementById('vid2-subject').value.trim(), grade=document.getElementById('vid2-grade').value,
+            title=document.getElementById('vid2-title').value.trim(), url=document.getElementById('vid2-url').value.trim(), dur=document.getElementById('vid2-dur').value.trim();
+      if(!title||!url){ showToast('⚠️ Title and video link are required'); return; }
+      await fbPush(FB.videos, { subject, targetGrade: grade, title, url, duration: dur||'N/A', icon:'▶️', thumb:'#2a0020', teacherName:'WebTeam', createdAt: Date.now() });
+      document.getElementById('vid2-subject').value=''; document.getElementById('vid2-title').value=''; document.getElementById('vid2-url').value=''; document.getElementById('vid2-dur').value='';
+      showToast('✅ Video added!');
+    } else if(kind==='apps'){
+      const title=document.getElementById('app2-title').value.trim(), grade=document.getElementById('app2-grade').value,
+            notes=document.getElementById('app2-notes').value.trim(), file=document.getElementById('app2-file').files[0], link=document.getElementById('app2-link').value.trim();
+      if(!title){ showToast('⚠️ Title is required'); return; }
+      if(!file && !link){ showToast('⚠️ Provide a file or a link'); return; }
+      let fileUrl = link || null, fileName = title, isImage = false;
+      if(file){ showToast('⏳ Uploading...'); const up = await uploadToCloudinary(file, 'applications'); fileUrl = up.url; fileName = up.name; isImage = up.isImage; }
+      await fbPush(FB.applications, { title, targetGrade: grade, notes, link: link||null, fileUrl, fileName, isImage, status:'pending', teacherName:'WebTeam', date: fmtDate(Date.now()), createdAt: Date.now() });
+      document.getElementById('app2-title').value=''; document.getElementById('app2-notes').value=''; document.getElementById('app2-file').value=''; document.getElementById('app2-link').value='';
+      showToast('✅ File uploaded!');
+    }
+  }catch(e){ showToast('❌ Failed: '+e.message); }
+}
+</script>
+</body>
+</html>

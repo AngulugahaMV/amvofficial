@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angulugaha Maha Vidyalaya</title>
+<link rel="icon" type="image/png" href="title_logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+  --maroon: #800020;
+  --maroon-light: #a0002a;
+  --maroon-dark: #5a0015;
+  --gold: #D4AF37;
+  --gold-light: #e8c84a;
+  --gold-dark: #b8941f;
+  --bg: rgba(80,0,20,0.92);
+  --bg2: rgba(60,0,15,0.85);
+  --surface: rgba(255,255,255,0.07);
+  --surface2: rgba(255,255,255,0.12);
+  --text: #f5e6d0;
+  --text2: #c9a97a;
+  --border: rgba(212,175,55,0.25);
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --glow: 0 0 20px rgba(212,175,55,0.3);
+  --radius: 16px;
+  --font-head: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0a0a12;
+  --bg2: #111120;
+  --surface: rgba(128,0,32,0.15);
+  --surface2: rgba(128,0,32,0.25);
+  --text: #e8ddd0;
+  --text2: #9a8060;
+  --border: rgba(128,0,32,0.35);
+  --glow: 0 0 20px rgba(128,0,32,0.4);
+}
+[data-theme="light"] {
+  --bg: #f5f0eb;
+  --bg2: #ede5da;
+  --surface: rgba(255,255,255,0.8);
+  --surface2: rgba(255,255,255,0.95);
+  --text: #2a1010;
+  --text2: #6b4030;
+  --border: rgba(128,0,32,0.2);
+  --glow: 0 0 20px rgba(212,175,55,0.2);
+  --shadow: 0 8px 32px rgba(128,0,32,0.12);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background 0.4s,color 0.4s;
+  overflow-x:hidden;
+}
+
+/* LOADING SCREEN */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#3a000e,#800020,#4a0010);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.6s,visibility 0.6s;
+}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-crest{
+  width:90px;height:90px;
+  border:3px solid var(--gold);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  animation:pulse 1.5s ease-in-out infinite;
+  box-shadow:0 0 30px rgba(212,175,55,0.5);
+  margin-bottom:20px;
+}
+.loader-bar{
+  width:200px;height:3px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;margin-top:16px;
+  overflow:hidden;
+}
+.loader-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--maroon),var(--gold));
+  border-radius:2px;
+  animation:load 2s ease forwards;
+}
+.loader-text{
+  color:var(--gold);font-family:var(--font-head);
+  font-size:1.1rem;margin-top:12px;letter-spacing:2px;
+}
+@keyframes load{to{width:100%}}
+@keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(212,175,55,0.4)}50%{box-shadow:0 0 40px rgba(212,175,55,0.8)}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(60,0,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+  transition:background 0.4s;
+}
+.nav-links{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:6px;
+  list-style:none;
+}
+[data-theme="light"] nav{background:rgba(245,240,235,0.9)}
+.nav-brand{
+  display:flex;align-items:center;gap:12px;
+  text-decoration:none;
+}
+.nav-logo{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--maroon),var(--gold));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;font-weight:900;color:#fff;
+  box-shadow:var(--glow);
+}
+.nav-name{
+  font-family:var(--font-head);
+  font-size:1.05rem;color:var(--gold);
+  line-height:1.2;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  max-width:160px;
+}
+.nav-name span{display:block;font-size:0.65rem;color:var(--text2);font-family:var(--font-body);letter-spacing:1px}
+.nav-links a{
+  color:var(--text);text-decoration:none;
+  padding:6px 12px;border-radius:8px;
+  font-size:0.82rem;font-weight:500;
+  transition:all 0.3s;letter-spacing:0.3px;
+}
+.nav-links a:hover,.nav-links a.active{
+  background:var(--surface2);color:var(--gold);
+}
+.nav-links .btn-special{
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-light));
+  color:#fff!important;
+  box-shadow:0 2px 12px rgba(128,0,32,0.4);
+}
+.nav-links .btn-special:hover{
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  color:#1a0000!important;
+}
+.nav-controls{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nav-brand{min-width:0;flex:1}
+.theme-btn{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);padding:6px 12px;border-radius:8px;
+  cursor:pointer;font-size:0.78rem;font-family:var(--font-body);
+  transition:all 0.3s;
+}
+.theme-btn:hover{background:var(--surface2);border-color:var(--gold)}
+.nav-search{
+  padding:6px 12px;border-radius:8px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font-body);font-size:0.82rem;
+  width:160px;transition:all 0.3s;outline:none;
+}
+.nav-search:focus{width:220px;border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.2)}
+.hamburger{
+  display:none;flex-direction:column;gap:5px;
+  cursor:pointer;padding:6px;
+}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:0.3s}
+
+/* SECTIONS */
+section{padding:80px 0;scroll-margin-top:64px}
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.section-title{
+  font-family:var(--font-head);
+  font-size:2.4rem;color:var(--gold);
+  text-align:center;margin-bottom:12px;
+  position:relative;
+}
+.section-title::after{
+  content:'';display:block;width:60px;height:3px;
+  background:linear-gradient(90deg,var(--maroon),var(--gold));
+  margin:10px auto 0;border-radius:2px;
+}
+.section-sub{
+  text-align:center;color:var(--text2);
+  font-size:1rem;margin-bottom:48px;
+}
+
+/* HERO */
+#home{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(128,0,32,0.6),transparent 60%),
+    radial-gradient(ellipse at 80% 20%,rgba(212,175,55,0.15),transparent 50%),
+    linear-gradient(135deg,#2a0008,#6a0018,#3a000e);
+  display:flex;align-items:center;
+  position:relative;overflow:hidden;
+  padding-top:64px;
+}
+[data-theme="light"] #home{
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(128,0,32,0.15),transparent 60%),
+    linear-gradient(135deg,#f5e8e0,#ede0d8);
+}
+[data-theme="dark"] #home{
+  background:linear-gradient(135deg,#05050f,#0f0520,#0a0010);
+}
+.hero-particles{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.particle{
+  position:absolute;
+  background:var(--gold);
+  border-radius:50%;
+  opacity:0.15;
+  animation:float linear infinite;
+}
+@keyframes float{
+  0%{transform:translateY(100vh) rotate(0deg);opacity:0}
+  10%{opacity:0.15}
+  90%{opacity:0.15}
+  100%{transform:translateY(-100px) rotate(360deg);opacity:0}
+}
+.hero-content{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;
+  align-items:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  padding:6px 14px;border-radius:20px;
+  font-size:0.78rem;color:var(--gold);letter-spacing:1px;
+  margin-bottom:20px;
+  backdrop-filter:blur(10px);
+}
+.hero-title{
+  font-family:var(--font-head);
+  font-size:3.2rem;line-height:1.1;
+  color:var(--text);margin-bottom:16px;
+}
+.hero-title .highlight{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-desc{
+  color:var(--text2);font-size:1rem;line-height:1.7;
+  margin-bottom:32px;max-width:480px;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  padding:12px 28px;border-radius:12px;
+  font-family:var(--font-body);font-size:0.9rem;font-weight:600;
+  cursor:pointer;transition:all 0.3s;border:none;
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-light));
+  color:#fff;
+  box-shadow:0 4px 20px rgba(128,0,32,0.4);
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(128,0,32,0.5);
+}
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold);
+}
+.btn-outline:hover{
+  background:var(--gold);color:#1a0000;
+  transform:translateY(-2px);
+}
+.hero-visual{
+  display:flex;justify-content:center;
+}
+.hero-crest{
+  width:320px;height:320px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(212,175,55,0.1),rgba(128,0,32,0.2));
+  border:2px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(212,175,55,0.15),inset 0 0 60px rgba(0,0,0,0.3);
+  position:relative;
+}
+.hero-crest::before{
+  content:'';
+  position:absolute;inset:-10px;
+  border-radius:50%;
+  border:1px solid rgba(212,175,55,0.2);
+  animation:rotate 20s linear infinite;
+}
+.hero-crest::after{
+  content:'';
+  position:absolute;inset:-20px;
+  border-radius:50%;
+  border:1px dashed rgba(212,175,55,0.1);
+  animation:rotate 30s linear infinite reverse;
+}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.crest-emoji{font-size:4rem;margin-bottom:12px}
+.crest-name{
+  font-family:var(--font-head);
+  font-size:1rem;color:var(--gold);
+  text-align:center;line-height:1.4;
+  padding:0 20px;
+}
+.crest-year{
+  font-size:0.8rem;color:var(--text2);
+  letter-spacing:3px;margin-top:6px;
+}
+.quick-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  margin-top:48px;
+}
+.quick-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;text-align:center;
+  cursor:pointer;transition:all 0.3s;
+  backdrop-filter:blur(10px);
+  text-decoration:none;color:var(--text);
+}
+.quick-card:hover{
+  transform:translateY(-4px);
+  background:var(--surface2);
+  border-color:var(--gold);
+  box-shadow:var(--glow);
+}
+.quick-card .icon{font-size:1.8rem;margin-bottom:8px}
+.quick-card .label{font-size:0.85rem;font-weight:600;color:var(--gold)}
+.quick-card .sub{font-size:0.75rem;color:var(--text2);margin-top:4px}
+
+/* GLASS CARD */
+.glass-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:32px;
+  backdrop-filter:blur(12px);
+  box-shadow:var(--shadow);
+  transition:all 0.3s;
+}
+.glass-card:hover{
+  border-color:rgba(212,175,55,0.4);
+  box-shadow:var(--shadow),var(--glow);
+}
+
+/* SLIDESHOW */
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  height: 550px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slideshow-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slideshow-slide.active {
+  opacity: 1;
+}
+.slideshow-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: kenBurns 8s ease-out forwards;
+}
+.slideshow-slide.active img {
+  animation: kenBurns 8s ease-out forwards;
+}
+@keyframes kenBurns {
+  0% {
+    transform: scale(1.05) translateZ(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateZ(0);
+    opacity: 1;
+  }
+}
+@keyframes parallaxShift {
+  0% { transform: translate(0, -2%); }
+  100% { transform: translate(0, 2%); }
+}
+.slideshow-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+  backdrop-filter: blur(12px);
+  font-weight: 300;
+}
+.slideshow-arrow:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+.slideshow-arrow.left {
+  left: 20px;
+}
+.slideshow-arrow.right {
+  right: 20px;
+}
+.slideshow-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+  backdrop-filter: blur(8px);
+}
+.dot.active {
+  background: rgba(212, 175, 55, 0.8);
+  border-color: rgba(212, 175, 55, 1);
+  width: 28px;
+  border-radius: 5px;
+}
+.dot:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive slideshow */
+@media (max-width: 1024px) {
+  .slideshow-container { height: 400px; }
+  .slideshow-arrow { width: 44px; height: 44px; font-size: 1.2rem; }
+  .slideshow-arrow.left { left: 12px; }
+  .slideshow-arrow.right { right: 12px; }
+}
+@media (max-width: 768px) {
+  .slideshow-container { height: 320px; }
+  .slideshow-arrow { width: 40px; height: 40px; font-size: 1rem; }
+  .slideshow-arrow.left { left: 8px; }
+  .slideshow-arrow.right { right: 8px; }
+}
+@media (max-width: 480px) {
+  .slideshow-container { height: 240px; }
+  .slideshow-arrow { width: 36px; height: 36px; font-size: 0.9rem; }
+  .slideshow-arrow.left { left: 6px; }
+  .slideshow-arrow.right { right: 6px; }
+  .dot { width: 8px; height: 8px; }
+  .dot.active { width: 24px; }
+}
+
+/* ABOUT */
+#about{background:var(--bg2)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.about-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+}
+.about-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--glow)}
+.about-card h3{
+  font-family:var(--font-head);color:var(--gold);
+  font-size:1.3rem;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.about-card p{color:var(--text2);line-height:1.7;font-size:0.92rem}
+.about-card ul{list-style:none;color:var(--text2);font-size:0.9rem}
+.about-card ul li{padding:5px 0;padding-left:16px;position:relative;line-height:1.5}
+.about-card ul li::before{content:'◆';position:absolute;left:0;color:var(--gold);font-size:0.5rem;top:9px}
+.achievements-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+  margin-top:32px;
+}
+.stat-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;text-align:center;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+}
+.stat-box:hover{border-color:var(--gold);box-shadow:var(--glow)}
+.stat-num{font-family:var(--font-head);font-size:2.2rem;color:var(--gold);font-weight:700}
+.stat-label{font-size:0.78rem;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+/* PRINCIPAL */
+#principal{background:var(--bg)}
+.principal-layout{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start}
+.principal-photo{
+  background:var(--surface);border:2px solid var(--border);
+  border-radius:var(--radius);padding:32px;
+  text-align:center;backdrop-filter:blur(12px);
+  position:sticky;top:80px;
+}
+.principal-avatar{
+  width:140px;height:140px;border-radius:50%;
+  background:linear-gradient(135deg,var(--maroon),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-size:3.5rem;margin:0 auto 16px;
+  border:3px solid var(--gold);
+  box-shadow:0 0 30px rgba(212,175,55,0.3);
+}
+.principal-name{font-family:var(--font-head);font-size:1.3rem;color:var(--gold);margin-bottom:4px}
+.principal-title{font-size:0.82rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase}
+.principal-msg{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px;backdrop-filter:blur(12px)}
+.principal-msg blockquote{
+  font-family:var(--font-head);font-size:1.5rem;
+  color:var(--gold);font-style:italic;
+  margin-bottom:20px;padding-left:20px;
+  border-left:3px solid var(--gold);
+}
+.principal-msg p{color:var(--text2);line-height:1.8;font-size:0.95rem;margin-bottom:16px}
+.vision-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.vision-badge{
+  background:var(--surface2);border:1px solid var(--border);
+  padding:6px 14px;border-radius:20px;
+  font-size:0.78rem;color:var(--gold);
+}
+
+/* RESULTS */
+#results{background:var(--bg2)}
+.results-tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+.tab-btn{
+  padding:8px 20px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;font-family:var(--font-body);font-size:0.85rem;
+  transition:all 0.3s;
+}
+.tab-btn.active,.tab-btn:hover{
+  background:var(--maroon);color:#fff;
+  border-color:var(--maroon);
+}
+.results-search{
+  width:100%;padding:12px 18px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font-body);font-size:0.9rem;
+  outline:none;margin-bottom:24px;transition:all 0.3s;
+}
+.results-search:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.15)}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.result-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+}
+.result-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--glow)}
+.result-card .student-name{font-weight:600;color:var(--text);margin-bottom:4px}
+.result-card .index{font-size:0.78rem;color:var(--text2);margin-bottom:12px;font-family:monospace}
+.result-card .grade-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem}
+.result-card .grade-row:last-child{border:none}
+.grade-A{color:#4ade80}
+.grade-B{color:#60a5fa}
+.grade-C{color:#fbbf24}
+.grade-S{color:#f87171}
+.results-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;
+}
+.r-stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;text-align:center;
+}
+.r-stat-num{font-family:var(--font-head);font-size:1.8rem;color:var(--gold)}
+.r-stat-label{font-size:0.78rem;color:var(--text2);margin-top:4px}
+
+/* NEWS */
+#news{background:var(--bg)}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.news-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+}
+.news-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:var(--glow)}
+.news-img{
+  height:160px;
+  background:linear-gradient(135deg,var(--maroon-dark),var(--maroon));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;position:relative;overflow:hidden;
+}
+.news-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.4));
+}
+.news-tag{
+  position:absolute;top:12px;left:12px;z-index:1;
+  background:var(--maroon);color:#fff;
+  padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;
+}
+.news-body{padding:20px}
+.news-date{font-size:0.75rem;color:var(--text2);margin-bottom:6px}
+.news-title{font-family:var(--font-head);color:var(--text);font-size:1.05rem;margin-bottom:8px;line-height:1.3}
+.news-excerpt{font-size:0.83rem;color:var(--text2);line-height:1.6}
+.gallery-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;
+  margin-top:40px;
+}
+.gallery-item{
+  height:180px;border-radius:12px;
+  background:linear-gradient(135deg,var(--maroon-dark),var(--maroon-light));
+  display:flex;align-items:flex-end;justify-content:flex-start;
+  font-size:2rem;cursor:pointer;
+  transition:all 0.3s;border:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.gallery-item:hover{transform:scale(1.03);border-color:var(--gold)}
+
+/* CONTACT */
+#contact{background:var(--bg2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.contact-info{display:flex;flex-direction:column;gap:16px}
+.contact-item{
+  display:flex;align-items:flex-start;gap:16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;
+  transition:all 0.3s;
+}
+.contact-item:hover{border-color:var(--gold);transform:translateX(4px)}
+.contact-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;flex-shrink:0;
+}
+.contact-item h4{font-size:0.82rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.contact-item p{color:var(--text);font-size:0.9rem;line-height:1.5}
+.contact-form{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:32px;backdrop-filter:blur(12px);
+}
+.contact-form h3{font-family:var(--font-head);color:var(--gold);font-size:1.4rem;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:0.82rem;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.form-group input,.form-group textarea,.form-group select{
+  width:100%;padding:10px 14px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);
+  font-family:var(--font-body);font-size:0.9rem;outline:none;
+  transition:all 0.3s;
+}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.1)}
+.form-group textarea{resize:vertical;min-height:100px}
+.map-placeholder{
+  height:200px;border-radius:var(--radius);
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;flex-direction:column;gap:8px;
+  margin-top:16px;color:var(--text2);font-size:0.9rem;
+  overflow:hidden;
+}
+.map-placeholder iframe{width:100%;height:100%;border:none;border-radius:var(--radius)}
+
+/* CLUBS & SOCIETIES */
+#clubs{background:var(--bg2)}
+.clubs-intro{
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px;
+}
+.clubs-intro-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;backdrop-filter:blur(10px);
+  grid-column:1/-1;
+}
+.clubs-intro-card h3{font-family:var(--font-head);color:var(--gold);font-size:1.1rem;margin-bottom:8px}
+.clubs-intro-card p{color:var(--text2);font-size:0.87rem;line-height:1.7}
+.clubs-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;
+  margin-bottom:36px;
+}
+.club-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+  position:relative;
+}
+.club-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--glow)}
+.club-card .club-icon{font-size:2rem;margin-bottom:10px}
+.club-card .club-name{font-family:var(--font-head);color:var(--gold);font-size:1.05rem;margin-bottom:6px}
+.club-card .club-desc{color:var(--text2);font-size:0.83rem;line-height:1.6;margin-bottom:14px}
+.club-avail{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.72rem;padding:3px 10px;border-radius:12px;
+  font-weight:600;letter-spacing:0.3px;
+}
+.avail-yes{background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25)}
+.avail-busy{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25)}
+.clubs-cta{
+  text-align:center;padding:36px;
+  background:linear-gradient(135deg,rgba(128,0,32,0.25),rgba(212,175,55,0.06));
+  border:1px solid rgba(212,175,55,0.3);
+  border-radius:var(--radius);backdrop-filter:blur(10px);
+}
+.clubs-cta h3{font-family:var(--font-head);color:var(--gold);font-size:1.4rem;margin-bottom:8px}
+.clubs-cta p{color:var(--text2);font-size:0.9rem;margin-bottom:20px}
+@media(max-width:600px){.clubs-intro{grid-template-columns:1fr}}
+
+/* CREATED BY */
+#createdby {
+  background: var(--bg2);
+  padding: 60px 0;
+}
+.creators-grid {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+.creator-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  text-align: center;
+  width: 200px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+.creator-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+  box-shadow: var(--glow);
+}
+.creator-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  margin: 0 auto 14px;
+  display: block;
+  box-shadow: 0 0 20px rgba(212,175,55,0.3);
+}
+.creator-name {
+  font-family: var(--font-head);
+  color: var(--gold);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.creator-role {
+  font-size: 0.78rem;
+  color: var(--text2);
+  letter-spacing: 0.5px;
+}
+
+/* FOOTER */
+.webteam-logo{height:44px;width:auto;vertical-align:middle;display:inline-block}
+.webteam-logo-light{display:none}
+.webteam-credit{display:inline-flex;align-items:center;gap:8px}
+footer{
+  background:rgba(20,0,5,0.95);
+  border-top:1px solid var(--border);
+  padding:48px 0 24px;
+}
+.footer-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;
+  margin-bottom:32px;
+}
+.footer-brand .name{font-family:var(--font-head);font-size:1.3rem;color:var(--gold);margin-bottom:8px}
+.footer-brand p{font-size:0.83rem;color:var(--text2);line-height:1.6;max-width:260px}
+.footer-col h4{color:var(--gold);font-size:0.9rem;margin-bottom:16px;letter-spacing:1px;text-transform:uppercase}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:8px}
+.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.85rem;transition:color 0.3s}
+.footer-col ul li a:hover{color:var(--gold)}
+.social-links{display:flex;gap:10px;margin-top:16px}
+.social-link{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:1rem;
+  transition:all 0.3s;
+}
+.social-link:hover{background:var(--maroon);border-color:var(--maroon)}
+.footer-bottom{
+  border-top:1px solid var(--border);padding-top:20px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:0.8rem;color:var(--text2);
+}
+
+/* BACK TO TOP */
+#btt{
+  position:fixed;bottom:30px;right:30px;z-index:900;
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-light));
+  border:1px solid var(--gold);
+  color:#fff;font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(10px);
+  transition:all 0.3s;pointer-events:none;
+  box-shadow:0 4px 20px rgba(128,0,32,0.4);
+}
+#btt.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#btt:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+
+/* MOBILE NAV */
+.mobile-menu{
+  display:none;position:fixed;
+  top:64px;left:0;right:0;
+  background:rgba(40,0,10,0.98);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:16px;z-index:999;
+  flex-direction:column;gap:4px;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{
+  color:var(--text);text-decoration:none;
+  padding:10px 16px;border-radius:10px;
+  font-size:0.9rem;transition:all 0.3s;
+}
+.mobile-menu a:hover{background:var(--surface2);color:var(--gold)}
+
+/* ANIMATIONS */
+.fade-in{
+  opacity:0;transform:translateY(20px);
+  transition:opacity 0.6s,transform 0.6s;
+}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* SEARCH HIGHLIGHT */
+.search-hidden{display:none!important}
+
+@media(max-width:768px){
+  .nav-links,.nav-search{display:none}
+  .hamburger{display:flex}
+  .hero-content{grid-template-columns:1fr;text-align:center}
+  .hero-visual{display:none}
+  .hero-title{font-size:2rem}
+  .quick-cards{grid-template-columns:1fr 1fr 1fr}
+  .about-grid{grid-template-columns:1fr}
+  .achievements-row{grid-template-columns:1fr 1fr}
+  .principal-layout{grid-template-columns:1fr}
+  .principal-photo{position:static}
+  .results-stats{grid-template-columns:1fr 1fr 1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+  .container{padding:0 1rem}
+  section{padding:60px 0}
+}
+@media(max-width:480px){
+  .quick-cards{grid-template-columns:1fr 1fr}
+  .achievements-row{grid-template-columns:1fr 1fr}
+  .results-stats{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .hero-title{font-size:1.8rem}
+  .section-title{font-size:1.9rem}
+  nav{padding:0 1rem}
+  .nav-name{font-size:0.9rem}
+}
+@media(max-width:360px){
+  nav{padding:0 0.6rem;height:58px}
+  .nav-logo{width:34px;height:34px;font-size:1rem;flex-shrink:0}
+  .nav-name{font-size:0.78rem;line-height:1.15}
+  .nav-name span{font-size:0.58rem}
+  .theme-btn{padding:5px 8px;font-size:0.72rem}
+  .hamburger span{width:18px}
+  .mobile-menu{top:58px;padding:12px}
+  .mobile-menu a{font-size:0.85rem;padding:10px 14px}
+  .hero-title{font-size:1.6rem}
+  .hero-desc{font-size:0.9rem}
+  .btn{padding:10px 18px;font-size:0.85rem}
+  .hero-btns{flex-direction:column;align-items:center}
+  .quick-cards{grid-template-columns:1fr 1fr}
+  .quick-card{padding:14px 10px}
+  .quick-card .icon{font-size:1.4rem}
+  .quick-card .label{font-size:0.78rem}
+  .quick-card .sub{font-size:0.68rem}
+  .section-title{font-size:1.6rem}
+  .section-sub{font-size:0.9rem}
+  .about-card{padding:20px}
+  .stat-num{font-size:1.8rem}
+  .principal-avatar{width:110px;height:110px;font-size:2.8rem}
+  .principal-msg blockquote{font-size:1.2rem}
+  .glass-card{padding:20px}
+  .results-stats{grid-template-columns:1fr 1fr}
+  .r-stat-num{font-size:1.4rem}
+  .tab-btn{padding:6px 14px;font-size:0.78rem}
+  .news-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .contact-form{padding:20px}
+  .clubs-grid{grid-template-columns:1fr}
+  .clubs-intro{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{font-size:0.72rem}
+  #btt{bottom:16px;right:16px;width:38px;height:38px}
+  .achievements-row{grid-template-columns:1fr 1fr}
+  .hero-badge{font-size:0.72rem;padding:5px 10px}
+  .container{padding:0 0.75rem}
+  section{padding:48px 0;scroll-margin-top:58px}
+  #home{padding-top:58px}
+}
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-crest">🏫</div>
+  <div class="loader-text">Angulugaha Maha Vidyalaya</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text" style="font-size:0.75rem;margin-top:8px;opacity:0.6">Sri Lanka · Est. 1977</div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-brand" href="#home">
+    <div class="nav-logo">A</div>
+    <div class="nav-name">Angulugaha M.V.<span><br>මානිවත්ථ අභික්ඛම</span></div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="lms.html" class="btn-special">LMS</a></li>
+    <li><a href="login.html" class="btn-special">Teacher Portal</a></li>
+  </ul>
+  <div class="nav-controls">
+    <button class="theme-btn" onclick="cycleTheme()">🎨 Theme</button>
+    <div class="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMM()">🏫 About</a>
+  <a href="#news" onclick="closeMM()">📰 News</a>
+  <a href="#contact" onclick="closeMM()">📞 Contact</a>
+  <a href="lms.html">📚 LMS</a>
+  <a href="teacher.html">👨‍🏫 Teacher Portal</a>
+  
+</div>
+
+<!-- HOME -->
+<section id="home">
+  <div class="hero-particles" id="particles"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-badge" id="hero-badge">⭐ Government School · Sri Lanka</div>
+        <h1 class="hero-title" id="hero-title">
+          <span class="highlight">Angulugaha</span><br>
+          Maha Vidyalaya
+        </h1>
+        <p class="hero-desc" id="hero-desc">A proud legacy of educational excellence since 1977, dedicated to fostering knowledge, integrity, and leadership for future generations.</p>
+        <div class="hero-btns">
+          <a href="#about" class="btn btn-primary">🏫 Discover Our School</a>
+          <a href="lms.html" class="btn btn-outline">📚 Access LMS</a>
+        </div>
+        <div class="quick-cards">
+          <a href="#results" class="quick-card">
+            <div class="icon">📊</div>
+            <div class="label">Results</div>
+            <div class="sub">O/L · A/L · Grade 5</div>
+          </a>
+          <a href="#news" class="quick-card">
+            <div class="icon">📰</div>
+            <div class="label">News</div>
+            <div class="sub">Latest events</div>
+          </a>
+          <a href="#contact" class="quick-card">
+            <div class="icon">📞</div>
+            <div class="label">Contact</div>
+            <div class="sub">Get in touch</div>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-crest">
+          <div class="crest-emoji" id="crest-emoji-display">🏫</div>
+          <div class="crest-name">Angulugaha<br>Maha Vidyalaya</div>
+          <div class="crest-year">EST · 1977</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HERO SLIDESHOW -->
+<section id="slideshow" class="slideshow-container">
+  <div class="slideshow-slide active">
+    <img src="1.jpg" alt="School Campus">
+  </div>
+  <div class="slideshow-slide">
+    <img src="2.jpg" alt="School Building">
+  </div>
+  <div class="slideshow-slide">
+    <img src="3.jpg" alt="Classroom">
+  </div>
+  <div class="slideshow-slide">
+    <img src="4.JPG" alt="School Activities">
+  </div>
+  <div class="slideshow-slide">
+    <img src="5.jpeg" alt="Students">
+  </div>
+
+  <button class="slideshow-arrow left" onclick="slideShowNav(-1)">‹</button>
+  <button class="slideshow-arrow right" onclick="slideShowNav(1)">›</button>
+
+  <div class="slideshow-dots" id="slideshowDots"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <h2 class="section-title fade-in">About Our School</h2>
+    <p class="section-sub fade-in">A legacy of excellence, built on values that shape tomorrow's leaders</p>
+    <div class="about-grid">
+      <div class="about-card fade-in">
+        <h3>📜 Our History</h3>
+        <p>Established in 1870 as the Angulugaha Methodist Mixed School with just 12 students, Angulugaha Maha Vidyalaya has grown into a leading educational institution in the Galle District. Initially managed under the supervision of the Methodist Church, the school experienced rapid development after being taken over by the government in 1940. It was classified as a junior school in 1963 and was upgraded to a Maha Vidyalaya on September 1, 1977, adopting the name Angulugaha Maha Vidyalaya. Since then, through the development of infrastructure, educational resources, and various improvement projects, the school has continued to progress and today stands as a distinguished institution committed to providing quality education and nurturing excellence among its students.</p>
+      </div>
+      <div class="about-card fade-in">
+        <h3>🎯 Vision & Mission</h3>
+        <p><strong style="color:var(--gold)">Vision:</strong> To become the most outstanding school in the Habaraduwa Education Division. <br> හබරාදුව කොට්ඨාසයේ විශිෂ්ඨතම පාසල බවට පත් කිරීම </p>
+        <br>
+        <p><strong style="color:var(--gold)">Mission:</strong> To nurture environmentally responsible citizens with exemplary character while achieving the national goals of education, thereby contributing them to the nation.<br> අධ්‍යාපනයේ පොදු අරමුණු සාක්ෂාත් කරගත හැකි අයුරින් හා මනා පෞරුෂයක් සහිත පරිසර හිතකාමී පුරවැසි පිරිසක් ලක් මෑණියන්ට දායාද කිරීම </p>
+      </div>
+      <div class="about-card fade-in">
+        <h3>🏆 Achievements</h3>
+        <ul id="about-achievements-list">
+          <li>National Science Olympiad Champions 2023</li>
+          <li>Best School Drama – Provincial Level 2023</li>
+          <li>Island Rank Students – O/L Examinations</li>
+          <li>100% Pass Rate – A/L 2022, 2023</li>
+          <li>Award for Environmental Conservation</li>
+          <li>Best Scouting Troop – District 2023</li>
+        </ul>
+      </div>
+      <div class="about-card fade-in">
+        <h3>📋 School Rules</h3>
+        <ul>
+          <li>Attend school in proper uniform daily</li>
+          <li>Respect all teachers and peers</li>
+          <li>Zero tolerance for bullying</li>
+          <li>Mobile phones prohibited during class</li>
+          <li>Maintain school grounds and property</li>
+          <li>Punctuality is mandatory for all activities</li>
+        </ul>
+      </div>
+    </div>
+    <div class="achievements-row fade-in">
+      <div class="stat-box"><div class="stat-num" id="about-students">1,450</div><div class="stat-label">Students</div></div>
+      <div class="stat-box"><div class="stat-num" id="about-teachers">68</div><div class="stat-label">Teachers</div></div>
+      <div class="stat-box"><div class="stat-num" id="about-years">72</div><div class="stat-label">Years of Service</div></div>
+      <div class="stat-box"><div class="stat-num" id="about-passrate">98%</div><div class="stat-label" id="about-passrate-label">Pass Rate 2023</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPAL -->
+<section id="principal">
+  <div class="container">
+    <h2 class="section-title fade-in">Principal's Message</h2>
+    <p class="section-sub fade-in">Guidance from our visionary leader</p>
+    <div class="principal-layout fade-in">
+      <div class="principal-photo">
+        <div class="principal-avatar" id="pp-avatar-display" style="display:flex;align-items:center;justify-content:center;overflow:hidden;">👨‍💼</div>
+        <div class="principal-name">Mr. K. D. Perera</div>
+        <div class="principal-title">Principal</div>
+        <br>
+        <div id="pp-quals-display" style="font-size:0.8rem;color:var(--text2);line-height:1.6">
+          M.Ed (Colombo)<br>B.Ed (Kelaniya)<br>30+ Years Experience
+        </div>
+      </div>
+      <div class="principal-msg">
+        <blockquote id="pp-quote-display">"Education is not the filling of a pail, but the lighting of a fire."</blockquote>
+        <div id="pp-message-display">
+          <p>Dear Students, Parents and Well-Wishers,</p>
+          <p>It is with great pride and deep humility that I welcome you to Angulugaha Maha Vidyalaya — a school that has stood for seven decades as a beacon of learning and character in our community.</p>
+          <p>Our school is more than just a place of academic instruction. It is a community where young minds are nurtured, where curiosity is celebrated, and where every student is given the opportunity to discover their unique potential.</p>
+          <p>We believe that excellence is not merely about examination results — though we pursue those with great dedication — but about developing young people who are compassionate, resilient, and ready to contribute meaningfully to our nation and the world.</p>
+          <p>I invite all stakeholders to work together with us in this sacred mission of education. Together, we will continue to uphold the proud traditions of our school while boldly embracing the opportunities of the future.</p>
+        </div>
+        <p style="color:var(--gold);font-family:var(--font-head)" id="pp-sig-name">Mr. K. D. Perera<br><span style="font-size:0.85rem;font-style:normal;color:var(--text2)">Principal, Angulugaha Maha Vidyalaya</span></p>
+        <div class="vision-badges" id="pp-badges-display">
+          <div class="vision-badge">🎓 Academic Excellence</div>
+          <div class="vision-badge">🌍 Global Citizens</div>
+          <div class="vision-badge">💪 Character Building</div>
+          <div class="vision-badge">🤝 Community Service</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="container">
+    <h2 class="section-title fade-in">Academic Results</h2>
+    <div class="results-tabs fade-in">
+      <button class="tab-btn active" onclick="switchTab('ol',this)">📚 O/L Results</button>
+      <button class="tab-btn" onclick="switchTab('al',this)">🎓 A/L Results</button>
+      <button class="tab-btn" onclick="switchTab('g5',this)">⭐ Grade 5</button>
+    </div>
+    <input class="results-search fade-in" type="text" placeholder="🔍 Search by student name or index number..." id="resultsSearch" oninput="searchResults(this.value)">
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news">
+  <div class="container">
+    <h2 class="section-title fade-in">News & Events</h2>
+    <p class="section-sub fade-in">Stay updated with the latest happenings at our school</p>
+    <div class="news-grid fade-in" id="newsGrid"></div>
+    <h3 style="font-family:var(--font-head);color:var(--gold);text-align:center;margin:48px 0 20px">📸 Photo Gallery</h3>
+    <div class="gallery-grid fade-in" id="galleryGrid"></div>
+  </div>
+</section>
+
+<!-- CLUBS & SOCIETIES -->
+<section id="clubs">
+  <div class="container">
+    <h2 class="section-title fade-in">Clubs & Societies</h2>
+    <p class="section-sub fade-in">Vibrant student communities driving creativity, service and excellence</p>
+    <div class="clubs-intro fade-in">
+      <div class="clubs-intro-card">
+        <h3>🎭 Our Student Clubs</h3>
+        <p>Angulugaha Maha Vidyalaya hosts over 10 active student clubs spanning arts, science, sports, media and community service. Each club is available to support school events when booked in advance.</p>
+      </div>
+    </div>
+    <div class="clubs-grid fade-in" id="clubsGrid">
+      <div class="club-card">
+        <div class="club-icon">📸</div>
+        <div class="club-name">Photography Club</div>
+        <div class="club-desc">Event photography, portrait sessions and the school yearbook. Available for bookings at official school functions.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-icon">🎬</div>
+        <div class="club-name">Media Unit</div>
+        <div class="club-desc">Videography, live coverage, PA systems and digital media production for major school events.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-icon">🔬</div>
+        <div class="club-name">Science Club</div>
+        <div class="club-desc">National Olympiad champions. Organises science fairs, experiments and STEM outreach activities.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-icon">🎭</div>
+        <div class="club-name">Drama Society</div>
+        <div class="club-desc">Provincial award-winning performances. Available to stage cultural segments at ceremonies.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-icon">🌿</div>
+        <div class="club-name">Environment Club</div>
+        <div class="club-desc">Green initiatives, tree planting drives and sustainability projects across the school campus.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-icon">🎨</div>
+        <div class="club-name">Art & Craft Society</div>
+        <div class="club-desc">Decorations, banners, stage design and artwork for school events and exhibitions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <h2 class="section-title fade-in">Contact Us</h2>
+    <p class="section-sub fade-in">We'd love to hear from you</p>
+    <div class="contact-grid fade-in">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div><h4>Address</h4><p id="contact-address">G/Angulugaha Maha Vidyalaya<br>Angulugaha, Galle,<br>Sri Lanka</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div><h4>Email</h4><p id="contact-email">info@angulugahamv.lk</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div><h4>School Hours</h4><p id="contact-hours">Monday – Friday: 7:30 AM – 1:30 PM<br>Saturday: 7:30 AM – 12:00 PM</p></div>
+        </div>
+        <div class="map-placeholder">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3967.7100155709404!2d80.312642474478!3d6.034475628654002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae16db1fd7292e7%3A0x361bd8ad2aedb2!2sAngulugaha%20Maha%20Vidyalaya!5e0!3m2!1sen!2slk!4v1781629593973!5m2!1sen!2slk" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade""></iframe>
+        </div>
+      </div>
+      <div class="contact-form">
+        <h3>📬 Send a Message</h3>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your full name" id="cf_name">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="your@email.com" id="cf_email">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="cf_subject">
+            <option>General Inquiry</option>
+            <option>Admission Inquiry</option>
+            <option>Academic Query</option>
+            <option>Administrative</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea placeholder="Write your message here..." id="cf_msg"></textarea>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendMsg()">📨 Send Message</button>
+        <div id="cf_status" style="margin-top:12px;font-size:0.85rem;text-align:center"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREATED BY -->
+<section id="createdby">
+  <div class="container">
+    <h2 class="section-title fade-in">Created By</h2>
+    <p class="section-sub fade-in">The team behind this website</p>
+    <div class="creators-grid" id="creatorsGrid">
+
+      <div class="creator-card fade-in">
+        <img class="creator-photo" src="p-1.jpg" alt="Person 1">
+        <div class="creator-name">Oshadha Liyanage</div>
+        <div class="creator-role">Developer</div>
+      </div>
+
+      <div class="creator-card fade-in">
+        <img class="creator-photo" src="p-2.png" alt="Person 2">
+        <div class="creator-name">Imasha Kalhara</div>
+        <div class="creator-role">Developer</div>
+      </div>
+
+      <div class="creator-card fade-in">
+        <img class="creator-photo" src="p-3.png" alt="Person 3">
+        <div class="creator-name">Amidu Prabhashwara</div>
+        <div class="creator-role">Content Manager</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="name">🏫 Angulugaha Maha Vidyalaya</div>
+        <p id="footer-desc">A proud legacy of educational excellence since 1977, dedicated to fostering knowledge, integrity, and leadership for future generations.</p>
+        <div class="social-links">
+    <a class="social-link" id="social-facebook" href="https://www.facebook.com/profile.php?id=61586902044163" target="_blank">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+
+    <a class="social-link" id="social-tiktok" href="https://www.tiktok.com/@angulugahamv" target="_blank">
+        <i class="fab fa-tiktok"></i>
+    </a>
+
+    <a class="social-link" id="social-youtube" href="https://youtube.com/@AngulugahaMV" target="_blank">
+        <i class="fab fa-youtube"></i>
+    </a>
+
+    <a class="social-link" id="social-whatsapp" href="https://whatsapp.com/channel/0029VbCthS58KMqc9TPyCh40" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About School</a></li>
+          <li><a href="#principal">Principal</a></li>
+          <li><a href="#results">Results</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Portals</h4>
+        <ul>
+          <li><a href="lms.html">Student LMS</a></li>
+          <li><a href="teacher.html">Teacher Portal</a></li>
+          <li><a href="#results">View Results</a></li>
+          <li><a href="#news">News & Events</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#">G/Angulugaha Maha Vidyalaya, Angulugaha, Galle.</a></li>
+          <li><a href="#">info@angulugahamv.lk</a></li>
+          <li><a href="#">Mon–Fri: 7:30–13:30</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 web team AMV (Angulugaha Maha Vidyalaya). All Rights Reserved.</span>
+      <span style="color:var(--gold)">Excellence · Integrity · Service</span>
+      <span class="webteam-credit">Powered by
+        <img class="webteam-logo webteam-logo-dark" src="footer-logo.png" alt="WebTeam">
+    </div>
+  </div>
+</footer>
+
+<!-- BACK TO TOP -->
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ---- THEME MANAGER ----
+const themes = ['default','dark','light'];
+function themeManager(){
+  const saved = localStorage.getItem('amv_theme') || 'default';
+  document.documentElement.setAttribute('data-theme', saved);
+}
+function cycleTheme(){
+  const current = document.documentElement.getAttribute('data-theme') || 'default';
+  const idx = themes.indexOf(current);
+  const next = themes[(idx+1)%themes.length];
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('amv_theme',next);
+}
+themeManager();
+
+// ---- LOADER ----
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+  },2200);
+});
+
+// ---- PARTICLES ----
+(function(){
+  const container = document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p = document.createElement('div');
+    p.className='particle';
+    const size = Math.random()*6+2;
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${Math.random()*15+10}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ---- MOBILE MENU ----
+function toggleMobileMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMM(){
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ---- BACK TO TOP ----
+window.addEventListener('scroll',()=>{
+  document.getElementById('btt').classList.toggle('show',window.scrollY>300);
+  updateActiveNav();
+});
+
+// ---- ACTIVE NAV ----
+function updateActiveNav(){
+  const sections=['home','about','principal','results','news','clubs','contact'];
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const rect=el.getBoundingClientRect();
+    const links=document.querySelectorAll('.nav-links a');
+    links.forEach(a=>{
+      if(a.getAttribute('href')==='#'+id){
+        if(rect.top<=100&&rect.bottom>100) a.classList.add('active');
+        else a.classList.remove('active');
+      }
+    });
+  });
+}
+
+// ---- FADE IN OBSERVER ----
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+// ============================================================
+// FIREBASE SETUP
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDeznPuFsqSdbrPFA1F3AMI-8paNd2syZ0",
+  authDomain: "amvofficial00.firebaseapp.com",
+  databaseURL: "https://amvofficial00-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "amvofficial00",
+  storageBucket: "amvofficial00.firebasestorage.app",
+  messagingSenderId: "575639657506",
+  appId: "1:575639657506:web:0fec6335fac07bcc3c7e7b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ============================================================
+// PRINCIPAL PROFILE — real-time from amv/principal
+// ============================================================
+db.ref('amv/principal').on('value', snap => {
+  const d = snap.val() || {};
+  const p = d.profile || {};
+
+  // -- Name --
+  if (p.name) {
+    document.querySelectorAll('.principal-name').forEach(el => el.textContent = p.name);
+    // signature at bottom of message
+    const sig = document.getElementById('pp-sig-name');
+    if (sig) sig.innerHTML = p.name + '<br><span style="font-size:0.85rem;font-style:normal;color:var(--text2)">Principal, Angulugaha Maha Vidyalaya</span>';
+  }
+
+  // -- Qualifications --
+  if (p.quals) {
+    const qualEl = document.getElementById('pp-quals-display');
+    if (qualEl) qualEl.innerHTML = p.quals.split('·').map(q => q.trim()).join('<br>');
+  }
+
+  // -- Quote --
+  if (p.quote) {
+    const quoteEl = document.getElementById('pp-quote-display');
+    if (quoteEl) quoteEl.textContent = p.quote;
+  }
+
+  // -- Message paragraphs --
+  if (p.message) {
+    const msgEl = document.getElementById('pp-message-display');
+    if (msgEl) {
+      msgEl.innerHTML = p.message.split(/\n\n+/).filter(s=>s.trim()).map(para =>
+        `<p>${para.trim().replace(/\n/g,'<br>')}</p>`
+      ).join('');
+    }
+  }
+
+  // -- Vision badges --
+  if (p.badges) {
+    const badgesEl = document.getElementById('pp-badges-display');
+    if (badgesEl) {
+      badgesEl.innerHTML = p.badges.split(',').map(b => b.trim()).filter(Boolean)
+        .map(b => `<div class="vision-badge">${b}</div>`).join('');
+    }
+  }
+
+  // -- Photo --
+  const avatarEl = document.getElementById('pp-avatar-display');
+  if (avatarEl) {
+    if (d.photo) {
+      avatarEl.innerHTML = `<img src="${d.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Principal" />`;
+    } else {
+      avatarEl.innerHTML = '👨‍💼';
+    }
+  }
+});
+
+// ============================================================
+// HERO CONTENT — real-time from amv/hero
+// ============================================================
+db.ref('amv/hero').on('value', snap => {
+  const h = snap.val() || {};
+  if (h.badge) { const el = document.getElementById('hero-badge'); if (el) el.textContent = h.badge; }
+  if (h.title) {
+    const el = document.getElementById('hero-title');
+    if (el) el.innerHTML = h.title.split('\n').map((line,i)=> i===0 ? `<span class="highlight">${line}</span>` : line).join('<br>');
+  }
+  if (h.desc) { const el = document.getElementById('hero-desc'); if (el) el.textContent = h.desc; }
+});
+
+// ============================================================
+// CONTACT INFO — real-time from amv/contact
+// ============================================================
+db.ref('amv/contact').on('value', snap => {
+  const c = snap.val() || {};
+  if (c.address) { const el = document.getElementById('contact-address'); if (el) el.innerHTML = c.address.replace(/\n/g,'<br>'); }
+  if (c.email)   { const el = document.getElementById('contact-email');   if (el) el.textContent = c.email; }
+  if (c.hours)   { const el = document.getElementById('contact-hours');   if (el) el.innerHTML = c.hours.replace(/\n/g,'<br>'); }
+});
+
+// ============================================================
+// FOOTER — real-time from amv/footer
+// ============================================================
+db.ref('amv/footer').on('value', snap => {
+  const f = snap.val() || {};
+  if (f.desc) { const el = document.getElementById('footer-desc'); if (el) el.textContent = f.desc; }
+  ['facebook','tiktok','youtube','whatsapp'].forEach(k=>{
+    if (f[k]) { const el = document.getElementById('social-'+k); if (el) el.href = f[k]; }
+  });
+});
+
+// ============================================================
+// CREATORS — real-time from amv/creators
+// ============================================================
+db.ref('amv/creators').on('value', snap => {
+  const list = objToArr(snap.val());
+  const grid = document.getElementById('creatorsGrid');
+  if (!grid || !list.length) return;
+  grid.innerHTML = list.map(c => `
+    <div class="creator-card fade-in">
+      <img class="creator-photo" src="${c.photo || 'p-1.jpg'}" alt="${c.name||''}">
+      <div class="creator-name">${c.name||''}</div>
+      <div class="creator-role">${c.role||''}</div>
+    </div>
+  `).join('');
+});
+
+// ============================================================
+// SCHOOL LOGO — real-time from amv/branding/logo
+// ============================================================
+db.ref('amv/branding/logo').on('value', snap => {
+  const logo = snap.val();
+  const crestEl = document.getElementById('crest-emoji-display');
+  if (crestEl) {
+    if (logo) {
+      crestEl.innerHTML = `<img src="${logo}" style="width:100px;height:100px;object-fit:cover;border-radius:50%;" alt="School Logo" />`;
+    } else {
+      crestEl.textContent = '🏫';
+    }
+  }
+});
+
+// ============================================================
+// CLUBS & SOCIETIES — real-time from amv/shared/clubs
+// ============================================================
+db.ref('amv/shared/clubs').on('value', snap => {
+  const clubs = objToArr(snap.val());
+  const grid = document.getElementById('clubsGrid');
+  if (!grid) return;
+  if (clubs.length) {
+    grid.innerHTML = clubs.map(c => `
+      <div class="club-card">
+        <div class="club-icon">${c.icon || '🎯'}</div>
+        <div class="club-name">${c.name}</div>
+        <div class="club-desc">${c.desc || ''}</div>
+      </div>
+    `).join('');
+  }
+  // If no clubs exist in Firebase yet, the default markup already in the page stays visible.
+});
+
+function objToArr(obj){
+  if(!obj) return [];
+  return Object.entries(obj).map(([k,v])=>({...v,_fbKey:k}));
+}
+
+
+// ============================================================
+// ABOUT SECTION — real-time stats & achievements from Firebase
+// ============================================================
+db.ref("amv/about").on("value", snap => {
+  const d = snap.val() || {};
+
+  if (d.students !== undefined) {
+    const el = document.getElementById("about-students");
+    if (el) el.textContent = d.students;
+  }
+  if (d.teachers !== undefined) {
+    const el = document.getElementById("about-teachers");
+    if (el) el.textContent = d.teachers;
+  }
+  if (d.years !== undefined) {
+    const el = document.getElementById("about-years");
+    if (el) el.textContent = d.years;
+  }
+  if (d.passrate !== undefined) {
+    const el = document.getElementById("about-passrate");
+    if (el) el.textContent = d.passrate;
+  }
+  if (d.passrateLabel !== undefined) {
+    const el = document.getElementById("about-passrate-label");
+    if (el) el.textContent = d.passrateLabel;
+  }
+  if (d.achievements) {
+    const listEl = document.getElementById("about-achievements-list");
+    if (listEl) {
+      const items = d.achievements.split("\n").map(s => s.trim()).filter(Boolean);
+      listEl.innerHTML = items.map(item => "<li>" + item + "</li>").join("");
+    }
+  }
+});
+// ============================================================
+// RESULTS — real-time from amv/shared/results
+// ============================================================
+let currentTab = 'ol';
+let _fbResults = { ol:[], al:[], g5:[] };
+
+db.ref('amv/shared/results').on('value', snap => {
+  const all = objToArr(snap.val());
+  _fbResults.ol = all.filter(r => r.type && r.type.toLowerCase().includes('o/l'));
+  _fbResults.al = all.filter(r => r.type && r.type.toLowerCase().includes('a/l'));
+  _fbResults.g5 = all.filter(r => r.type && r.type.toLowerCase().includes('grade 5'));
+  renderResults(currentTab);
+});
+
+function renderResults(tab){
+  currentTab = tab;
+  const grid = document.getElementById('resultsGrid');
+  const data = _fbResults[tab] || [];
+
+  if(!data.length){
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text2)">
+        <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+        <div style="font-size:0.95rem">No results uploaded yet. Check back soon.</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  data.forEach(s => {
+    // Grade 5 Scholarship results have no subjects — just a mark out of a
+    // target cutoff and a Pass/Weak status. O/L & A/L results carry a
+    // "subjects" array of [subject, grade] pairs (older entries may still
+    // use a "grades" text blob "Subject: Grade\nSubject: Grade").
+    let subjectRows = '';
+    if(s.mark !== undefined && s.mark !== null && s.target !== undefined && s.target !== null){
+      const statusClass = s.status === 'Pass' ? 'grade-A' : 'grade-S';
+      subjectRows = `<div class="grade-row"><span>${s.mark}/${s.target}</span><span class="${statusClass}">${s.status||''}</span></div>`;
+    } else if(Array.isArray(s.subjects) && s.subjects.length){
+      subjectRows = s.subjects.map(pair => {
+        const sub = (pair && pair[0]) ? String(pair[0]).trim() : '';
+        const grade = (pair && pair[1]) ? String(pair[1]).trim() : '';
+        const gradeClass = ['A','B','C'].includes(grade) ? `grade-${grade}` : '';
+        return `<div class="grade-row"><span>${sub}</span><span class="${gradeClass}">${grade}</span></div>`;
+      }).join('');
+    } else if(s.grades){
+      const lines = s.grades.split('\n').filter(l=>l.trim());
+      subjectRows = lines.map(line => {
+        const parts = line.split(':');
+        const sub = parts[0]?.trim() || line;
+        const grade = parts[1]?.trim() || '';
+        const gradeClass = ['A','B','C'].includes(grade) ? `grade-${grade}` : '';
+        return `<div class="grade-row"><span>${sub}</span><span class="${gradeClass}">${grade}</span></div>`;
+      }).join('');
+    }
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.setAttribute('data-search', ((s.name||'')+(s.index||'')).toLowerCase());
+    card.innerHTML = `
+      <div class="student-name">${s.name||'—'}</div>
+      <div class="index">Index: ${s.index||'—'}</div>
+      ${subjectRows}
+      <div style="font-size:0.72rem;color:var(--text2);margin-top:8px;opacity:0.7">
+        📅 ${s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : ''}
+        ${s.teacherName ? '· '+s.teacherName : ''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function switchTab(tab, btn){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderResults(tab);
+  document.getElementById('resultsSearch').value = '';
+}
+
+function searchResults(q){
+  document.querySelectorAll('.result-card').forEach(c=>{
+    c.style.display = c.getAttribute('data-search').includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ============================================================
+// NEWS — real-time from BOTH amv/shared/news AND announcements
+// ============================================================
+let _newsCache = [];
+let _announcementsCache = [];
+
+function mergeAndRenderNews() {
+  // Combine news articles and announcements, deduplicate by _fbKey, sort newest first
+  const combined = [..._newsCache, ..._announcementsCache];
+  combined.sort((a, b) => {
+    const da = a.createdAt || a.date || '';
+    const db_ = b.createdAt || b.date || '';
+    return da > db_ ? -1 : 1;
+  });
+  renderNews(combined);
+}
+
+// Listen to teacher-posted news (amv/shared/news)
+db.ref('amv/shared/news').on('value', snap => {
+  _newsCache = objToArr(snap.val());
+  mergeAndRenderNews();
+});
+
+// Listen to announcements / notice board (announcements path)
+db.ref('announcements').on('value', snap => {
+  _announcementsCache = objToArr(snap.val());
+  mergeAndRenderNews();
+});
+
+function renderNews(items){
+  const grid = document.getElementById('newsGrid');
+  grid.innerHTML = '';
+
+  if(!items.length){
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text2)">
+        <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+        <div style="font-size:0.95rem">No news or announcements posted yet. Check back soon.</div>
+      </div>`;
+    return;
+  }
+
+  items.forEach(n => {
+    const isUrgent = n.urgent === true || n.urgent === 'true';
+    // News articles (from News Upload panel) have a `content` field; announcements have `text`
+    const isNewsArticle = !!n.content;
+    const excerpt = n.content
+      ? n.content.substring(0,140) + (n.content.length > 140 ? '\u2026' : '')
+      : (n.text || n.message || '');
+    const dateStr = n.date
+      ? n.date
+      : n.createdAt
+        ? new Date(n.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+        : '\u2014';
+    const tagLabel = isUrgent ? 'Breaking' : (n.category || (isNewsArticle ? 'News' : 'Notice'));
+    const tagEmoji = isUrgent ? '\ud83d\udea8' : (isNewsArticle ? '\ud83d\udcf0' : '\ud83d\udce2');
+    const hasCover = isNewsArticle && n.cover && n.cover.dataUrl;
+    const bgStyle = isUrgent ? '#7f0000,#b00000' : (isNewsArticle ? '#1a3a6b,#2a5298' : 'var(--maroon-dark),var(--maroon)');
+    const imgSection = hasCover
+      ? `<div class="news-img" style="background:url('${n.cover.dataUrl}') center/cover no-repeat;position:relative"><div class="news-tag">${tagLabel}</div></div>`
+      : `<div class="news-img" style="background:linear-gradient(135deg,${bgStyle})"><div style="font-size:2.5rem;z-index:1">${tagEmoji}</div><div class="news-tag">${tagLabel}</div></div>`;
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.setAttribute('data-search', ((n.title||'')+' '+excerpt+' '+(n.category||'')+' '+(n.teacherName||'')).toLowerCase());
+    card.innerHTML = `
+      ${imgSection}
+      <div class="news-body">
+        <div class="news-date">\ud83d\udcc5 ${dateStr}</div>
+        <div class="news-title">${n.title||'School Notice'}</div>
+        <div class="news-excerpt">${excerpt}</div>
+        ${n.teacherName ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:6px">\u2014 ${n.teacherName}</div>` : ''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// GALLERY — real-time from amv/shared/gallery
+// Renders photo collections uploaded by teachers
+// ============================================================
+
+// Lightbox state
+let _galLightboxItems = [];
+let _galLightboxIdx   = 0;
+
+function buildGallery(collections){
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = '';
+
+  if(!collections.length){
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text2)">
+        <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+        <div style="font-size:0.95rem">No photos uploaded yet. Check back soon.</div>
+      </div>`;
+    return;
+  }
+
+  // Sort newest first
+  const sorted = collections.slice().sort((a,b)=>{
+    const da = a.uploadedAt || ''; const db_ = b.uploadedAt || '';
+    return da > db_ ? -1 : 1;
+  });
+
+  sorted.forEach(col => {
+    const isDrive = !!col.isDriveFolder;
+    const photos = col.photos || [];
+    const cover  = photos[0]?.url || '';
+    const count  = col.photoCount || photos.length || 1;
+    const label  = col.collection || col.caption || col.category || 'Gallery';
+    const sub    = [col.category, col.dateTaken ? '📅 '+col.dateTaken : '', col.teacherName ? '— '+col.teacherName : ''].filter(Boolean).join(' · ');
+
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.setAttribute('data-label', label);
+    item.style.cssText = 'cursor:pointer;flex-direction:column;gap:0;height:180px;';
+    if(isDrive){
+      item.style.background = `linear-gradient(135deg, rgba(26,115,232,0.35), rgba(0,0,0,0.65))`;
+    } else if(cover){
+      item.style.background = `linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.55)), url('${cover}') center/cover no-repeat`;
+    }
+    item.innerHTML = `
+      ${isDrive ? `<div style="position:absolute;top:12px;left:12px;font-size:1.8rem">📁</div>` : ''}
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;background:linear-gradient(transparent 35%,rgba(0,0,0,0.72))">
+        <div style="font-weight:700;font-size:0.88rem;color:#fff;line-height:1.3;margin-bottom:2px">${label}</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.75)">${sub}</div>
+        <div style="font-size:0.68rem;color:var(--gold);margin-top:3px">${isDrive ? '📁 Google Drive Album' : `📷 ${count} photo${count>1?'s':''}`}</div>
+      </div>
+      ${(!isDrive && count>1)?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:20px;backdrop-filter:blur(4px)">+${count}</div>`:''}
+    `;
+    item.addEventListener('click', () => {
+      if(isDrive) openDriveGalleryModal(col.driveFolderId, label);
+      else openGalleryLightbox(photos, label);
+    });
+    grid.appendChild(item);
+  });
+}
+
+// Google Drive folder viewer modal (embedded, no API key needed)
+function openDriveGalleryModal(folderId, title){
+  if(!folderId) return;
+  let m = document.getElementById('galDriveModal');
+  if(!m){
+    m = document.createElement('div');
+    m.id = 'galDriveModal';
+    m.style.cssText = `
+      position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.93);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
+    `;
+    m.innerHTML = `
+      <div style="width:100%;max-width:1000px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div id="galDriveTitle" style="color:var(--gold);font-family:var(--font-head);font-size:1.1rem">📁 Google Drive Album</div>
+        <button onclick="document.getElementById('galDriveModal').style.display='none'"
+          style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.85rem">✕ Close</button>
+      </div>
+      <iframe id="galDriveFrame" style="width:100%;max-width:1000px;height:75vh;border:1px solid rgba(255,255,255,0.15);border-radius:12px;background:#fff" allow="autoplay"></iframe>
+    `;
+    m.addEventListener('click', e => { if(e.target===m) m.style.display='none'; });
+    document.body.appendChild(m);
+  }
+  document.getElementById('galDriveTitle').textContent = '📁 ' + title;
+  document.getElementById('galDriveFrame').src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
+  m.style.display = 'flex';
+}
+
+// Simple lightbox
+function openGalleryLightbox(photos, title){
+  if(!photos||!photos.length) return;
+  _galLightboxItems = photos;
+  _galLightboxIdx   = 0;
+
+  let lb = document.getElementById('galLightbox');
+  if(!lb){
+    lb = document.createElement('div');
+    lb.id = 'galLightbox';
+    lb.style.cssText = `
+      position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.93);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+    `;
+    lb.innerHTML = `
+      <div style="position:absolute;top:16px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+        <div id="galLbTitle" style="color:var(--gold);font-family:var(--font-head);font-size:1.1rem"></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="galLbCounter" style="color:rgba(255,255,255,0.6);font-size:0.82rem"></span>
+          <button onclick="document.getElementById('galLightbox').style.display='none'"
+            style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.85rem">✕ Close</button>
+        </div>
+      </div>
+      <img id="galLbImg" style="max-width:92vw;max-height:78vh;border-radius:12px;border:1px solid rgba(255,255,255,0.1);object-fit:contain;transition:opacity 0.25s">
+      <div style="display:flex;gap:14px;margin-top:18px">
+        <button onclick="galLbNav(-1)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:10px;padding:8px 22px;cursor:pointer;font-size:1rem">‹ Prev</button>
+        <button onclick="galLbNav(1)"  style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:10px;padding:8px 22px;cursor:pointer;font-size:1rem">Next ›</button>
+      </div>
+    `;
+    lb.addEventListener('click', e => { if(e.target===lb) lb.style.display='none'; });
+    document.body.appendChild(lb);
+  }
+  lb.style.display = 'flex';
+  document.getElementById('galLbTitle').textContent = title;
+  galLbShow();
+}
+
+function galLbShow(){
+  const img = document.getElementById('galLbImg');
+  const p   = _galLightboxItems[_galLightboxIdx];
+  img.style.opacity = '0';
+  img.src = p?.url || '';
+  img.onload = ()=>{ img.style.opacity='1'; };
+  document.getElementById('galLbCounter').textContent =
+    `${_galLightboxIdx+1} / ${_galLightboxItems.length}`;
+}
+
+function galLbNav(dir){
+  _galLightboxIdx = (_galLightboxIdx + dir + _galLightboxItems.length) % _galLightboxItems.length;
+  galLbShow();
+}
+
+// Real-time listener on amv/shared/gallery
+db.ref('amv/shared/gallery').on('value', snap => {
+  const collections = objToArr(snap.val());
+  buildGallery(collections);
+});
+
+// ---- CONTACT FORM ----
+function sendMsg(){
+  const n=document.getElementById('cf_name').value;
+  const e=document.getElementById('cf_email').value;
+  const subj=document.getElementById('cf_subject').value;
+  const m=document.getElementById('cf_msg').value;
+  const st=document.getElementById('cf_status');
+  if(!n||!e||!m){
+    st.style.color='#f87171';st.textContent='⚠️ Please fill all required fields.';return;
+  }
+  st.style.color='var(--text2)';st.textContent='Sending...';
+
+  fetch('https://formspree.io/f/xgobgwyz',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({name:n,email:e,subject:subj,message:m})
+  }).then(res=>{
+    if(res.ok){
+      st.style.color='#4ade80';st.textContent='✅ Message sent successfully! We will reply soon.';
+      document.getElementById('cf_name').value='';
+      document.getElementById('cf_email').value='';
+      document.getElementById('cf_msg').value='';
+    }else{
+      st.style.color='#f87171';st.textContent='⚠️ Something went wrong. Please try again.';
+    }
+  }).catch(()=>{
+    st.style.color='#f87171';st.textContent='⚠️ Something went wrong. Please try again.';
+  }).finally(()=>{
+    setTimeout(()=>{st.textContent='';},5000);
+  });
+}
+
+// ---- GLOBAL SEARCH ----
+function globalSearchFn(q){
+  if(!q){
+    document.querySelectorAll('.news-card,.result-card,.about-card').forEach(el=>el.classList.remove('search-hidden'));
+    return;
+  }
+  const lq=q.toLowerCase();
+  document.querySelectorAll('.news-card').forEach(card=>{
+    const text=card.textContent.toLowerCase();
+    card.classList.toggle('search-hidden',!text.includes(lq));
+  });
+}
+
+// ---- SLIDESHOW FUNCTIONALITY ----
+let slideShowIndex = 0;
+let slideShowInterval = null;
+const SLIDESHOW_INTERVAL = 3000; // 3 seconds
+
+function initSlideShow() {
+  const slides = document.querySelectorAll('.slideshow-slide');
+  const container = document.getElementById('slideshow');
+  
+  if (!slides.length) return;
+  
+  // Create dots
+  const dotsContainer = document.getElementById('slideshowDots');
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (idx === 0 ? ' active' : '');
+      dot.onclick = () => slideShowGoto(idx);
+      dotsContainer.appendChild(dot);
+    });
+  }
+  
+  startSlideShowTimer();
+}
+
+function startSlideShowTimer() {
+  if (slideShowInterval) clearInterval(slideShowInterval);
+  slideShowInterval = setInterval(() => slideShowNav(1), SLIDESHOW_INTERVAL);
+}
+
+function slideShowNav(n) {
+  const slides = document.querySelectorAll('.slideshow-slide');
+  if (!slides.length) return;
+  
+  slideShowIndex = (slideShowIndex + n + slides.length) % slides.length;
+  slideShowGoto(slideShowIndex);
+  startSlideShowTimer();
+}
+
+function slideShowGoto(n) {
+  const slides = document.querySelectorAll('.slideshow-slide');
+  const dots = document.querySelectorAll('.dot');
+  
+  if (!slides.length) return;
+  
+  slideShowIndex = (n + slides.length) % slides.length;
+  
+  slides.forEach(slide => slide.classList.remove('active'));
+  dots.forEach(dot => dot.classList.remove('active'));
+  
+  slides[slideShowIndex].classList.add('active');
+  if (dots[slideShowIndex]) dots[slideShowIndex].classList.add('active');
+}
+
+// Initialize slideshow when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initSlideShow, 100);
+});
+
+// ---- STORAGE MANAGER ----
+function storageManager(key,val){
+  if(val===undefined) return JSON.parse(localStorage.getItem(key)||'null');
+  localStorage.setItem(key,JSON.stringify(val));
+}
+
+</script>
+
+</body>
+</html>
