@@ -479,10 +479,19 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="grid-2">
           <div class="card">
             <div class="card-title">➕ Upload Marks</div>
-            <div class="form-group">
-              <label>Exam Term</label>
-              <input type="text" id="em_term" list="em_term_list" placeholder="e.g. First Term 2026" onblur="loadExamMarksList();loadClassRoster()">
-              <datalist id="em_term_list"></datalist>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Exam Term</label>
+                <select id="em_term" onchange="loadExamMarksList();loadClassRoster()">
+                  <option value="1st Term">1st Term</option>
+                  <option value="2nd Term">2nd Term</option>
+                  <option value="3rd Term">3rd Term</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Year</label>
+                <input type="number" id="em_year" value="2026" min="2020" max="2100" step="1" onchange="loadExamMarksList();loadClassRoster()">
+              </div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -1992,8 +2001,10 @@ function populateExamTermSuggestions(){
 }
 
 function currentExamSelection(){
+  const term = document.getElementById('em_term').value.trim();
+  const year = document.getElementById('em_year').value.trim();
   return {
-    termLabel: document.getElementById('em_term').value.trim(),
+    termLabel: year ? `${term} ${year}` : term,
     grade:     document.getElementById('em_grade').value,
     cls:       document.getElementById('em_class').value,
     subject:   getSubjectValue('em_subject'),
@@ -2105,7 +2116,8 @@ let _rosterRef = null;
 let _rosterNames = [];
 
 function classRosterPath(){
-  const termLabel = document.getElementById('em_term').value.trim();
+  const sel = currentExamSelection();
+  const termLabel = sel.termLabel;
   const grade = document.getElementById('em_grade').value;
   const cls   = document.getElementById('em_class').value;
   if(!termLabel) return null;
