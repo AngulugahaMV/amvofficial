@@ -278,17 +278,10 @@
   /* ── SCHOOL LOGO / BRANDING ── */
   let _logoData = null; // base64 string of newly selected logo
 
-  window.previewLogo = function(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 1.2 * 1024 * 1024) { alert("⚠️ Image too large. Please choose a file under 1MB."); input.value=""; return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-      _logoData = e.target.result;
-      const preview = document.getElementById("logo-preview");
-      preview.innerHTML = `<img src="${_logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
-    };
-    reader.readAsDataURL(file);
+  window.setCroppedLogo = function(dataURL) {
+    _logoData = dataURL;
+    const preview = document.getElementById("logo-preview");
+    preview.innerHTML = `<img src="${_logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
   };
 
   window.saveLogo = function() {
@@ -1153,7 +1146,7 @@ tr:hover td{ background: var(--bg-surface); }
             </div>
             <label style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:var(--primary);color:var(--accent);border-radius:8px;font-family:sans-serif;font-size:13px;font-weight:bold;transition:background .2s;" onmouseover="this.style.background='var(--primary-h)'" onmouseout="this.style.background='var(--primary)'">
               📁 Choose Logo
-              <input type="file" accept="image/*" style="display:none" onchange="previewLogo(this)">
+              <input type="file" accept="image/*" style="display:none" onchange="handleLogoFile(this)">
             </label>
             <p style="font-size:11px;color:var(--text-3);font-family:sans-serif;text-align:center;">JPG, PNG or WebP (square image works best). Max 1MB.<br>Stored in Firebase DB as base64.</p>
             <button onclick="saveLogo()" style="width:100%;padding:10px;background:var(--accent);color:#1a0a0a;border:none;border-radius:8px;font-family:sans-serif;font-size:13px;font-weight:bold;cursor:pointer;transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
@@ -1251,6 +1244,80 @@ function logout() {
   localStorage.removeItem("principal_seen_keys");
   window.location.href = "login.html";
 }
+
+/* ═══════════ LOGO CROPPER — WhatsApp-style drag & zoom circular crop ═══════════
+   Ensures whatever is saved fits the site's circular crest exactly,
+   with no letterboxing or awkward auto-cropping. */
+function handleLogoFile(input){
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 1.2*1024*1024){ alert('⚠️ Image too large. Please choose a file under 1MB.'); input.value=''; return; }
+  openLogoCropper(file);
+  input.value='';
+}
+let _cropZoom=1, _cropBaseScale=1, _cropX=0, _cropY=0, _cropImgNatW=0, _cropImgNatH=0;
+const CROP_STAGE=260, CROP_OUTPUT=512;
+function openLogoCropper(file){
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('cropperImg');
+    img.onload = () => {
+      _cropImgNatW = img.naturalWidth; _cropImgNatH = img.naturalHeight;
+      _cropBaseScale = Math.max(CROP_STAGE/_cropImgNatW, CROP_STAGE/_cropImgNatH);
+      _cropZoom = 1;
+      document.getElementById('cropperZoom').value = 100;
+      _cropX = (CROP_STAGE - _cropImgNatW*_cropBaseScale)/2;
+      _cropY = (CROP_STAGE - _cropImgNatH*_cropBaseScale)/2;
+      applyCropTransform();
+      document.getElementById('cropperOverlay').classList.add('open');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function applyCropTransform(){
+  const img = document.getElementById('cropperImg');
+  const scale = _cropBaseScale*_cropZoom;
+  const w = _cropImgNatW*scale, h = _cropImgNatH*scale;
+  _cropX = Math.min(0, Math.max(CROP_STAGE - w, _cropX));
+  _cropY = Math.min(0, Math.max(CROP_STAGE - h, _cropY));
+  img.style.width = w+'px'; img.style.height = h+'px';
+  img.style.transform = `translate(${_cropX}px,${_cropY}px)`;
+}
+function closeCropper(){
+  document.getElementById('cropperOverlay').classList.remove('open');
+}
+function applyCrop(){
+  const scale = _cropBaseScale*_cropZoom;
+  const k = CROP_OUTPUT/CROP_STAGE;
+  const canvas = document.createElement('canvas');
+  canvas.width = CROP_OUTPUT; canvas.height = CROP_OUTPUT;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CROP_OUTPUT/2, CROP_OUTPUT/2, CROP_OUTPUT/2, 0, Math.PI*2);
+  ctx.clip();
+  const img = document.getElementById('cropperImg');
+  ctx.drawImage(img, _cropX*k, _cropY*k, _cropImgNatW*scale*k, _cropImgNatH*scale*k);
+  ctx.restore();
+  if (window.setCroppedLogo) window.setCroppedLogo(canvas.toDataURL('image/png'));
+  closeCropper();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  const stage = document.getElementById('cropperStage');
+  if(!stage) return;
+  let dragging=false, startX=0, startY=0, origX=0, origY=0;
+  const start=(x,y)=>{ dragging=true; startX=x; startY=y; origX=_cropX; origY=_cropY; stage.classList.add('dragging'); };
+  const move=(x,y)=>{ if(!dragging) return; _cropX=origX+(x-startX); _cropY=origY+(y-startY); applyCropTransform(); };
+  const end=()=>{ dragging=false; stage.classList.remove('dragging'); };
+  stage.addEventListener('mousedown', e=>start(e.clientX,e.clientY));
+  window.addEventListener('mousemove', e=>move(e.clientX,e.clientY));
+  window.addEventListener('mouseup', end);
+  stage.addEventListener('touchstart', e=>{ const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:true});
+  stage.addEventListener('touchmove', e=>{ const t=e.touches[0]; move(t.clientX,t.clientY); }, {passive:true});
+  stage.addEventListener('touchend', end);
+  const zoomInput = document.getElementById('cropperZoom');
+  if(zoomInput) zoomInput.addEventListener('input', e=>{ _cropZoom=e.target.value/100; applyCropTransform(); });
+});
 
 /* ═══════════ NAVIGATION ═══════════ */
 const titles = { dashboard:"Dashboard", leave:"Leave Requests", announcements:"Announcements", teachers:"Manage Teachers", settings:"Settings", "principal-profile":"Principal Profile", "about-section":"About Section", "branding":"School Logo" };
@@ -1509,6 +1576,21 @@ window._onLeaveRequestsUpdate = function(entries) {
   from { opacity:0; transform:translateY(20px) scale(0.97); }
   to   { opacity:1; transform:translateY(0) scale(1); }
 }
+/* LOGO CROPPER — WhatsApp-style drag & zoom circular crop */
+.cropper-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.cropper-overlay.open{display:flex}
+.cropper-box{background:var(--bg-card,var(--bg-surface));border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 24px 70px rgba(0,0,0,.55);font-family:sans-serif}
+.cropper-title{font-size:15px;font-weight:700;color:var(--accent)}
+.cropper-stage{width:260px;height:260px;border-radius:50%;overflow:hidden;position:relative;background:#000;cursor:grab;touch-action:none;box-shadow:0 0 0 4px var(--border),0 0 30px rgba(0,0,0,.5)}
+.cropper-stage.dragging{cursor:grabbing}
+.cropper-stage img{position:absolute;top:0;left:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform}
+.cropper-zoom{width:260px;display:flex;align-items:center;gap:10px;color:var(--text-3)}
+.cropper-zoom input[type=range]{flex:1;accent-color:var(--accent)}
+.cropper-hint{font-size:11px;color:var(--text-3);text-align:center}
+.cropper-actions{display:flex;gap:10px;width:100%}
+.cropper-actions button{flex:1;padding:11px;border-radius:9px;font-weight:700;cursor:pointer;border:none;font-size:13px;font-family:inherit}
+.cropper-cancel{background:transparent;border:1px solid var(--border)!important;color:var(--text-3)!important}
+.cropper-apply{background:var(--accent);color:#1a0a0a}
 </style>
 
 <!-- PRINCIPAL NOTIFICATION PANEL -->
@@ -1519,6 +1601,24 @@ window._onLeaveRequestsUpdate = function(entries) {
   </div>
   <div class="notif-body" id="principalNotifBody">
     <div class="notif-empty">Loading…</div>
+  </div>
+</div>
+<!-- LOGO CROPPER MODAL -->
+<div class="cropper-overlay" id="cropperOverlay">
+  <div class="cropper-box">
+    <div class="cropper-title">🖼️ Adjust Logo</div>
+    <div class="cropper-stage" id="cropperStage">
+      <img id="cropperImg" src="" alt="">
+    </div>
+    <div class="cropper-zoom">
+      <span>🔍</span>
+      <input type="range" id="cropperZoom" min="100" max="300" value="100">
+    </div>
+    <div class="cropper-hint">Drag to reposition · Slide to zoom — just like a WhatsApp profile photo</div>
+    <div class="cropper-actions">
+      <button class="cropper-cancel" onclick="closeCropper()">Cancel</button>
+      <button class="cropper-apply" onclick="applyCrop()">✅ Use Photo</button>
+    </div>
   </div>
 </div>
 </body>
