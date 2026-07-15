@@ -1554,11 +1554,19 @@ db.ref('amv/creators').on('value', snap => {
 db.ref('amv/branding/logo').on('value', snap => {
   const logo = snap.val();
   const crestEl = document.getElementById('crest-emoji-display');
+  const nameEl = document.querySelector('.crest-name');
+  const yearEl = document.querySelector('.crest-year');
   if (crestEl) {
     if (logo) {
-      crestEl.innerHTML = `<img src="${logo}" style="width:100px;height:100px;object-fit:cover;border-radius:50%;" alt="School Logo" />`;
+      crestEl.innerHTML = `<img src="${logo}" style="width:88%;height:88%;object-fit:contain;border-radius:50%;" alt="School Logo" />`;
+      crestEl.style.cssText = 'width:100%;height:100%;margin:0;display:flex;align-items:center;justify-content:center;';
+      if (nameEl) nameEl.style.display = 'none';
+      if (yearEl) yearEl.style.display = 'none';
     } else {
       crestEl.textContent = '🏫';
+      crestEl.style.cssText = '';
+      if (nameEl) nameEl.style.display = '';
+      if (yearEl) yearEl.style.display = '';
     }
   }
 });
