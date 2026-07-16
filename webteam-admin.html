@@ -140,6 +140,7 @@ tr:hover td{background:var(--bg-surface)}
 .name-cell{font-weight:600;color:var(--text-1)}
 .badge{padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:600}
 .badge-online{background:rgba(76,175,80,.2);color:#81c784}
+.badge-stale{background:rgba(255,152,0,.2);color:#ffb74d}
 .action-cell{display:flex;gap:6px;flex-wrap:wrap}
 .btn-mini{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:11.5px;font-weight:600;transition:all .2s;white-space:nowrap}
 .btn-approve{background:rgba(76,175,80,.2);color:#81c784;border:1px solid #4caf5044}
@@ -167,7 +168,23 @@ tr:hover td{background:var(--bg-surface)}
 .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
 
 .avatar-preview{width:90px;height:90px;border-radius:50%;background:var(--bg-surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin-bottom:10px}
-.logo-preview{width:90px;height:90px;border-radius:16px;background:var(--bg-surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin-bottom:10px}
+.logo-preview{width:90px;height:90px;border-radius:50%;background:var(--bg-surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin-bottom:10px}
+
+/* LOGO CROPPER — WhatsApp-style drag & zoom circular crop */
+.cropper-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.cropper-overlay.open{display:flex}
+.cropper-box{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.cropper-title{font-size:15px;font-weight:700;color:var(--accent)}
+.cropper-stage{width:260px;height:260px;border-radius:50%;overflow:hidden;position:relative;background:#000;cursor:grab;touch-action:none;box-shadow:0 0 0 4px var(--border),0 0 30px rgba(0,0,0,.5)}
+.cropper-stage.dragging{cursor:grabbing}
+.cropper-stage img{position:absolute;top:0;left:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform}
+.cropper-zoom{width:260px;display:flex;align-items:center;gap:10px;color:var(--text-3)}
+.cropper-zoom input[type=range]{flex:1;accent-color:var(--accent)}
+.cropper-hint{font-size:11px;color:var(--text-3);text-align:center}
+.cropper-actions{display:flex;gap:10px;width:100%}
+.cropper-actions button{flex:1;padding:11px;border-radius:9px;font-weight:700;cursor:pointer;border:none;font-size:13px;font-family:inherit}
+.cropper-cancel{background:transparent;border:1px solid var(--border)!important;color:var(--text-3)!important}
+.cropper-apply{background:var(--accent);color:#1a0a0a}
 
 .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
 .subtab-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-2);cursor:pointer;font-size:12.5px;font-weight:600;transition:all .2s}
@@ -394,7 +411,7 @@ tr:hover td{background:var(--bg-surface)}
           <div class="panel-header"><span class="panel-title">School Logo</span></div>
           <div class="panel-body">
             <div class="logo-preview" id="logo-preview">🏫</div>
-            <input type="file" accept="image/*" id="logo-file" onchange="previewLogo(this)">
+            <input type="file" accept="image/*" id="logo-file" onchange="handleLogoFile(this)">
             <div class="f-hint">Max 1.2MB. Replaces the crest in the navbar, hero and footer.</div>
             <div class="form-actions">
               <button class="btn-danger-outline" onclick="removeLogo()">🗑 Remove Logo</button>
@@ -434,7 +451,7 @@ tr:hover td{background:var(--bg-surface)}
           <div class="panel-header"><span class="panel-title">Photo</span></div>
           <div class="panel-body">
             <div class="avatar-preview" id="pp-avatar-preview">👨‍💼</div>
-            <input type="file" accept="image/*" id="pp-photo-file" onchange="previewPPPhoto(this)">
+            <input type="file" accept="image/*" id="pp-photo-file" onchange="handlePPPhotoFile(this)">
             <div class="f-hint">Max 1.2MB.</div>
             <div class="form-actions">
               <button class="btn-danger-outline" onclick="removePrincipalPhoto()">🗑 Remove Photo</button>
@@ -1040,6 +1057,7 @@ function initAdmin(){
 // ============================================================
 // SESSIONS
 // ============================================================
+const SESSION_STALE_MS = 90*1000; // no heartbeat in 90s (heartbeat writes every 30s) → likely a dead/ghost session
 function listenSessions(){
   db.ref('presence/students').on('value', snap=>{
     const obj = snap.val() || {};
@@ -1047,14 +1065,18 @@ function listenSessions(){
     _dashCounts.studentsOnline = entries.length;
     document.getElementById('sessStudentsCount').textContent = entries.length;
     const body = document.getElementById('sessStudentsBody');
-    body.innerHTML = entries.length ? entries.map(([sid,v])=>`
+    body.innerHTML = entries.length ? entries.map(([sid,v])=>{
+      const stale = !v.lastSeen || (Date.now()-v.lastSeen > SESSION_STALE_MS);
+      const name  = v.name ? esc(v.name) : '<span style="opacity:.55">Unknown</span>';
+      return `
       <tr>
-        <td class="name-cell">${esc(v.name)} <span class="badge badge-online">online</span></td>
-        <td>Grade ${esc(v.grade)}</td>
+        <td class="name-cell">${name} <span class="badge ${stale?'badge-stale':'badge-online'}">${stale?'stale':'online'}</span></td>
+        <td>${v.grade ? 'Grade '+esc(v.grade) : '—'}</td>
         <td>${fmtDateTime(v.loginTime)}</td>
         <td>${fmtDateTime(v.lastSeen)}</td>
-        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/students','${sid}')">🚫 Force Logout</button></td>
-      </tr>`).join('') : '<tr><td colspan="5" class="empty-row">No students currently logged in.</td></tr>';
+        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/students','${sid}')">${stale?'🗑 Clear':'🚫 Force Logout'}</button></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-row">No students currently logged in.</td></tr>';
     updateDashboard();
   });
   db.ref('presence/teachers').on('value', snap=>{
@@ -1063,14 +1085,18 @@ function listenSessions(){
     _dashCounts.teachersOnline = entries.length;
     document.getElementById('sessTeachersCount').textContent = entries.length;
     const body = document.getElementById('sessTeachersBody');
-    body.innerHTML = entries.length ? entries.map(([id,v])=>`
+    body.innerHTML = entries.length ? entries.map(([id,v])=>{
+      const stale = !v.lastSeen || (Date.now()-v.lastSeen > SESSION_STALE_MS);
+      const name  = v.name ? esc(v.name) : `<span style="opacity:.55">${esc(id)}</span>`;
+      return `
       <tr>
-        <td class="name-cell">${esc(v.name||id)} <span class="badge badge-online">online</span></td>
+        <td class="name-cell">${name} <span class="badge ${stale?'badge-stale':'badge-online'}">${stale?'stale':'online'}</span></td>
         <td>${esc(v.subject||'—')}</td>
         <td>${fmtDateTime(v.loginTime)}</td>
         <td>${fmtDateTime(v.lastSeen)}</td>
-        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/teachers','${id}')">🚫 Force Logout</button></td>
-      </tr>`).join('') : '<tr><td colspan="5" class="empty-row">No teachers currently logged in.</td></tr>';
+        <td class="action-cell"><button class="btn-mini btn-dismiss" onclick="kickSession('presence/teachers','${id}')">${stale?'🗑 Clear':'🚫 Force Logout'}</button></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-row">No teachers currently logged in.</td></tr>';
     updateDashboard();
   });
 }
@@ -1078,6 +1104,10 @@ function kickSession(path, key){
   if(!confirm('Force log out this session immediately?')) return;
   db.ref(path+'/'+key+'/kick').set(true);
   showToast('🚫 Logout signal sent');
+  // Safety net: if the device is offline / the tab already crashed and never
+  // picks up the kick signal, remove the stale record after a few seconds so
+  // it doesn't linger in Active Sessions forever.
+  setTimeout(()=>{ db.ref(path+'/'+key).remove().catch(()=>{}); }, 4000);
 }
 
 // ============================================================
@@ -1163,12 +1193,15 @@ function saveHero(){
   db.ref(FB.hero).set({badge, title, desc, updatedAt: Date.now()}).then(()=>showToast('✅ Hero text saved to website!'));
 }
 let _logoData = null;
-function previewLogo(input){
+function handleLogoFile(input){
   const file = input.files[0]; if(!file) return;
   if(file.size > 1.2*1024*1024){ alert('⚠️ Image too large. Please choose a file under 1MB.'); input.value=''; return; }
-  const reader = new FileReader();
-  reader.onload = e => { _logoData = e.target.result; document.getElementById('logo-preview').innerHTML = `<img src="${_logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`; };
-  reader.readAsDataURL(file);
+  openLogoCropper(file, 'logo');
+  input.value=''; // allow re-selecting the same file later
+}
+function setCroppedLogo(dataURL){
+  _logoData = dataURL;
+  document.getElementById('logo-preview').innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
 }
 function saveLogo(){
   if(!_logoData){ showToast('⚠️ No logo image selected'); return; }
@@ -1178,6 +1211,85 @@ function removeLogo(){
   if(!confirm('Remove the custom logo and revert to the default school crest?')) return;
   db.ref('amv/branding/logo').remove().then(()=>{ _logoData=null; document.getElementById('logo-preview').innerHTML='🏫'; showToast('🗑 Logo removed'); });
 }
+
+// ============================================================
+// LOGO CROPPER — WhatsApp-style drag & zoom circular crop.
+// Ensures whatever is saved fits the site's circular crest exactly,
+// with no letterboxing or awkward auto-cropping.
+// ============================================================
+let _cropZoom=1, _cropBaseScale=1, _cropX=0, _cropY=0, _cropImgNatW=0, _cropImgNatH=0, _cropTarget='logo';
+const CROP_STAGE=260, CROP_OUTPUT=512;
+
+function openLogoCropper(file, target){
+  _cropTarget = target || 'logo';
+  const titleEl = document.querySelector('.cropper-title');
+  if (titleEl) titleEl.textContent = _cropTarget === 'photo' ? '🖼️ Adjust Photo' : '🖼️ Adjust Logo';
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('cropperImg');
+    img.onload = () => {
+      _cropImgNatW = img.naturalWidth; _cropImgNatH = img.naturalHeight;
+      _cropBaseScale = Math.max(CROP_STAGE/_cropImgNatW, CROP_STAGE/_cropImgNatH);
+      _cropZoom = 1;
+      document.getElementById('cropperZoom').value = 100;
+      _cropX = (CROP_STAGE - _cropImgNatW*_cropBaseScale)/2;
+      _cropY = (CROP_STAGE - _cropImgNatH*_cropBaseScale)/2;
+      applyCropTransform();
+      document.getElementById('cropperOverlay').classList.add('open');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function applyCropTransform(){
+  const img = document.getElementById('cropperImg');
+  const scale = _cropBaseScale*_cropZoom;
+  const w = _cropImgNatW*scale, h = _cropImgNatH*scale;
+  _cropX = Math.min(0, Math.max(CROP_STAGE - w, _cropX));
+  _cropY = Math.min(0, Math.max(CROP_STAGE - h, _cropY));
+  img.style.width = w+'px'; img.style.height = h+'px';
+  img.style.transform = `translate(${_cropX}px,${_cropY}px)`;
+}
+function closeCropper(){
+  document.getElementById('cropperOverlay').classList.remove('open');
+}
+function applyCrop(){
+  const scale = _cropBaseScale*_cropZoom;
+  const k = CROP_OUTPUT/CROP_STAGE;
+  const canvas = document.createElement('canvas');
+  canvas.width = CROP_OUTPUT; canvas.height = CROP_OUTPUT;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CROP_OUTPUT/2, CROP_OUTPUT/2, CROP_OUTPUT/2, 0, Math.PI*2);
+  ctx.clip();
+  const img = document.getElementById('cropperImg');
+  ctx.drawImage(img, _cropX*k, _cropY*k, _cropImgNatW*scale*k, _cropImgNatH*scale*k);
+  ctx.restore();
+  const dataURL = canvas.toDataURL('image/png');
+  if (_cropTarget === 'photo') {
+    setCroppedPPPhoto(dataURL);
+  } else {
+    setCroppedLogo(dataURL);
+  }
+  closeCropper();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  const stage = document.getElementById('cropperStage');
+  if(!stage) return;
+  let dragging=false, startX=0, startY=0, origX=0, origY=0;
+  const start=(x,y)=>{ dragging=true; startX=x; startY=y; origX=_cropX; origY=_cropY; stage.classList.add('dragging'); };
+  const move=(x,y)=>{ if(!dragging) return; _cropX=origX+(x-startX); _cropY=origY+(y-startY); applyCropTransform(); };
+  const end=()=>{ dragging=false; stage.classList.remove('dragging'); };
+  stage.addEventListener('mousedown', e=>start(e.clientX,e.clientY));
+  window.addEventListener('mousemove', e=>move(e.clientX,e.clientY));
+  window.addEventListener('mouseup', end);
+  stage.addEventListener('touchstart', e=>{ const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:true});
+  stage.addEventListener('touchmove', e=>{ const t=e.touches[0]; move(t.clientX,t.clientY); }, {passive:true});
+  stage.addEventListener('touchend', end);
+  const zoomInput = document.getElementById('cropperZoom');
+  if(zoomInput) zoomInput.addEventListener('input', e=>{ _cropZoom=e.target.value/100; applyCropTransform(); });
+});
 db.ref && null;
 
 // ============================================================
@@ -1211,12 +1323,15 @@ function saveAboutData(){
 // PRINCIPAL
 // ============================================================
 let _ppPhotoData = null;
-function previewPPPhoto(input){
+function handlePPPhotoFile(input){
   const file = input.files[0]; if(!file) return;
   if(file.size > 1.2*1024*1024){ alert('⚠️ Image too large. Please choose a file under 1MB.'); input.value=''; return; }
-  const reader = new FileReader();
-  reader.onload = e => { _ppPhotoData = e.target.result; document.getElementById('pp-avatar-preview').innerHTML = `<img src="${_ppPhotoData}" style="width:100%;height:100%;object-fit:cover">`; };
-  reader.readAsDataURL(file);
+  openLogoCropper(file, 'photo');
+  input.value='';
+}
+function setCroppedPPPhoto(dataURL){
+  _ppPhotoData = dataURL;
+  document.getElementById('pp-avatar-preview').innerHTML = `<img src="${dataURL}" style="width:100%;height:100%;object-fit:cover">`;
 }
 function savePrincipalPhoto(){
   if(!_ppPhotoData){ showToast('⚠️ No photo selected'); return; }
@@ -1564,5 +1679,23 @@ async function addResource(kind){
   }catch(e){ showToast('❌ Failed: '+e.message); }
 }
 </script>
+<!-- LOGO CROPPER MODAL -->
+<div class="cropper-overlay" id="cropperOverlay">
+  <div class="cropper-box">
+    <div class="cropper-title">🖼️ Adjust Logo</div>
+    <div class="cropper-stage" id="cropperStage">
+      <img id="cropperImg" src="" alt="">
+    </div>
+    <div class="cropper-zoom">
+      <span>🔍</span>
+      <input type="range" id="cropperZoom" min="100" max="300" value="100">
+    </div>
+    <div class="cropper-hint">Drag to reposition · Slide to zoom — just like a WhatsApp profile photo</div>
+    <div class="cropper-actions">
+      <button class="cropper-cancel" onclick="closeCropper()">Cancel</button>
+      <button class="cropper-apply" onclick="applyCrop()">✅ Use Photo</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
