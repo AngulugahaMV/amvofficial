@@ -950,7 +950,7 @@ footer{
 <!-- NAV -->
 <nav id="navbar">
   <a class="nav-brand" href="#home">
-    <div class="nav-logo">A</div>
+    <div class="nav-logo" id="nav-logo-display" style="overflow:hidden;">A</div>
     <div class="nav-name">Angulugaha M.V.<span><br>මානිවත්ථ අභික්ඛම</span></div>
   </a>
   <ul class="nav-links" id="navLinks">
@@ -1556,6 +1556,7 @@ db.ref('amv/branding/logo').on('value', snap => {
   const crestEl = document.getElementById('crest-emoji-display');
   const nameEl = document.querySelector('.crest-name');
   const yearEl = document.querySelector('.crest-year');
+  const navLogoEl = document.getElementById('nav-logo-display');
   if (crestEl) {
     if (logo) {
       crestEl.innerHTML = `<img src="${logo}" style="width:88%;height:88%;object-fit:contain;border-radius:50%;" alt="School Logo" />`;
@@ -1567,6 +1568,13 @@ db.ref('amv/branding/logo').on('value', snap => {
       crestEl.style.cssText = '';
       if (nameEl) nameEl.style.display = '';
       if (yearEl) yearEl.style.display = '';
+    }
+  }
+  if (navLogoEl) {
+    if (logo) {
+      navLogoEl.innerHTML = `<img src="${logo}" style="width:100%;height:100%;object-fit:cover;" alt="School Logo" />`;
+    } else {
+      navLogoEl.textContent = 'A';
     }
   }
 });
