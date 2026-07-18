@@ -908,6 +908,7 @@ window.addEventListener('load', ()=>{
 const STUDENT_ID   = 'student';
 const STUDENT_PASS = 'school123';
 let currentStudentGrade = null;
+let currentStudentName  = null;
 
 function doLogin(){
   const name = document.getElementById('loginName').value.trim();
@@ -938,6 +939,7 @@ function checkSession(){
 
 function showDashboard(name, grade){
   currentStudentGrade = grade;
+  currentStudentName  = name;
   document.getElementById('loginPage').style.display='none';
   document.getElementById('dashboard').style.display='block';
   document.getElementById('userName').textContent = name;
@@ -1728,6 +1730,25 @@ function appendAiMsg(text, cls){
   return div;
 }
 
+// Logs each chat message to Firebase so the webteam admin panel can
+// review or download a student's AI Study Bot conversation.
+// Keyed by this device's session id (sid) — same id used for presence.
+function logAiChatMessage(role, text){
+  try{
+    const sid = getSessionId();
+    const logRef = db.ref('amv/aiChatLogs/' + sid);
+    logRef.child('messages').push({ role, text, time: Date.now() });
+    logRef.update({
+      name: currentStudentName || 'Unknown',
+      grade: currentStudentGrade || '',
+      lastActive: Date.now()
+    });
+  } catch(e){
+    // Logging failures should never block the chat experience
+    console.warn('AI chat log failed:', e);
+  }
+}
+
 async function sendAiChatMessage(){
   if(aiChatBusy) return;
   const input = document.getElementById('aiChatInput');
@@ -1740,6 +1761,7 @@ async function sendAiChatMessage(){
   }
 
   appendAiMsg(text, 'ai-msg-user');
+  logAiChatMessage('user', text);
   input.value = '';
   aiChatBusy = true;
   const typingEl = appendAiMsg('Thinking…', 'ai-msg-typing');
@@ -1763,6 +1785,7 @@ async function sendAiChatMessage(){
     }
 
     appendAiMsg(data.reply, 'ai-msg-bot');
+    logAiChatMessage('model', data.reply);
     aiChatHistory.push({role:'user', text});
     aiChatHistory.push({role:'model', text:data.reply});
     if(aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
