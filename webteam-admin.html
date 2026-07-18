@@ -139,6 +139,10 @@ tr:hover td{background:var(--bg-surface)}
 .empty-row{text-align:center;color:var(--text-3);font-style:italic;padding:30px!important}
 .name-cell{font-weight:600;color:var(--text-1)}
 .badge{padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:600}
+.ai-log-msg{max-width:75%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.ai-log-msg.role-user{align-self:flex-end;background:var(--accent);color:#fff}
+.ai-log-msg.role-model{align-self:flex-start;background:var(--bg-surface);border:1px solid var(--border)}
+.ai-log-time{font-size:10px;color:var(--text-3);margin-top:3px}
 .badge-online{background:rgba(76,175,80,.2);color:#81c784}
 .badge-stale{background:rgba(255,152,0,.2);color:#ffb74d}
 .action-cell{display:flex;gap:6px;flex-wrap:wrap}
@@ -251,6 +255,7 @@ tr:hover td{background:var(--bg-surface)}
       <div class="nav-label">Overview</div>
       <div class="nav-item active" data-section="dashboard" onclick="navigate(this,'dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
       <div class="nav-item" data-section="sessions" onclick="navigate(this,'sessions')"><span class="nav-icon">🟢</span> Active Sessions</div>
+      <div class="nav-item" data-section="aichats" onclick="navigate(this,'aichats')"><span class="nav-icon">🤖</span> AI Chat Logs</div>
 
       <div class="nav-label">People</div>
       <div class="nav-item" data-section="teachers" onclick="navigate(this,'teachers')"><span class="nav-icon">👩‍🏫</span> Manage Teachers</div>
@@ -351,6 +356,34 @@ tr:hover td{background:var(--bg-surface)}
           </div>
         </div>
       </section>
+
+      <!-- ═══ AI CHAT LOGS ═══ -->
+      <section class="section" id="sec-aichats">
+        <div class="section-title">AI Study Bot — Chat Logs</div>
+        <div class="section-sub">Every conversation Grade 10 &amp; 11 students have had with the AI Study Bot. Click "View" to read a transcript, or download it as a text file.</div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">💬 Conversations (<span id="aiChatsCount">0</span>)</span></div>
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Grade</th><th>Messages</th><th>Last Active</th><th>Action</th></tr></thead>
+              <tbody id="aiChatsBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" id="aiChatDetailPanel" style="display:none">
+          <div class="panel-header">
+            <span class="panel-title">📄 Transcript — <span id="aiChatDetailName">—</span></span>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="downloadAiChatTranscript()">⬇ Download .txt</button>
+              <button class="btn-secondary" onclick="closeAiChatDetail()">✕ Close</button>
+            </div>
+          </div>
+          <div class="panel-body" id="aiChatDetailBody" style="max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </section>
+
 
       <!-- ═══ TEACHERS ═══ -->
       <section class="section" id="sec-teachers">
@@ -886,6 +919,7 @@ const FB = {
   applications: 'amv/shared/applications',
   announcements: 'announcements',
   leaveRequests: 'leaveRequests',
+  aiChatLogs: 'amv/aiChatLogs',
 };
 
 // ============================================================
@@ -944,7 +978,7 @@ function setTheme(name, btn){
 // NAVIGATION
 // ============================================================
 const titles = {
-  dashboard:'Dashboard', sessions:'Active Sessions', teachers:'Manage Teachers', leave:'Leave Requests',
+  dashboard:'Dashboard', sessions:'Active Sessions', aichats:'AI Chat Logs', teachers:'Manage Teachers', leave:'Leave Requests',
   hero:'Hero & Logo', about:'About Section', principal:'Principal Profile', clubs:'Clubs & Societies',
   contact:'Contact & Footer', gallery:'Gallery', news:'News', results:'Exam Results',
   announcements:'Announcements', lms:'LMS Resources', settings:'Settings'
@@ -1034,6 +1068,7 @@ function initAdmin(){
   });
 
   listenSessions();
+  listenAiChatLogs();
   listenTeachers();
   listenLeave();
   loadHero();
@@ -1108,6 +1143,109 @@ function kickSession(path, key){
   // picks up the kick signal, remove the stale record after a few seconds so
   // it doesn't linger in Active Sessions forever.
   setTimeout(()=>{ db.ref(path+'/'+key).remove().catch(()=>{}); }, 4000);
+}
+
+// ============================================================
+// AI CHAT LOGS
+// ============================================================
+let _aiChatCache = {}; // sid -> {name, grade, lastActive, messages:[...]}
+let _aiChatDetailSid = null;
+
+function listenAiChatLogs(){
+  db.ref(FB.aiChatLogs).on('value', snap=>{
+    const obj = snap.val() || {};
+    const entries = Object.entries(obj);
+    document.getElementById('aiChatsCount').textContent = entries.length;
+    const body = document.getElementById('aiChatsBody');
+    if(!entries.length){
+      body.innerHTML = '<tr><td colspan="5" class="empty-row">No AI Study Bot conversations yet.</td></tr>';
+      return;
+    }
+    // Sort by most recently active first
+    entries.sort((a,b)=>(b[1].lastActive||0)-(a[1].lastActive||0));
+    body.innerHTML = entries.map(([sid,v])=>{
+      const msgCount = v.messages ? Object.keys(v.messages).length : 0;
+      return `
+      <tr>
+        <td class="name-cell">${esc(v.name||'Unknown')}</td>
+        <td>${v.grade ? 'Grade '+esc(v.grade) : '—'}</td>
+        <td>${msgCount}</td>
+        <td>${fmtDateTime(v.lastActive)}</td>
+        <td class="action-cell">
+          <button class="btn-mini btn-approve" onclick="viewAiChatLog('${sid}')">👁 View</button>
+          <button class="btn-mini btn-dismiss" onclick="deleteAiChatLog('${sid}','${esc(v.name||'this student')}')">🗑 Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+function viewAiChatLog(sid){
+  const ref = db.ref(FB.aiChatLogs + '/' + sid);
+  ref.once('value').then(snap=>{
+    const v = snap.val() || {};
+    const messages = v.messages ? Object.values(v.messages) : [];
+    messages.sort((a,b)=>(a.time||0)-(b.time||0));
+
+    _aiChatDetailSid = sid;
+    _aiChatCache[sid] = { name: v.name||'Unknown', grade: v.grade||'', lastActive: v.lastActive, messages };
+
+    document.getElementById('aiChatDetailName').textContent =
+      `${v.name||'Unknown'}${v.grade ? ' (Grade '+v.grade+')' : ''}`;
+
+    const detailBody = document.getElementById('aiChatDetailBody');
+    detailBody.innerHTML = messages.length
+      ? messages.map(m => `
+          <div class="ai-log-msg role-${m.role==='user'?'user':'model'}">
+            ${esc(m.text||'')}
+            <div class="ai-log-time">${fmtDateTime(m.time)}</div>
+          </div>
+        `).join('')
+      : '<div class="empty-row">No messages recorded.</div>';
+
+    document.getElementById('aiChatDetailPanel').style.display = 'block';
+    document.getElementById('aiChatDetailPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+function closeAiChatDetail(){
+  document.getElementById('aiChatDetailPanel').style.display = 'none';
+  _aiChatDetailSid = null;
+}
+
+function downloadAiChatTranscript(){
+  if(!_aiChatDetailSid || !_aiChatCache[_aiChatDetailSid]) return;
+  const { name, grade, messages } = _aiChatCache[_aiChatDetailSid];
+  const lines = [
+    `AI Study Bot Transcript`,
+    `Student: ${name}${grade ? '  |  Grade: '+grade : ''}`,
+    `Exported: ${new Date().toLocaleString()}`,
+    '='.repeat(50),
+    ''
+  ];
+  messages.forEach(m=>{
+    const who = m.role === 'user' ? name : 'AI Study Bot';
+    lines.push(`[${fmtDateTime(m.time)}] ${who}:`);
+    lines.push(m.text || '');
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AIChat_${(name||'student').replace(/[^a-z0-9]+/gi,'_')}_${Date.now()}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function deleteAiChatLog(sid, name){
+  if(!confirm(`Delete the AI chat history for ${name}? This cannot be undone.`)) return;
+  db.ref(FB.aiChatLogs + '/' + sid).remove().then(()=>{
+    showToast('🗑 Chat log deleted');
+    if(_aiChatDetailSid === sid) closeAiChatDetail();
+  });
 }
 
 // ============================================================
