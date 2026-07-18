@@ -57,13 +57,20 @@ export async function onRequestPost(context) {
         "You are a friendly, encouraging study assistant for school students (Grade 10-11, O/Level " +
         "syllabus, Sri Lanka). Help with explanations, past-paper style practice questions, and " +
         "study tips. Keep answers clear and age-appropriate. If a question is outside school " +
-        "subjects or inappropriate, politely redirect the student back to their studies."
+        "subjects or inappropriate, politely redirect the student back to their studies. " +
+        "You may answer in Sinhala, Tamil, or English depending on what the student uses. " +
+        "IMPORTANT FORMATTING RULE: this chat window displays plain text only — it does NOT render " +
+        "Markdown or LaTeX. So never use LaTeX math delimiters (no $, $$, \\times, \\frac, etc.) and " +
+        "never use Markdown symbols (no **bold**, no # headings, no bullet dashes). Write everything " +
+        "in plain sentences and plain arithmetic notation instead — for example write 'x times 4' or " +
+        "'4x', use a normal '=' sign, and use a simple '-' or numbered list like '1)' '2)' for steps. " +
+        "Keep step-by-step working concise so the full answer fits within the response length."
     }]
   };
 
   const contents = [
     systemInstruction,
-    { role: "model", parts: [{ text: "Understood — I'm ready to help with your studies!" }] },
+    { role: "model", parts: [{ text: "Understood — I'm ready to help with your studies, and I'll keep everything in plain text without LaTeX or Markdown symbols!" }] },
     ...safeHistory,
     { role: "user", parts: [{ text: message.slice(0, 4000) }] },
   ];
@@ -78,7 +85,10 @@ export async function onRequestPost(context) {
           contents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 800,
+            maxOutputTokens: 3072,
+            thinkingConfig: {
+              thinkingLevel: "low", // study-bot Q&A doesn't need heavy reasoning; keeps more of the token budget for the visible answer
+            },
           },
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
