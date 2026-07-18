@@ -233,6 +233,11 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .panel-header{margin-bottom:28px}
 .panel-header h2{font-family:var(--font-head);color:var(--gold);font-size:1.8rem;margin-bottom:4px}
 .panel-header p{color:var(--text2);font-size:0.9rem}
+.ai-msg{max-width:78%;padding:10px 14px;border-radius:14px;font-size:0.88rem;line-height:1.5;white-space:pre-wrap}
+.ai-msg-bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+.ai-msg-user{align-self:flex-end;background:linear-gradient(135deg,var(--maroon),var(--maroon-light));color:#fff}
+.ai-msg-error{align-self:center;color:#f87171;font-size:0.8rem;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2)}
+.ai-msg-typing{align-self:flex-start;color:var(--text2);font-style:italic;font-size:0.85rem}
 
 /* CARDS */
 .card{
@@ -624,6 +629,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="nav-item" onclick="showPanel('applications',this)"><span class="icon">📂</span> Applications</div>
         <div class="nav-section-title">Info</div>
         <div class="nav-item" onclick="showPanel('notices',this)"><span class="icon">📢</span> Notices</div>
+        <div class="nav-item" id="navAiBot" onclick="showPanel('aibot',this)" style="display:none"><span class="icon">🤖</span> AI Study Bot</div>
       </nav>
       <div class="sidebar-footer">
         <button class="footer-btn" onclick="cycleTheme()">🎨 Theme</button>
@@ -789,6 +795,25 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
           <div style="color:var(--text2);padding:20px;text-align:center">Loading notices...</div>
         </div>
       </div>
+
+      <!-- AI STUDY BOT (Grade 10/11 only) -->
+      <div class="panel" id="panel-aibot">
+        <div class="panel-header">
+          <h2>🤖 AI Study Bot</h2>
+          <p>Ask study questions, get explanations, and practice for your exams. Available for Grade 10 &amp; 11.</p>
+        </div>
+        <div id="aiChatWindow" style="display:flex;flex-direction:column;height:60vh;max-height:600px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+          <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div class="ai-msg ai-msg-bot">👋 Hi! I'm your AI study assistant. Ask me anything about your subjects — explanations, practice questions, or study tips.</div>
+          </div>
+          <div style="display:flex;gap:8px;padding:14px;border-top:1px solid var(--border)">
+            <input id="aiChatInput" type="text" placeholder="Type your question..."
+              style="flex:1;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font-body);font-size:0.9rem;outline:none"
+              onkeydown="if(event.key==='Enter')sendAiChatMessage()">
+            <button class="btn btn-primary" style="width:auto;padding:12px 22px" onclick="sendAiChatMessage()">Send</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -883,6 +908,7 @@ window.addEventListener('load', ()=>{
 const STUDENT_ID   = 'student';
 const STUDENT_PASS = 'school123';
 let currentStudentGrade = null;
+let currentStudentName  = null;
 
 function doLogin(){
   const name = document.getElementById('loginName').value.trim();
@@ -913,12 +939,16 @@ function checkSession(){
 
 function showDashboard(name, grade){
   currentStudentGrade = grade;
+  currentStudentName  = name;
   document.getElementById('loginPage').style.display='none';
   document.getElementById('dashboard').style.display='block';
   document.getElementById('userName').textContent = name;
   document.getElementById('welcomeMsg').textContent = `Welcome back, ${name}. Here's your learning overview.`;
   attachRealtimeListeners();
   startPresence(name, grade);
+
+  const navBot = document.getElementById('navAiBot');
+  if(navBot) navBot.style.display = (grade==='10'||grade==='11') ? 'flex' : 'none';
 }
 
 // ============================================================
@@ -939,8 +969,10 @@ function startPresence(name, grade){
   _presenceRef.onDisconnect().remove();
   _presenceRef.child('kick').on('value', snap=>{
     if(snap.val()===true){
-      if(_presenceRef) _presenceRef.off(); 
-      alert('You have been logged out by the school admin.');
+      const ref = _presenceRef;
+      _presenceRef = null;
+      if(ref){ ref.off(); ref.remove(); }
+      if(_presenceInterval){ clearInterval(_presenceInterval); _presenceInterval=null; }
       localStorage.removeItem('amv_lms_session');
       location.reload();
     }
@@ -1596,7 +1628,7 @@ function showPanel(id, navEl){
   document.getElementById('panel-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(navEl) navEl.classList.add('active');
-  const titles = {home:'📊 Dashboard',papers:'📄 Past Papers',notes:'📒 Study Notes',homework:'✏️ Homework',exammarks:'🎯 Exam Marks',videos:'▶️ Videos',downloads:'⬇️ Downloads',applications:'📂 Applications',notices:'📢 Notices'};
+  const titles = {home:'📊 Dashboard',papers:'📄 Past Papers',notes:'📒 Study Notes',homework:'✏️ Homework',exammarks:'🎯 Exam Marks',videos:'▶️ Videos',downloads:'⬇️ Downloads',applications:'📂 Applications',notices:'📢 Notices',aibot:'🤖 AI Study Bot'};
   document.getElementById('topbarTitle').textContent = titles[id]||id;
   if(id==='exammarks') renderExamMarksTable();
   if(window.innerWidth<=768) document.getElementById('sidebar').classList.remove('open');
@@ -1682,6 +1714,90 @@ function closePreviewModal(event){
 }
 
 // ============================================================
+// AI STUDY BOT (Gemini, via server-side proxy at /api/chat)
+// ============================================================
+let aiChatHistory = []; // [{role:'user'|'model', text:''}]
+let aiChatBusy = false;
+
+function appendAiMsg(text, cls){
+  const box = document.getElementById('aiChatMessages');
+  if(!box) return;
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + cls;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+// Logs each chat message to Firebase so the webteam admin panel can
+// review or download a student's AI Study Bot conversation.
+// Keyed by this device's session id (sid) — same id used for presence.
+function logAiChatMessage(role, text){
+  try{
+    const sid = getSessionId();
+    const logRef = db.ref('amv/aiChatLogs/' + sid);
+    logRef.child('messages').push({ role, text, time: Date.now() });
+    logRef.update({
+      name: currentStudentName || 'Unknown',
+      grade: currentStudentGrade || '',
+      lastActive: Date.now()
+    });
+  } catch(e){
+    // Logging failures should never block the chat experience
+    console.warn('AI chat log failed:', e);
+  }
+}
+
+async function sendAiChatMessage(){
+  if(aiChatBusy) return;
+  const input = document.getElementById('aiChatInput');
+  const text = (input.value || '').trim();
+  if(!text) return;
+
+  if(!(currentStudentGrade==='10' || currentStudentGrade==='11')){
+    appendAiMsg('The AI Study Bot is only available for Grade 10 and 11 students.', 'ai-msg-error');
+    return;
+  }
+
+  appendAiMsg(text, 'ai-msg-user');
+  logAiChatMessage('user', text);
+  input.value = '';
+  aiChatBusy = true;
+  const typingEl = appendAiMsg('Thinking…', 'ai-msg-typing');
+
+  try{
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        grade: currentStudentGrade,
+        message: text,
+        history: aiChatHistory
+      })
+    });
+    const data = await res.json();
+    typingEl.remove();
+
+    if(!res.ok){
+      appendAiMsg(data.error || 'Something went wrong. Please try again.', 'ai-msg-error');
+      return;
+    }
+
+    appendAiMsg(data.reply, 'ai-msg-bot');
+    logAiChatMessage('model', data.reply);
+    aiChatHistory.push({role:'user', text});
+    aiChatHistory.push({role:'model', text:data.reply});
+    if(aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+  } catch(e){
+    typingEl.remove();
+    appendAiMsg('Could not reach the study bot. Check your connection and try again.', 'ai-msg-error');
+  } finally {
+    aiChatBusy = false;
+  }
+}
+
+// ============================================================
 // EXPOSE GLOBALS
 // ============================================================
 window.doLogin          = doLogin;
@@ -1693,6 +1809,7 @@ window.lmsSearch        = lmsSearch;
 window.openPreview      = openPreview;
 window.closePreviewModal= closePreviewModal;
 window.downloadFile     = downloadFile;
+window.sendAiChatMessage = sendAiChatMessage;
 window.setExamClass         = setExamClass;
 window.renderExamMarksTable = renderExamMarksTable;
 window.downloadExamMarksPDF = downloadExamMarksPDF;
