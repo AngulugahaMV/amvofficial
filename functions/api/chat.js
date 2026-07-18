@@ -64,7 +64,11 @@ export async function onRequestPost(context) {
         "never use Markdown symbols (no **bold**, no # headings, no bullet dashes). Write everything " +
         "in plain sentences and plain arithmetic notation instead — for example write 'x times 4' or " +
         "'4x', use a normal '=' sign, and use a simple '-' or numbered list like '1)' '2)' for steps. " +
-        "Keep step-by-step working concise so the full answer fits within the response length."
+        "LENGTH RULE: keep every answer concise — roughly 100 to 180 words, focused only on the key " +
+        "points needed to answer the question. Do not write long multi-section essays. If the topic " +
+        "genuinely needs more than that, give the most important part first and end by asking the " +
+        "student if they'd like you to continue with the next part, rather than trying to fit " +
+        "everything into one reply."
     }]
   };
 
@@ -85,9 +89,9 @@ export async function onRequestPost(context) {
           contents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 3072,
+            maxOutputTokens: 8192,
             thinkingConfig: {
-              thinkingLevel: "low", // study-bot Q&A doesn't need heavy reasoning; keeps more of the token budget for the visible answer
+              thinkingLevel: "minimal", // study-bot Q&A doesn't need heavy reasoning; leaves max budget for the visible answer
             },
           },
           safetySettings: [
@@ -107,9 +111,14 @@ export async function onRequestPost(context) {
     }
 
     const data = await geminiRes.json();
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") ||
+    const candidate = data?.candidates?.[0];
+    let reply =
+      candidate?.content?.parts?.map(p => p.text).join("") ||
       "Sorry, I couldn't come up with a response to that — could you rephrase your question?";
+
+    if (candidate?.finishReason === "MAX_TOKENS") {
+      reply += "\n\n[Answer was cut short to keep it quick — reply \"continue\" if you'd like the rest.]";
+    }
 
     return json({ reply });
   } catch (err) {
