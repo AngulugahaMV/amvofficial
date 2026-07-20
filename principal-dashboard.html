@@ -9,7 +9,7 @@
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, push, update, remove, serverTimestamp }
+  import { getDatabase, ref, onValue, get, set, push, update, remove, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -24,6 +24,10 @@
 
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
+
+  // Must match the hardcoded defaults in login.html. Used as a fallback when
+  // this account has never had its password changed (no Firebase override yet).
+  const PRINCIPAL_DEFAULT_PASSWORDS = { "P001": "principal123", "VP001": "vp123" };
 
   /* ── helpers ── */
   function fmt(ts) {
@@ -104,6 +108,62 @@
 
   window.approveLeave = id => update(ref(db,`leaveRequests/${id}`),{status:"approved"});
   window.dismissLeave = id => update(ref(db,`leaveRequests/${id}`),{status:"dismissed"});
+
+  /* ── CHANGE PASSWORD ── */
+  window.changePrincipalPassword = async function() {
+    const msgEl = document.getElementById("pw-msg");
+    const setMsg = (text, ok) => {
+      msgEl.textContent = text;
+      msgEl.style.color = ok ? "#7ee787" : "#ff8fa3";
+    };
+
+    const id = sessionStorage.getItem("amv_principal_id");
+    if (!id) { setMsg("Session expired — please log out and log in again.", false); return; }
+
+    const current = document.getElementById("pw-current").value;
+    const next    = document.getElementById("pw-new").value;
+    const confirm = document.getElementById("pw-confirm").value;
+
+    if (!current || !next || !confirm) { setMsg("Please fill in all three fields.", false); return; }
+    if (next.length < 6) { setMsg("New password must be at least 6 characters.", false); return; }
+    if (next !== confirm) { setMsg("New password and confirmation don't match.", false); return; }
+
+    setMsg("Checking current password…", true);
+
+    try {
+      // Current effective password = Firebase override if one exists, else the hardcoded default
+      let effectiveCurrent = PRINCIPAL_DEFAULT_PASSWORDS[id];
+      const snap = await get(ref(db, `principals/${id}/password`));
+      if (snap.exists() && snap.val()) effectiveCurrent = snap.val();
+
+      if (current !== effectiveCurrent) {
+        setMsg("Current password is incorrect.", false);
+        return;
+      }
+
+      await set(ref(db, `principals/${id}`), {
+        password: next,
+        changedAt: serverTimestamp()
+      });
+
+      // Keep "remember this device" in sync so auto-login doesn't break
+      const saved = localStorage.getItem("amv_saved_user");
+      if (saved) {
+        try {
+          const obj = JSON.parse(saved);
+          if (obj.id === id) localStorage.setItem("amv_saved_user", JSON.stringify({ id, password: next }));
+        } catch(e) {}
+      }
+
+      document.getElementById("pw-current").value = "";
+      document.getElementById("pw-new").value = "";
+      document.getElementById("pw-confirm").value = "";
+      setMsg("✅ Password updated successfully.", true);
+      showToast("🔒 Password updated");
+    } catch (e) {
+      setMsg("Something went wrong — please try again.", false);
+    }
+  };
 
   /* ── ANNOUNCEMENTS ── */
   function listenAnnouncements() {
@@ -807,6 +867,19 @@ tr:hover td{ background: var(--bg-surface); }
   background:rgba(0,0,0,.5); z-index:90;
 }
 
+.pp-grid{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:24px;
+  align-items:start;
+}
+.pp-grid-even{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  align-items:start;
+}
+
 /* ══════════ RESPONSIVE ══════════ */
 @media (max-width:768px){
   :root{ --sidebar-w: 0px; }
@@ -821,6 +894,8 @@ tr:hover td{ background: var(--bg-surface); }
   .topbar{ padding:0 16px; }
   .content{ padding:16px; }
   .principal-chip .chip-name{ display:none; }
+  .pp-grid{ grid-template-columns:1fr; }
+  .pp-grid-even{ grid-template-columns:1fr; }
 }
 @media (max-width:480px){
   .stat-grid{ grid-template-columns:1fr; }
@@ -1060,6 +1135,15 @@ tr:hover td{ background: var(--bg-surface); }
             <p>Your dashboard is connected to Firebase Realtime Database. All data syncs instantly across devices.</p>
             <div class="db-badge">✅ Connected — amvofficial00</div>
           </div>
+          <div class="setting-card" style="grid-column: 1 / -1;">
+            <h3>🔒 Change Password</h3>
+            <p>Update the password used to sign in to this portal. The web team can also reset it for you if you forget it.</p>
+            <input class="setting-input" id="pw-current" type="password" placeholder="Current password" autocomplete="off" style="margin-bottom:10px;" />
+            <input class="setting-input" id="pw-new" type="password" placeholder="New password (min. 6 characters)" autocomplete="off" style="margin-bottom:10px;" />
+            <input class="setting-input" id="pw-confirm" type="password" placeholder="Confirm new password" autocomplete="off" style="margin-bottom:10px;" />
+            <div id="pw-msg" style="font-size:12px;min-height:16px;margin-bottom:8px;font-family:sans-serif;"></div>
+            <button class="setting-save" onclick="changePrincipalPassword()">Update Password</button>
+          </div>
         </div>
       </section>
 
@@ -1068,7 +1152,7 @@ tr:hover td{ background: var(--bg-surface); }
         <div class="section-title">Principal Profile</div>
         <div class="section-sub">Edit the principal's photo, name and message shown on the school website.</div>
 
-        <div style="display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;">
+        <div class="pp-grid">
 
           <!-- Photo card -->
           <div class="panel" style="text-align:center;">
@@ -1165,7 +1249,7 @@ tr:hover td{ background: var(--bg-surface); }
         <div class="section-title">About Section</div>
         <div class="section-sub">Update the statistics and achievements shown in the About section of the school website.</div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+        <div class="pp-grid-even">
 
           <!-- Stats card -->
           <div class="panel">
