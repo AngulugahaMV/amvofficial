@@ -259,6 +259,7 @@ tr:hover td{background:var(--bg-surface)}
 
       <div class="nav-label">People</div>
       <div class="nav-item" data-section="teachers" onclick="navigate(this,'teachers')"><span class="nav-icon">👩‍🏫</span> Manage Teachers</div>
+      <div class="nav-item" data-section="principals" onclick="navigate(this,'principals')"><span class="nav-icon">🔑</span> Principal Accounts</div>
       <div class="nav-item" data-section="leave" onclick="navigate(this,'leave')"><span class="nav-icon">📋</span> Leave Requests</div>
 
       <div class="nav-label">Website Content</div>
@@ -408,6 +409,20 @@ tr:hover td{background:var(--bg-surface)}
             <table>
               <thead><tr><th>Name</th><th>Login ID</th><th>Subject</th><th>Password</th><th>Action</th></tr></thead>
               <tbody id="teachersBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PRINCIPAL ACCOUNTS ═══ -->
+      <section class="section" id="sec-principals">
+        <div class="section-title">Principal Accounts</div>
+        <div class="section-sub">These accounts are built into the login page and can't be added/removed here — but if a principal changes their password, it shows below. If a principal forgets their password, reset it here.</div>
+        <div class="panel">
+          <div class="panel-body tight table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Role</th><th>Current Password</th><th>Last Changed</th><th>Action</th></tr></thead>
+              <tbody id="principalsBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -868,9 +883,16 @@ tr:hover td{background:var(--bg-surface)}
           </div>
         </div>
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Credentials</span></div>
+          <div class="panel-header"><span class="panel-title">🔒 Change Password</span></div>
           <div class="panel-body">
-            <p class="mini-note">To change the WebTeam login username/password, edit the <code>WEBTEAM_USER</code> and <code>WEBTEAM_PASS</code> constants near the top of this file's script, then re-upload it.</p>
+            <p class="mini-note">Username stays <code>adminwebteamamv</code> — this only changes the password. Enter the current password to confirm.</p>
+            <div class="form-grid">
+              <div class="f-group"><label>Current Password</label><input type="password" id="wt-pw-current" placeholder="Current password"></div>
+              <div class="f-group"><label>New Password</label><input type="password" id="wt-pw-new" placeholder="Min. 6 characters"></div>
+              <div class="f-group"><label>Confirm New Password</label><input type="password" id="wt-pw-confirm" placeholder="Re-enter new password"></div>
+            </div>
+            <div class="lg-error" id="wt-pw-msg" style="text-align:left"></div>
+            <div class="form-actions"><button class="btn-primary" onclick="changeWebteamPassword()">🔒 Update Password</button></div>
           </div>
         </div>
       </section>
@@ -920,20 +942,31 @@ const FB = {
   announcements: 'announcements',
   leaveRequests: 'leaveRequests',
   aiChatLogs: 'amv/aiChatLogs',
+  principals: 'principals',
 };
 
 // ============================================================
-// AUTH — hardcoded WebTeam gate (change these before going live)
+// AUTH — hardcoded WebTeam gate, with an optional password
+// override stored in Firebase (see Settings > Change Password)
 // ============================================================
 const WEBTEAM_USER = "adminwebteamamv";
-const WEBTEAM_PASS = "amv@webteamadmin";
+const WEBTEAM_PASS_DEFAULT = "amv@webteamadmin";
 
-function doAdminLogin(){
+async function doAdminLogin(){
   const u = document.getElementById('lg-user').value.trim();
   const p = document.getElementById('lg-pass').value.trim();
   const err = document.getElementById('lg-error');
   if(!u || !p){ err.textContent = '⚠️ Enter both username and password.'; return; }
-  if(u !== WEBTEAM_USER || p !== WEBTEAM_PASS){ err.textContent = '❌ Invalid credentials.'; return; }
+
+  let effectivePass = WEBTEAM_PASS_DEFAULT;
+  try{
+    const snap = await db.ref('webteamAuth/password').once('value');
+    if(snap.exists() && snap.val()) effectivePass = snap.val();
+  }catch(e){
+    // Firebase unreachable — fall back to the hardcoded default password
+  }
+
+  if(u !== WEBTEAM_USER || p !== effectivePass){ err.textContent = '❌ Invalid credentials.'; return; }
   err.textContent = '';
   localStorage.setItem('amv_webteam_session', JSON.stringify({loginTime: Date.now()}));
   enterAdmin();
@@ -958,6 +991,48 @@ function enterAdmin(){
   document.getElementById('adminApp').style.display = 'block';
   initAdmin();
 }
+
+async function changeWebteamPassword(){
+  const msgEl = document.getElementById('wt-pw-msg');
+  const setMsg = (text, ok) => {
+    msgEl.textContent = text;
+    msgEl.style.color = ok ? '#7ee787' : '';
+  };
+
+  const current = document.getElementById('wt-pw-current').value;
+  const next    = document.getElementById('wt-pw-new').value;
+  const confirmPw = document.getElementById('wt-pw-confirm').value;
+
+  if(!current || !next || !confirmPw){ setMsg('⚠️ Please fill in all three fields.', false); return; }
+  if(next.length < 6){ setMsg('⚠️ New password must be at least 6 characters.', false); return; }
+  if(next !== confirmPw){ setMsg("⚠️ New password and confirmation don't match.", false); return; }
+
+  setMsg('Checking current password…', true);
+
+  try{
+    let effectiveCurrent = WEBTEAM_PASS_DEFAULT;
+    const snap = await db.ref('webteamAuth/password').once('value');
+    if(snap.exists() && snap.val()) effectiveCurrent = snap.val();
+
+    if(current !== effectiveCurrent){
+      setMsg('❌ Current password is incorrect.', false);
+      return;
+    }
+
+    await db.ref('webteamAuth').set({
+      password: next,
+      changedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    document.getElementById('wt-pw-current').value = '';
+    document.getElementById('wt-pw-new').value = '';
+    document.getElementById('wt-pw-confirm').value = '';
+    setMsg('✅ Password updated successfully.', true);
+    showToast('🔒 WebTeam password updated');
+  }catch(e){
+    setMsg('❌ Something went wrong — please try again.', false);
+  }
+}
 checkAdminSession();
 
 // ============================================================
@@ -978,7 +1053,7 @@ function setTheme(name, btn){
 // NAVIGATION
 // ============================================================
 const titles = {
-  dashboard:'Dashboard', sessions:'Active Sessions', aichats:'AI Chat Logs', teachers:'Manage Teachers', leave:'Leave Requests',
+  dashboard:'Dashboard', sessions:'Active Sessions', aichats:'AI Chat Logs', teachers:'Manage Teachers', principals:'Principal Accounts', leave:'Leave Requests',
   hero:'Hero & Logo', about:'About Section', principal:'Principal Profile', clubs:'Clubs & Societies',
   contact:'Contact & Footer', gallery:'Gallery', news:'News', results:'Exam Results',
   announcements:'Announcements', lms:'LMS Resources', settings:'Settings'
@@ -1069,6 +1144,7 @@ function initAdmin(){
 
   listenSessions();
   listenAiChatLogs();
+  listenPrincipalAccounts();
   listenTeachers();
   listenLeave();
   loadHero();
@@ -1245,6 +1321,60 @@ function deleteAiChatLog(sid, name){
   db.ref(FB.aiChatLogs + '/' + sid).remove().then(()=>{
     showToast('🗑 Chat log deleted');
     if(_aiChatDetailSid === sid) closeAiChatDetail();
+  });
+}
+
+// ============================================================
+// PRINCIPAL ACCOUNTS
+// ============================================================
+// These accounts are hardcoded in login.html (never created here). This map
+// mirrors login.html's defaults so we can show a password even before a
+// principal has ever changed theirs (i.e. no Firebase override exists yet).
+const PRINCIPAL_ACCOUNTS = {
+  'P001':  { role: 'Principal',      defaultPassword: 'principal123' },
+  'VP001': { role: 'Vice Principal', defaultPassword: 'vp123' },
+};
+
+function listenPrincipalAccounts(){
+  db.ref(FB.principals).on('value', snap=>{
+    const overrides = snap.val() || {};
+    const body = document.getElementById('principalsBody');
+    const ids = Object.keys(PRINCIPAL_ACCOUNTS);
+    body.innerHTML = ids.map(id=>{
+      const acc = PRINCIPAL_ACCOUNTS[id];
+      const override = overrides[id];
+      const currentPassword = (override && override.password) ? override.password : acc.defaultPassword;
+      const changedLabel = (override && override.changedAt) ? fmtDateTime(override.changedAt) : 'Never (default password)';
+      return `
+      <tr>
+        <td class="name-cell">${esc(id)}</td>
+        <td>${esc(acc.role)}</td>
+        <td><code>${esc(currentPassword)}</code></td>
+        <td>${changedLabel}</td>
+        <td class="action-cell">
+          <button class="btn-mini btn-approve" onclick="resetPrincipalPassword('${id}')">🔄 Reset Password</button>
+        </td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+function resetPrincipalPassword(id){
+  const acc = PRINCIPAL_ACCOUNTS[id];
+  if(!acc) return;
+  const newPass = prompt(`Set a new password for ${id} (${acc.role}):`);
+  if(newPass === null) return; // cancelled
+  if(newPass.trim().length < 6){
+    alert('Password must be at least 6 characters.');
+    return;
+  }
+  db.ref(FB.principals + '/' + id).set({
+    password: newPass.trim(),
+    changedAt: firebase.database.ServerValue.TIMESTAMP
+  }).then(()=>{
+    showToast(`🔒 Password reset for ${id}`);
+  }).catch(()=>{
+    alert('Failed to update password — check your connection and try again.');
   });
 }
 
