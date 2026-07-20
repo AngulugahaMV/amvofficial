@@ -245,6 +245,7 @@
     <button class="btn" onclick="handleLogin()">Sign In</button>
 
     <div class="hint">ID format: <span>P001</span> · <span>VP001</span> · <span>T001</span> · <span>T002…</span></div>
+    <div class="hint" style="margin-top:10px;">Forgot your password? <span>Contact the web team</span> to have it reset.</div>
     <div class="hint" id="forgetHint" style="margin-top:10px;display:none;">
       Saved login detected. <span style="cursor:pointer;text-decoration:underline;color:rgba(212,175,55,0.85);" onclick="forgetDevice()">Sign in as someone else?</span>
     </div>
@@ -327,10 +328,20 @@
     async function attemptLogin(id, password, silent = false) {
       const upperID = id.toUpperCase();
 
-      // 1. Check principal accounts first (instant, no Firebase)
+      // 1. Check principal accounts (a Firebase-stored password change overrides the hardcoded default)
       if (principalAccounts[upperID]) {
-        const acc = principalAccounts[upperID];
-        if (acc.password === password) {
+        const defaultAcc = principalAccounts[upperID];
+        let effectivePassword = defaultAcc.password;
+        try {
+          const pSnap = await get(ref(db, `principals/${upperID}/password`));
+          if (pSnap.exists() && pSnap.val()) {
+            effectivePassword = pSnap.val();
+          }
+        } catch (e) {
+          // Firebase unreachable — fall back to the hardcoded default password
+        }
+
+        if (effectivePassword === password) {
           localStorage.setItem("amv_saved_user", JSON.stringify({ id: upperID, password }));
           sessionStorage.setItem("amv_principal_id", upperID);
           window.location.href = routes.principal;
