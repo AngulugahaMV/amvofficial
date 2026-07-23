@@ -81,10 +81,13 @@ export async function onRequestPost(context) {
 
   try {
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey, // newer "AQ." auth keys require the header form; the old ?key= query param no longer works for them
+        },
         body: JSON.stringify({
           contents,
           generationConfig: {
