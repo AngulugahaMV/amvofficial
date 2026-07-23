@@ -496,6 +496,120 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 /* SEARCH HIDE */
 .search-hide{display:none!important}
 
+/* ================= GAMES ZONE ================= */
+.games-band-note{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);
+  padding:8px 16px;border-radius:20px;font-size:0.8rem;color:var(--gold);
+  margin-bottom:20px;
+}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.game-card{
+  position:relative;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px;text-align:center;cursor:pointer;
+  transition:all 0.3s;overflow:hidden;
+}
+.game-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--glow)}
+.game-card .g-icon{font-size:2.4rem;margin-bottom:10px}
+.game-card .g-title{font-family:var(--font-head);color:var(--gold);font-size:1.05rem;margin-bottom:4px}
+.game-card .g-desc{font-size:0.78rem;color:var(--text2);line-height:1.5}
+.game-card .g-band{
+  display:inline-block;margin-top:10px;font-size:0.68rem;
+  background:rgba(212,175,55,0.15);color:var(--gold);
+  padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.5px;
+}
+.game-card.locked{cursor:not-allowed}
+.game-card.locked:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.game-lock-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(10,0,4,0.72);gap:6px;backdrop-filter:blur(1px);
+}
+.game-lock-overlay .lock-icon{font-size:1.8rem}
+.game-lock-overlay .lock-text{font-size:0.72rem;color:#f5e6d0;padding:0 16px;text-align:center;line-height:1.4}
+
+/* GAME MODAL (mirrors preview-modal, sized for gameplay) */
+.game-modal-overlay{
+  position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.9);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  animation:fadeIn 0.2s ease;
+}
+.game-modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+  width:900px;max-width:96vw;max-height:94vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;
+}
+.game-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;
+}
+.game-modal-title{font-family:var(--font-head);color:var(--gold);font-size:1.05rem}
+.game-modal-body{flex:1;overflow:auto;padding:22px}
+
+/* SUBJECT PICKER (Millionaire) */
+.subj-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.subj-pick{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:20px 10px;text-align:center;cursor:pointer;transition:all 0.25s;
+}
+.subj-pick:hover{border-color:var(--gold);background:var(--surface2)}
+.subj-pick .s-icon{font-size:1.8rem;margin-bottom:6px}
+.subj-pick .s-name{font-size:0.85rem;font-weight:600;color:var(--text)}
+
+/* MILLIONAIRE QUIZ */
+.quiz-wrap{max-width:640px;margin:0 auto}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.quiz-prize{font-family:var(--font-head);color:var(--gold);font-size:1.1rem}
+.quiz-q{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:20px;font-size:1rem;color:var(--text);margin-bottom:18px;line-height:1.5;min-height:70px;
+}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quiz-opt{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;cursor:pointer;font-size:0.9rem;transition:all 0.25s;text-align:left;
+}
+.quiz-opt:hover{border-color:var(--gold)}
+.quiz-opt.correct{background:rgba(74,222,128,0.2);border-color:#4ade80;color:#4ade80}
+.quiz-opt.wrong{background:rgba(248,113,113,0.2);border-color:#f87171;color:#f87171}
+.quiz-opt.disabled{opacity:0.5;pointer-events:none}
+.quiz-tools{display:flex;gap:10px;margin-top:16px}
+.quiz-ladder{margin-top:20px;font-size:0.75rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:6px}
+.quiz-ladder span{padding:3px 10px;border-radius:8px;background:var(--surface2)}
+.quiz-ladder span.done{background:rgba(212,175,55,0.2);color:var(--gold);font-weight:700}
+.quiz-result{text-align:center;padding:30px 10px}
+.quiz-result .r-icon{font-size:3rem;margin-bottom:10px}
+.quiz-result .r-amt{font-family:var(--font-head);color:var(--gold);font-size:1.6rem;margin-bottom:16px}
+
+/* ARCADE (Colour Match / Body Parts) */
+.arcade-wrap{max-width:560px;margin:0 auto;text-align:center}
+.arcade-score{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text2);margin-bottom:14px}
+.arcade-swatch{width:140px;height:140px;border-radius:20px;margin:0 auto 20px;border:4px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.arcade-word{font-family:var(--font-head);font-size:1.6rem;color:var(--gold);margin-bottom:20px}
+.arcade-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.arcade-opt{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:1.1rem;cursor:pointer;transition:all 0.25s}
+.arcade-opt.emoji{font-size:2.4rem;padding:20px}
+.arcade-opt:hover{border-color:var(--gold);transform:scale(1.03)}
+.arcade-opt.correct{background:rgba(74,222,128,0.2);border-color:#4ade80}
+.arcade-opt.wrong{background:rgba(248,113,113,0.2);border-color:#f87171}
+
+/* MATH SHOOTER */
+.shooter-wrap{max-width:600px;margin:0 auto;text-align:center}
+.shooter-hud{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text2);margin-bottom:10px}
+.shooter-q{font-family:var(--font-head);font-size:1.8rem;color:var(--gold);background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px}
+.shooter-field{position:relative;height:340px;background:linear-gradient(180deg,rgba(212,175,55,0.05),rgba(128,0,32,0.08));border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.shooter-bubble{
+  position:absolute;top:-60px;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-light));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1.05rem;cursor:pointer;border:2px solid var(--gold);
+  box-shadow:0 4px 14px rgba(0,0,0,0.3);transition:transform 0.15s;
+  animation-name:shooterFall;animation-timing-function:linear;animation-fill-mode:forwards;
+}
+.shooter-bubble:hover{transform:scale(1.1)}
+.shooter-bubble.hit{background:rgba(74,222,128,0.7);border-color:#4ade80}
+.shooter-bubble.miss{background:rgba(248,113,113,0.7);border-color:#f87171}
+@keyframes shooterFall{from{top:-60px}to{top:340px}}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
@@ -511,6 +625,15 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 @media(max-width:480px){
   .stat-row{grid-template-columns:1fr 1fr}
   .panel{padding:16px}
+}
+
+/* GAMES — MOBILE */
+@media(max-width:768px){
+  .quiz-opts{grid-template-columns:1fr}
+  .arcade-opts{grid-template-columns:1fr 1fr}
+  .subj-pick-grid{grid-template-columns:repeat(2,1fr)}
+  .game-modal-body{padding:14px}
+  .shooter-field{height:280px}
 }
 
 /* EXAM MARKS — MOBILE */
@@ -627,6 +750,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="nav-item" onclick="showPanel('videos',this)"><span class="icon">▶️</span> Videos</div>
         <div class="nav-item" onclick="showPanel('downloads',this)"><span class="icon">⬇️</span> Downloads</div>
         <div class="nav-item" onclick="showPanel('applications',this)"><span class="icon">📂</span> Applications</div>
+        <div class="nav-section-title">Fun Zone</div>
+        <div class="nav-item" onclick="showPanel('games',this)"><span class="icon">🎮</span> ඉගෙනුම් ක්‍රීඩා</div>
         <div class="nav-section-title">Info</div>
         <div class="nav-item" onclick="showPanel('notices',this)"><span class="icon">📢</span> Notices</div>
         <div class="nav-item" id="navAiBot" onclick="showPanel('aibot',this)" style="display:none"><span class="icon">🤖</span> AI Study Bot</div>
@@ -785,6 +910,16 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         </div>
       </div>
 
+      <!-- GAMES -->
+      <div class="panel" id="panel-games">
+        <div class="panel-header">
+          <h2>🎮 ඉගෙනුම් ක්‍රීඩා</h2>
+          <p>ඔබේ ශ්‍රේණියට ගැලපෙන විනෝදාත්මක ක්‍රීඩා — එකක් තෝරාගෙන ක්‍රීඩා කරන්න!</p>
+        </div>
+        <div class="games-band-note" id="gamesBandNote"></div>
+        <div class="games-grid" id="gamesGrid"></div>
+      </div>
+
       <!-- NOTICES -->
       <div class="panel" id="panel-notices">
         <div class="panel-header">
@@ -829,6 +964,17 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       </div>
     </div>
     <div class="preview-modal-body" id="previewModalBody"></div>
+  </div>
+</div>
+
+<!-- GAME MODAL -->
+<div id="gameModal" style="display:none" class="game-modal-overlay" onclick="closeGameModalOutside(event)">
+  <div class="game-modal">
+    <div class="game-modal-header">
+      <div class="game-modal-title" id="gameModalTitle">ක්‍රීඩාව</div>
+      <button class="preview-btn preview-btn-close" onclick="closeGameModal()">✕ වසන්න</button>
+    </div>
+    <div class="game-modal-body" id="gameModalBody"></div>
   </div>
 </div>
 
@@ -1628,9 +1774,10 @@ function showPanel(id, navEl){
   document.getElementById('panel-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(navEl) navEl.classList.add('active');
-  const titles = {home:'📊 Dashboard',papers:'📄 Past Papers',notes:'📒 Study Notes',homework:'✏️ Homework',exammarks:'🎯 Exam Marks',videos:'▶️ Videos',downloads:'⬇️ Downloads',applications:'📂 Applications',notices:'📢 Notices',aibot:'🤖 AI Study Bot'};
+  const titles = {home:'📊 Dashboard',papers:'📄 Past Papers',notes:'📒 Study Notes',homework:'✏️ Homework',exammarks:'🎯 Exam Marks',videos:'▶️ Videos',downloads:'⬇️ Downloads',applications:'📂 Applications',notices:'📢 Notices',aibot:'🤖 AI Study Bot',games:'🎮 ඉගෙනුම් ක්‍රීඩා'};
   document.getElementById('topbarTitle').textContent = titles[id]||id;
   if(id==='exammarks') renderExamMarksTable();
+  if(id==='games') renderGamesPanel();
   if(window.innerWidth<=768) document.getElementById('sidebar').classList.remove('open');
 }
 
@@ -1798,6 +1945,519 @@ async function sendAiChatMessage(){
 }
 
 // ============================================================
+// GAMES ZONE
+// ============================================================
+
+// Grade -> band. Games are shown only to the band(s) they target;
+// everything else shows locked (with a padlock) for that student.
+function getGradeBand(grade){
+  if(grade==='A/L' || grade==='10' || grade==='11') return 'senior';
+  const n = parseInt(grade,10);
+  if(n>=6 && n<=9) return 'middle';
+  return 'primary'; // grades 1-5, and safe default
+}
+const BAND_LABEL = {
+  primary:'ප්‍රාථමික · ශ්‍රේණි 1–5',
+  middle:'මධ්‍යම · ශ්‍රේණි 6–9',
+  senior:'උසස් · ශ්‍රේණි 10–11 / A/L'
+};
+
+const GAMES_CATALOGUE = [
+  {id:'millionaire', icon:'💰', title:'මිලියනපතියෙක් වීමට කැමතිද?', desc:'ඕනෑම විෂයක් තෝරන්න — ප්‍රශ්න ඔබේ ශ්‍රේණියට ගැලපේ.', bands:['primary','middle','senior']},
+  {id:'colormatch',  icon:'🎨', title:'වර්ණ ගැලපීම',                 desc:'වර්ණයේ නම ඉංග්‍රීසි සහ සිංහලෙන් ගැලපන්න.', bands:['primary']},
+  {id:'bodyparts',   icon:'🧍', title:'ශරීර අවයව ගැලපීම',            desc:'ඉංග්‍රීසියෙන් ශරීර අවයව නම් ඉගෙන ගන්න.', bands:['primary']},
+  {id:'mathshoot',   icon:'🎯', title:'නිවැරදි පිළිතුරට වෙඩි තියන්න', desc:'ගණිත ප්‍රශ්නය පහළට වැටෙයි — නිවැරදි පිළිතුර ඇති බුබුල වෙඩි තියන්න.', bands:['primary','middle']},
+];
+
+function renderGamesPanel(){
+  const band = getGradeBand(currentStudentGrade);
+  const note = document.getElementById('gamesBandNote');
+  if(note) note.innerHTML = `🔓 ඔබේ ශ්‍රේණියට අගුළු ඇරී ඇත: <strong>${BAND_LABEL[band]}</strong>`;
+  const grid = document.getElementById('gamesGrid');
+  if(!grid) return;
+  grid.innerHTML = GAMES_CATALOGUE.map(g=>{
+    const unlocked = g.bands.includes(band);
+    return `
+      <div class="game-card ${unlocked?'':'locked'}" ${unlocked?`onclick="launchGame('${g.id}')"`:''}>
+        <div class="g-icon">${g.icon}</div>
+        <div class="g-title">${g.title}</div>
+        <div class="g-desc">${g.desc}</div>
+        <div class="g-band">${g.bands.map(b=>BAND_LABEL[b].split(' · ')[0]).join(' · ')}</div>
+        ${unlocked?'':`<div class="game-lock-overlay"><div class="lock-icon">🔒</div><div class="lock-text">${g.bands.map(b=>BAND_LABEL[b].split(' · ')[0]).join(' / ')} සිසුන්ට පමණි</div></div>`}
+      </div>`;
+  }).join('');
+}
+
+function launchGame(id){
+  if(id==='millionaire') openMillionaireSubjectPicker();
+  else if(id==='colormatch') openColorMatch();
+  else if(id==='bodyparts') openBodyParts();
+  else if(id==='mathshoot') openMathShooter();
+}
+
+function shuffleArr(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+function openGameModal(title){
+  document.getElementById('gameModalTitle').textContent = title;
+  document.getElementById('gameModal').style.display = 'flex';
+}
+function closeGameModal(){
+  document.getElementById('gameModal').style.display = 'none';
+  document.getElementById('gameModalBody').innerHTML = '';
+  stopShooterLoop();
+}
+function closeGameModalOutside(event){
+  if(event.target === document.getElementById('gameModal')) closeGameModal();
+}
+
+// ---------- MILLIONAIRE-STYLE QUIZ ----------
+const QUIZ_SUBJECTS = [
+  {key:'sinhala',     icon:'📗', name:'සිංහල'},
+  {key:'buddhism',    icon:'☸️', name:'බුද්ධ ධර්මය'},
+  {key:'english',     icon:'📘', name:'ඉංග්‍රීසි'},
+  {key:'science',     icon:'🔬', name:'විද්‍යාව'},
+  {key:'environment', icon:'🌱', name:'පරිසරය'},
+  {key:'history',     icon:'🏛️', name:'ඉතිහාසය'},
+  {key:'maths',       icon:'➗', name:'ගණිතය'},
+];
+
+// Starter question bank, grouped by grade band then subject.
+// To add more questions later: push { q, options:[4 strings], a: correctIndex(0-3) }
+// into the matching band/subject array below — no other code changes needed.
+const QUIZ_BANK = {
+  primary: {
+    sinhala:[
+      {q:'"Book" සඳහා සිංහල වචනය කුමක්ද?', options:['පොත','ගස','බල්ලා','වතුර'], a:0},
+      {q:'සිංහල අකුරු වලින් "අ" හඳුන්වන්නේ කුමක් ලෙසද?', options:['ව්‍යඤ්ජනාක්ෂරය','ස්වරාක්ෂරය','ඉලක්කම','සංකේතය'], a:1},
+      {q:'"Water" සඳහා සිංහල වචනය කුමක්ද?', options:['ගිනි','ගස','වතුර','අහස'], a:2},
+      {q:'"Sun" සඳහා සිංහල වචනය කුමක්ද?', options:['සඳ','ඉර','තරුව','වලාකුළ'], a:1},
+      {q:'පහත වචන අතරින් සිංහල ආචාර කිරීමේ වචනය කුමක්ද?', options:['Hello','Bonjour','ආයුබෝවන්','Namaste'], a:2},
+    ],
+    buddhism:[
+      {q:'බුද්ධාගමේ ආරම්භකයා කවුරුන්ද?', options:['විෂ්ණු','බුදුන් වහන්සේ','ජේසුස්','මුහම්මද්'], a:1},
+      {q:'සිද්ධාර්ථ කුමරු උපත ලැබුවේ කොහිද?', options:['මහනුවර','දිල්ලි','ලුම්බිණි','කොළඹ'], a:2},
+      {q:'බෞද්ධ පන්සලක් හඳුන්වන්නේ කුමක් ලෙසද?', options:['පල්ලිය','විහාරය','මුස්ලිම් පල්ලිය','යුදෙව් සිනගෝගය'], a:1},
+      {q:'සාමාන්‍යයෙන් උපාසක/උපාසිකාවන් දිනපතා රකින සිල් ගණන කීයද?', options:['10','3','8','5'], a:3},
+      {q:'බුද්ධාගමේ පොදු සංකේතය වන මල් වර්ගය කුමක්ද?', options:['රෝස','නෙළුම්','ටියුලිප්','ඩේසි'], a:1},
+    ],
+    english:[
+      {q:'"cat" යන්නෙහි බහුවචනය කුමක්ද?', options:['cats','caties','cat','catss'], a:0},
+      {q:'"big" යන්නෙහි ප්‍රතිලෝමය (opposite) තෝරන්න.', options:['tall','small','fast','loud'], a:1},
+      {q:'පහත ඒවායින් වර්ණයක් වන්නේ කුමක්ද?', options:['Jump','Yellow','Quickly','Chair'], a:1},
+      {q:'සම්පූර්ණ කරන්න: "I ___ a student."', options:['is','are','am','be'], a:2},
+      {q:'බල්ලාගේ පැටියාට කියන්නේ කුමක්ද?', options:['Kitten','Cub','Puppy','Calf'], a:2},
+    ],
+    science:[
+      {q:'ශාක වැඩීමට අවශ්‍ය වන්නේ කුමක්ද?', options:['වැලි පමණි','අන්ධකාරය පමණි','හිරු එළිය, ජලය සහ වාතය','සීනි පමණි'], a:2},
+      {q:'අපගේ ශරීරයේ රුධිරය පොම්ප කරන අවයවය කුමක්ද?', options:['පෙනහළු','හදවත','බඩවැල','මොළය'], a:1},
+      {q:'ජලය සෑදී ඇත්තේ කුමකින්ද?', options:['හයිඩ්‍රජන් සහ ඔක්සිජන්','ඔක්සිජන් පමණි','කාබන් ඩයොක්සයිඩ්','ලුණු'], a:0},
+      {q:'පහත සතුන් අතරින් ක්ෂීරපායියෙක් වන්නේ කවුද?', options:['සර්පයා','මාළුවා','අලියා','ගෙම්බා'], a:2},
+      {q:'ශාක තමන්ගේම ආහාර සකස් කරගන්නා ක්‍රියාවලිය හඳුන්වන්නේ කුමක් ලෙසද?', options:['ආහාර දිරවීම','ප්‍රභාසංස්ලේෂණය','ශ්වසනය','වාෂ්පීකරණය'], a:1},
+    ],
+    environment:[
+      {q:'පරිසරයට උදව් කිරීමට අප කළ යුත්තේ කුමක්ද?', options:['සියලු ගස් කැපීම','ගස් සිටුවීම','ප්ලාස්ටික් පිච්චීම','ජලය නාස්ති කිරීම'], a:1},
+      {q:'කඩදාසි කසළ දැමිය යුත්තේ කුමන කූඩයටද?', options:['ඕනෑම තැනකට','මුහුදට','ප්‍රතිචක්‍රීකරණ බඳුනට','ගින්නට'], a:2},
+      {q:'සතුන් සහ ශාක එකට ජීවත් වන ස්වභාවික පද්ධතිය හඳුන්වන්නේ කුමක් ලෙසද?', options:['නගරය','පරිසර පද්ධතිය','කර්මාන්තශාලාව','වෙළඳපොළ'], a:1},
+      {q:'පහත ඒවායින් වායු දූෂණයට හේතු වන්නේ කුමක්ද?', options:['නැවුම් මල්','වාහන දුම','පිරිසිදු ජලය','වර්ෂාව'], a:1},
+      {q:'වනාන්තර වැදගත් වන්නේ ඇයි?', options:['ඒවා අපට ඔක්සිජන් ලබා දෙයි','ඒවා ශබ්දය කරයි','ඒවා පාරවල් අවහිර කරයි','ඒවා අනවශ්‍යයි'], a:0},
+    ],
+    history:[
+      {q:'ජලාශ ඉදිකිරීම සඳහා ප්‍රසිද්ධ පුරාණ ශ්‍රී ලාංකික රජු කවුරුන්ද?', options:['නැපෝලියන්','පරාක්‍රමබාහු රජතුමා','එලිසබෙත් රැජින','ඇලෙක්සැන්ඩර්'], a:1},
+      {q:'ශ්‍රී ලංකාවේ පුරාවිද්‍යා නටබුන් සඳහා ප්‍රසිද්ධ පුරාණ නගරය කුමක්ද?', options:['පැරිස්','අනුරාධපුරය','ටෝකියෝ','කයිරෝ'], a:1},
+      {q:'අතීතයේ ගොඩනැගිලි සහ වස්තු හඳුන්වන්නේ කුමක් ලෙසද?', options:['සෙල්ලම් බඩු','පුරාවිද්‍යා නටබුන්','ආහාර','ඇඳුම්'], a:1},
+      {q:'ශ්‍රී ලංකාව කලින් හඳුන්වනු ලැබුවේ කුමන නමින්ද?', options:['ලංකා','සිලෝන් (Ceylon)','පර්සියාව','ගෝල්'], a:1},
+      {q:'ශ්‍රී ලංකාවට බුද්ධාගම ගෙන ආවේ කවුරුන්ද?', options:['මාකෝ පෝලෝ','කොලොම්බස්','අරහත් මිහිඳු හිමි','වාස්කෝ ද ගාමා'], a:2},
+    ],
+    maths:[
+      {q:'7 + 5 කීයද?', options:['11','12','13','10'], a:1},
+      {q:'9 - 4 කීයද?', options:['4','6','5','3'], a:2},
+      {q:'3 × 4 කීයද?', options:['10','9','12','14'], a:2},
+      {q:'ත්‍රිකෝණයකට කොපමණ පැති ගණනක් තිබේද?', options:['4','5','3','2'], a:2},
+      {q:'10 හි අඩක් කීයද?', options:['4','6','2','5'], a:3},
+    ],
+  },
+  middle: {
+    sinhala:[
+      {q:'"ක්‍රියා පදය" යනු කුමන වචන කොටසද?', options:['නාම පදය','ක්‍රියා පදය','විශේෂණය','සර්වනාමය'], a:1},
+      {q:'"සිංහයා මෙන් නිර්භීත" යනු කුමන අලංකාරයට උදාහරණයක්ද?', options:['උපමාව','රූපකය','අනුප්‍රාසය','රිද්මය'], a:0},
+      {q:'ප්‍රසිද්ධ සිංහල සම්භාව්‍ය කාව්‍ය ග්‍රන්ථයක් කුමක්ද?', options:['Harry Potter','ගුත්තිල කාව්‍යය','Odyssey','Macbeth'], a:1},
+      {q:'"නාම පදය" යනු කුමන වචන කොටසද?', options:['ක්‍රියාව','නාමය','ක්‍රියා විශේෂණය','පූර්වයෝගය'], a:1},
+      {q:'ප්‍රසිද්ධ සිංහල කෙටිකතා රචකයෙකු කවුරුන්ද?', options:['Shakespeare','Tolstoy','මාර්ටින් වික්‍රමසිංහ','Homer'], a:2},
+    ],
+    buddhism:[
+      {q:'බුදුන් වහන්සේගේ පළමු දේශනාවේ මූලික අංගය කුමක්ද?', options:['චතුරාර්ය සත්‍යය','හින්දු වේද','බයිබලය','කුරාණය'], a:0},
+      {q:'"දුක්ඛ" යන්නෙහි තේරුම කුමක්ද?', options:['සතුට','දුක','ධනය','කෝපය'], a:1},
+      {q:'ආර්ය අෂ්ටාංගික මාර්ගය ගෙන යන්නේ කුමකටද?', options:['දුක නැති කිරීමට','ධනයට','කීර්තියට','යුද්ධයට'], a:0},
+      {q:'බුදුන් වහන්සේ බුද්ධත්වයට පත් වූයේ කොහිද?', options:['ලුම්බිණි','බුද්ධ ගයා','මහනුවර','කුසිනාරා'], a:1},
+      {q:'"ස්තූපය" යනු කුමක්ද?', options:['ආහාර වර්ගයක්','නර්තනයක්','බෞද්ධ ස්මාරකයක්','මුදල් වර්ගයක්'], a:2},
+    ],
+    english:[
+      {q:'"She has finished her homework." — මෙය කුමන කාලයද (tense)?', options:['Past Simple','Present Perfect','Future','Present Continuous'], a:1},
+      {q:'"happy" යන්නෙහි සමානාර්ථය (synonym) තෝරන්න.', options:['Sad','Joyful','Angry','Tired'], a:1},
+      {q:'"Close the door!" යනු කුමන වාක්‍ය වර්ගයක්ද?', options:['Declarative','Interrogative','Imperative','Exclamatory'], a:2},
+      {q:'නිවැරදිව අක්ෂර වින්‍යාසය කළ වචනය තෝරන්න.', options:['Neccessary','Necesary','Necessary','Neccesary'], a:2},
+      {q:'"Metaphor" එකක් වඩාත් හොඳින් විස්තර වන්නේ කෙසේද?', options:['A question','A rhyme','A direct comparison without "like/as"','A list'], a:2},
+    ],
+    science:[
+      {q:'සෛලයේ බලාගාරය හඳුන්වන්නේ කුමක් ලෙසද?', options:['න්‍යෂ්ටිය','මයිටොකොන්ඩ්‍රියාව','රයිබසෝමය','සෛල බිත්තිය'], a:1},
+      {q:'ප්‍රභාසංස්ලේෂණය සඳහා ශාක අවශෝෂණය කරන වායුව කුමක්ද?', options:['ඔක්සිජන්','නයිට්‍රජන්','කාබන් ඩයොක්සයිඩ්','හයිඩ්‍රජන්'], a:2},
+      {q:'බලයේ SI ඒකකය කුමක්ද?', options:['ජූල්','වොට්','නිව්ටන්','පැස්කල්'], a:2},
+      {q:'පහත ඒවායින් අම්ලයක් වන්නේ කුමක්ද?', options:['සෝඩියම් හයිඩ්‍රොක්සයිඩ්','හයිඩ්‍රොක්ලෝරික් අම්ලය','ඇමෝනියා','බේකින් සෝඩා'], a:1},
+      {q:'සෝඩියම් සඳහා රසායනික සංකේතය කුමක්ද?', options:['So','Na','Sd','Nm'], a:1},
+    ],
+    environment:[
+      {q:'ගෝලීය උණුසුමට ප්‍රධාන හේතුව කුමක්ද?', options:['වර්ෂාව','හරිතාගාර වායු විමෝචනය','සාගර ධාරා','සඳ එළිය'], a:1},
+      {q:'"ජෛව විවිධත්වය" යනු කුමක්ද?', options:['ගල් වර්ගයක්','පෘථිවියේ ජීවීන්ගේ විවිධත්වය','කාලගුණ රටාවක්','මුදල් වර්ගයක්'], a:1},
+      {q:'අපද්‍රව්‍ය කළමනාකරණයේ "R 3" මූලධර්ම කුමක්ද?', options:['දුවන්න කියවන්න තරඟ කරන්න','අඩු කරන්න, නැවත පාවිච්චි කරන්න, ප්‍රතිචක්‍රීකරණය කරන්න','විවේක ගන්න','පදින්න ලණු ගසන්න පෙරළෙන්න'], a:1},
+      {q:'පහත ඒවායින් පුනර්ජනනීය බලශක්ති මූලාශ්‍රය කුමක්ද?', options:['ගල් අඟුරු','පෙට්‍රෝලියම්','සූර්ය බලය','ස්වාභාවික වායුව'], a:2},
+      {q:'UV කිරණවලින් පෘථිවිය ආරක්ෂා කරන ස්තරය කුමක්ද?', options:['ට්‍රොපොස්ෆියරය','මෙසෝස්ෆියරය','ඕසෝන් ස්තරය','එක්සොස්ෆියරය'], a:2},
+    ],
+    history:[
+      {q:'බ්‍රිතාන්‍යයන්ට එරෙහිව උව-වැල්ලස්ස කැරැල්ලට නායකත්වය දුන්නේ කවුද?', options:['දුටුගැමුණු','කැප්පෙටිපොල දිසාවේ','විජයබාහු','පරාක්‍රමබාහු'], a:1},
+      {q:'ශ්‍රී ලංකාව බ්‍රිතාන්‍යයන්ගෙන් නිදහස ලැබුවේ කුමන වර්ෂයේද?', options:['1815','1948','1972','1930'], a:1},
+      {q:'අනුරාධපුර රාජධානියෙන් පසුව පැමිණි රාජධානිය කුමක්ද?', options:['මහනුවර රාජධානිය','පොළොන්නරුව රාජධානිය','රෝම අධිරාජ්‍යය','මෝගල් අධිරාජ්‍යය'], a:1},
+      {q:'මහනුවර රාජධානියේ අවසාන රජු කවුරුන්ද?', options:['දුටුගැමුණු','විජයබාහු I','ශ්‍රී වික්‍රම රාජසිංහ','පරාක්‍රමබාහු I'], a:2},
+      {q:'1815 දී මහනුවර නිදහස අවසන් කළ ගිවිසුම කුමක්ද?', options:['උඩරට ගිවිසුම','වර්සායිල් ගිවිසුම','මැග්නා කාටා','පැරිස් ගිවිසුම'], a:0},
+    ],
+    maths:[
+      {q:'විසඳන්න: 3x = 12. x කීයද?', options:['3','4','6','12'], a:1},
+      {q:'5cm × 4cm සෘජාස්‍රයක වර්ගඵලය කීයද?', options:['9 cm²','18 cm²','20 cm²','25 cm²'], a:2},
+      {q:'200 හි 15% කීයද?', options:['20','30','15','25'], a:1},
+      {q:'81 හි වර්ගමූලය කීයද?', options:['8','7','9','10'], a:2},
+      {q:'ත්‍රිකෝණයක කෝණවල එකතුව කීයද?', options:['360°','90°','270°','180°'], a:3},
+    ],
+  },
+  senior: {
+    sinhala:[
+      {q:'සම්භාව්‍ය කාව්‍යවල "රසවත් උපමා" ප්‍රධාන වශයෙන් යොමු වන්නේ කුමකටද?', options:['ව්‍යාකරණ නීති','විචිත්‍ර උපමා','විරාම ලකුණු','අක්ෂර වින්‍යාසය'], a:1},
+      {q:'මාර්ටින් වික්‍රමසිංහගේ ගම් ජීවිතය නිරූපණය කරන නවකතාව කුමක්ද?', options:['විරාගය','ගම්පෙරළිය','කලියුගය','යුගාන්තය'], a:1},
+      {q:'"සන්ධි විච්ඡේදය" සම්බන්ධ වන්නේ කුමකටද?', options:['කාව්‍ය ලකුණ','නාට්‍ය','වචන එකතු කිරීම/වෙන් කිරීමේ නීති','රචනා ලිවීම'], a:2},
+      {q:'"මඩොල් දූව" රචනා කළේ කවුරුන්ද?', options:['W.A. සිල්වා','මාර්ටින් වික්‍රමසිංහ','G.B. සේනානායක','එදිරිවීර සරච්චන්ද්‍ර'], a:1},
+      {q:'සිංහල කවියේ "නිසදැස" යනුවෙන් අදහස් කරන්නේ කුමක්ද?', options:['ප්‍රහේලිකාවක්','ප්‍රස්තා පිරුළක්','නිදහස් පද්‍යයක්','රූඪියක්'], a:2},
+    ],
+    buddhism:[
+      {q:'ත්‍රිලක්ෂණයේ ලක්ෂණ තුන කුමක්ද?', options:['සීල සමාධි ප්‍රඥා','අනිච්ච දුක්ඛ අනාත්ම','මෙත්තා කරුණා මුදිතා','දාන සීල භාවනා'], a:1},
+      {q:'"අනාත්ම" යනු කුමක්ද?', options:['අනිත්‍යතාව','දුක','අනාත්මය (ස්වයං නොවීම)','තණ්හාව'], a:2},
+      {q:'ශ්‍රී ලංකාවේ ත්‍රිපිටකය ලිඛිතව සම්පාදනය කළ ධර්ම සංගායනාව කුමක්ද?', options:['රාජගහ පළමු සංගායනාව','වෙසාලි දෙවන සංගායනාව','අලුවිහාරයේ සිව්වන සංගායනාව','නිසියා සභාව'], a:2},
+      {q:'"පටිච්ච සමුප්පාදය" යනු කුමක්ද?', options:['ආර්ය අෂ්ටාංගික මාර්ගය','පටිච්ච සමුත්පත්තිය (හේතු ඵල දහම)','පංච සීල','චතුරාර්ය සත්‍යය'], a:1},
+      {q:'බුදුන් වහන්සේගේ දේශනා අඩංගු වන්නේ කුමන පිටකයේද?', options:['විනය පිටකය','සූත්‍ර පිටකය','අභිධර්ම පිටකය','ධම්මපදය පමණි'], a:1},
+    ],
+    english:[
+      {q:'"The wind whispered through the trees" යනු කුමන අලංකාරයට උදාහරණයක්ද?', options:['Simile','Personification','Hyperbole','Onomatopoeia'], a:1},
+      {q:'"They built the house." හි නිවැරදි කර්මකාරක (passive) වාක්‍යය තෝරන්න.', options:['The house build by them','The house was built by them','The house is building','The house built'], a:1},
+      {q:'"break the ice" යන idiom එකේ තේරුම කුමක්ද?', options:['Literally break ice','Start a conversation in an awkward setting','Cause an argument','End a friendship'], a:1},
+      {q:'"Although it rained, we went out." යනු කුමන වාක්‍ය වර්ගයක්ද?', options:['Simple sentence','Compound sentence','Complex sentence','Fragment'], a:2},
+      {q:'"abundant" යන්නෙහි ප්‍රතිලෝමය තෝරන්න.', options:['Plentiful','Ample','Rich','Scarce'], a:3},
+    ],
+    science:[
+      {q:'නිව්ටන්ගේ දෙවන නියමය ප්‍රකාශ වන්නේ කෙසේද?', options:['F = ma','E = mc²','V = IR','PV = nRT'], a:0},
+      {q:'උදාසීන ද්‍රාවණයක pH අගය කීයද?', options:['0','14','7','1'], a:2},
+      {q:'විද්‍යුත් ආරෝපණයක් නොමැති අංශුව කුමක්ද?', options:['ප්‍රෝටෝනය','නියුට්‍රෝනය','ඉලෙක්ට්‍රෝනය','අයනය'], a:1},
+      {q:'වර්ධනය සඳහා සිදුවන සෛල බෙදීමේ ක්‍රියාවලිය හඳුන්වන්නේ කුමක් ලෙසද?', options:['මියෝසිස්','ඔස්මෝසිස්','මයිටෝසිස්','විසරණය'], a:2},
+      {q:'විද්‍යුත් ප්‍රතිරෝධයේ ඒකකය කුමක්ද?', options:['වෝල්ට්','ඇම්පියර්','වොට්','ඕම්'], a:3},
+    ],
+    environment:[
+      {q:'ගෝලීය උණුසුම 2°C ට වඩා අඩුවෙන් සීමා කිරීම අරමුණු කරගත් ගිවිසුම කුමක්ද?', options:['කියෝටෝ ප්‍රොටෝකෝලය','පැරිස් ගිවිසුම','ජිනීවා සම්මුතිය','මොන්ට්‍රියල් ප්‍රොටෝකෝලය'], a:1},
+      {q:'"යූට්‍රොෆිකේෂන්" යනු කුමක්ද?', options:['පස ඛාදනය','ජලයේ අධික පෝෂක නිසා ඇල්ගී වර්ධනය වීම','ඕසෝන් හීනවීම','වන විනාශය'], a:1},
+      {q:'"කාබන් පා සටහන" (carbon footprint) මනින්නේ කුමක්ද?', options:['සිටුවන ලද ගස් ගණන','ආයතනයක් නිපදවන මුළු හරිතාගාර වායු ප්‍රමාණය','ජල පරිභෝජනය පමණි','අයිති ඉඩම් ප්‍රමාණය'], a:1},
+      {q:'ඕසෝන් හීනකාරී ද්‍රව්‍ය සම්බන්ධයෙන් විශේෂිතව ක්‍රියා කරන ප්‍රොටෝකෝලය කුමක්ද?', options:['කියෝටෝ ප්‍රොටෝකෝලය','පැරිස් ගිවිසුම','මොන්ට්‍රියල් ප්‍රොටෝකෝලය','බාසල් සම්මුතිය'], a:2},
+      {q:'"තිරසාර සංවර්ධනය" වඩාත් හොඳින් අර්ථදැක්වෙන්නේ කෙසේද?', options:['වේගවත් කාර්මිකකරණය','අනාගත පරම්පරාවලට හානි නොකර වර්තමාන අවශ්‍යතා සපුරාලීම','සියලු සම්පත් දැන් භාවිතා කිරීම','පාරිසරික බලපෑම් නොසලකා හැරීම'], a:1},
+    ],
+    history:[
+      {q:'පළමු ලෝක යුද්ධය ආරම්භ වීමට හේතු වූයේ කුමක්ද?', options:['පර්ල් හාබර් ප්‍රහාරය','ආචා ඩියුක් ෆ්‍රාන්ස් ෆර්ඩිනන්ඩ්ගේ ඝාතනය','බර්ලින් තාප්පය කඩා වැටීම','ප්‍රංශ විප්ලවය'], a:1},
+      {q:'1931 දී ශ්‍රී ලංකාවට විශ්ව මතාධිකාරය ලබා දුන් ප්‍රතිසංස්කරණය කුමක්ද?', options:['සෝල්බරි ආණ්ඩුක්‍රමය','ඩෝනොමෝර් ආණ්ඩුක්‍රමය','කෝල්බෲක්-කැමරන් ප්‍රතිසංස්කරණ','1978 ආණ්ඩුක්‍රම ව්‍යවස්ථාව'], a:1},
+      {q:'නිදහසින් පසු ශ්‍රී ලංකාවේ පළමු අගමැති කවුරුන්ද?', options:['ස්.ව්.ආර්.ඩි. බණ්ඩාරනායක','ජේ.ආර්. ජයවර්ධන','ඩී.එස්. සේනානායක','ආර්. ප්‍රේමදාස'], a:2},
+      {q:'ශ්‍රී ලංකාව ජනරජයක් වූයේ කුමන වර්ෂයේද?', options:['1948','1978','1956','1972'], a:3},
+      {q:'එක්සත් නොවූ ජාතීන්ගේ ව්‍යාපාරය (NAM) පිහිටුවනු ලැබුවේ කුමන යුගයේද?', options:['දෙවන ලෝක යුද්ධය','සීතල යුද්ධය','පුනරුදය','කාර්මික විප්ලවය'], a:1},
+    ],
+    maths:[
+      {q:'x² ය x සම්බන්ධයෙන් අවකලනය කරන්න.', options:['x','2','x²','2x'], a:3},
+      {q:'විසඳන්න: 2x + 3 = 11.', options:['5','3','6','4'], a:3},
+      {q:'sin(90°) කීයද?', options:['0','-1','0.5','1'], a:3},
+      {q:'π හි අගය දශම ස්ථාන 2කින් කීයද?', options:['3.41','2.14','4.13','3.14'], a:3},
+      {q:'x² - 9 සාධක වශයෙන් දක්වන්න.', options:['(x-9)(x+1)','(x-3)²','(x-3)(x+3)','(x+9)(x-1)'], a:2},
+    ],
+  },
+};
+
+let quizState = null;
+const QUIZ_PRIZES = ['රු. 100','රු. 250','රු. 500','රු. 1,000','රු. 2,500'];
+
+function openMillionaireSubjectPicker(){
+  openGameModal('💰 මිලියනපතියෙක් වීමට කැමතිද?');
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:18px;color:var(--text2);font-size:0.85rem">තරගය ආරම්භ කිරීමට විෂයක් තෝරන්න</div>
+    <div class="subj-pick-grid">
+      ${QUIZ_SUBJECTS.map(s=>`<div class="subj-pick" onclick="startMillionaire('${s.key}')"><div class="s-icon">${s.icon}</div><div class="s-name">${s.name}</div></div>`).join('')}
+    </div>`;
+}
+
+function startMillionaire(subjectKey){
+  const band = getGradeBand(currentStudentGrade);
+  const pool = (QUIZ_BANK[band] && QUIZ_BANK[band][subjectKey]) || [];
+  const questions = shuffleArr(pool).slice(0,5);
+  quizState = {questions, index:0, score:0, usedFifty:false};
+  openGameModal('💰 ' + QUIZ_SUBJECTS.find(s=>s.key===subjectKey).name + ' තරගය');
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion(){
+  const body = document.getElementById('gameModalBody');
+  if(!quizState.questions.length){
+    body.innerHTML = '<div class="empty-state"><div class="icon">🧩</div>මෙම විෂය/ශ්‍රේණිය සඳහා තවම ප්‍රශ්න නොමැත — ඉක්මනින් එකතු වේ!</div>';
+    return;
+  }
+  const q = quizState.questions[quizState.index];
+  const optionLetters = ['A','B','C','D'];
+  body.innerHTML = `
+    <div class="quiz-wrap">
+      <div class="quiz-top">
+        <div class="quiz-prize">🏆 ${QUIZ_PRIZES[quizState.index]}</div>
+        <div style="font-size:0.8rem;color:var(--text2)">ප්‍රශ්නය ${quizState.index+1} / ${quizState.questions.length}</div>
+      </div>
+      <div class="quiz-q">${escHtml(q.q)}</div>
+      <div class="quiz-opts" id="quizOpts">
+        ${q.options.map((opt,i)=>`<div class="quiz-opt" onclick="answerQuiz(${i})">${optionLetters[i]}) ${escHtml(opt)}</div>`).join('')}
+      </div>
+      <div class="quiz-tools">
+        <button class="footer-btn" style="flex:none;padding:8px 16px" onclick="useFifty()" ${quizState.usedFifty?'disabled':''}>🎯 50:50 උපකාරය</button>
+      </div>
+      <div class="quiz-ladder">
+        ${QUIZ_PRIZES.map((p,i)=>`<span class="${i<quizState.index?'done':''}">${p}</span>`).join('')}
+      </div>
+    </div>`;
+}
+
+function useFifty(){
+  if(quizState.usedFifty) return;
+  quizState.usedFifty = true;
+  const q = quizState.questions[quizState.index];
+  const opts = document.querySelectorAll('#quizOpts .quiz-opt');
+  const wrongIdx = [0,1,2,3].filter(i=>i!==q.a);
+  shuffleArr(wrongIdx).slice(0,2).forEach(i=>{ opts[i].style.visibility='hidden'; });
+}
+
+function answerQuiz(i){
+  const q = quizState.questions[quizState.index];
+  const opts = document.querySelectorAll('#quizOpts .quiz-opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  opts[q.a].classList.add('correct');
+  if(i!==q.a) opts[i].classList.add('wrong');
+  setTimeout(()=>{
+    if(i===q.a){
+      quizState.score++;
+      quizState.index++;
+      if(quizState.index >= quizState.questions.length) showQuizResult(true);
+      else renderQuizQuestion();
+    } else {
+      showQuizResult(false);
+    }
+  }, 1200);
+}
+
+function showQuizResult(won){
+  const body = document.getElementById('gameModalBody');
+  const prizeWon = quizState.score>0 ? QUIZ_PRIZES[quizState.score-1] : 'රු. 0';
+  body.innerHTML = `
+    <div class="quiz-result">
+      <div class="r-icon">${won?'🎉':'💡'}</div>
+      <h3 style="font-family:var(--font-head);color:var(--gold);margin-bottom:8px">${won?'සුබ පැතුම්!':'හොඳ උත්සාහයක්!'}</h3>
+      <div class="r-amt">ඔබ දිනාගත්තේ ${prizeWon}</div>
+      <p style="color:var(--text2);font-size:0.85rem;margin-bottom:20px">${quizState.questions.length}න් ${quizState.score}ක් නිවැරදියි</p>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="openMillionaireSubjectPicker()">🔁 නැවත ක්‍රීඩා කරන්න</button>
+    </div>`;
+}
+
+// ---------- COLOUR MATCH (primary) ----------
+const COLOR_LIST = [
+  {hex:'#e74c3c', en:'Red',       si:'රතු'},
+  {hex:'#3498db', en:'Blue',      si:'නිල්'},
+  {hex:'#2ecc71', en:'Green',     si:'කොළ'},
+  {hex:'#f1c40f', en:'Yellow',    si:'කහ'},
+  {hex:'#9b59b6', en:'Purple',    si:'දම්'},
+  {hex:'#e67e22', en:'Orange',    si:'තැඹිලි'},
+  {hex:'#ecf0f1', en:'White',     si:'සුදු'},
+  {hex:'#2c3e50', en:'Black',     si:'කළු'},
+  {hex:'#e91e63', en:'Pink',      si:'රෝස'},
+  {hex:'#795548', en:'Brown',     si:'දුඹුරු'},
+];
+let colorMatchState = null;
+function openColorMatch(){
+  colorMatchState = {round:0, score:0, total:8};
+  openGameModal('🎨 වර්ණ ගැලපීම');
+  nextColorRound();
+}
+function nextColorRound(){
+  if(colorMatchState.round >= colorMatchState.total) return endArcade('colormatch');
+  const correct = COLOR_LIST[Math.floor(Math.random()*COLOR_LIST.length)];
+  const distractors = shuffleArr(COLOR_LIST.filter(c=>c.en!==correct.en)).slice(0,3);
+  const opts = shuffleArr([correct, ...distractors]);
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div class="arcade-wrap">
+      <div class="arcade-score"><span>වටය ${colorMatchState.round+1}/${colorMatchState.total}</span><span>ලකුණු: ${colorMatchState.score}</span></div>
+      <div class="arcade-swatch" style="background:${correct.hex}"></div>
+      <div style="color:var(--text2);font-size:0.85rem;margin-bottom:14px">මෙය කුමන වර්ණයද?</div>
+      <div class="arcade-opts">
+        ${opts.map(o=>`<div class="arcade-opt" onclick="answerColorMatch('${o.en}','${correct.en}',this)">${o.en} <span style="opacity:0.6;font-size:0.75rem">(${o.si})</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+function answerColorMatch(picked, correct, el){
+  document.querySelectorAll('#gameModalBody .arcade-opt').forEach(o=>o.style.pointerEvents='none');
+  if(picked===correct){ el.classList.add('correct'); colorMatchState.score++; }
+  else el.classList.add('wrong');
+  colorMatchState.round++;
+  setTimeout(nextColorRound, 900);
+}
+
+// ---------- BODY PARTS MATCH (primary, English) ----------
+const BODY_PARTS = [
+  {name:'Eye', emoji:'👁️'}, {name:'Ear', emoji:'👂'}, {name:'Nose', emoji:'👃'},
+  {name:'Mouth', emoji:'👄'}, {name:'Hand', emoji:'✋'}, {name:'Foot', emoji:'🦶'},
+  {name:'Leg', emoji:'🦵'}, {name:'Arm', emoji:'💪'}, {name:'Tooth', emoji:'🦷'}, {name:'Brain', emoji:'🧠'},
+];
+let bodyPartsState = null;
+function openBodyParts(){
+  bodyPartsState = {round:0, score:0, total:8};
+  openGameModal('🧍 ශරීර අවයව ගැලපීම');
+  nextBodyPartRound();
+}
+function nextBodyPartRound(){
+  if(bodyPartsState.round >= bodyPartsState.total) return endArcade('bodyparts');
+  const correct = BODY_PARTS[Math.floor(Math.random()*BODY_PARTS.length)];
+  const distractors = shuffleArr(BODY_PARTS.filter(p=>p.name!==correct.name)).slice(0,3);
+  const opts = shuffleArr([correct, ...distractors]);
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div class="arcade-wrap">
+      <div class="arcade-score"><span>වටය ${bodyPartsState.round+1}/${bodyPartsState.total}</span><span>ලකුණු: ${bodyPartsState.score}</span></div>
+      <div class="arcade-word">මෙය සොයන්න: ${correct.name}</div>
+      <div class="arcade-opts">
+        ${opts.map(o=>`<div class="arcade-opt emoji" onclick="answerBodyParts('${o.name}','${correct.name}',this)">${o.emoji}</div>`).join('')}
+      </div>
+    </div>`;
+}
+function answerBodyParts(picked, correct, el){
+  document.querySelectorAll('#gameModalBody .arcade-opt').forEach(o=>o.style.pointerEvents='none');
+  if(picked===correct){ el.classList.add('correct'); bodyPartsState.score++; }
+  else el.classList.add('wrong');
+  bodyPartsState.round++;
+  setTimeout(nextBodyPartRound, 900);
+}
+
+function endArcade(kind){
+  const state = kind==='colormatch' ? colorMatchState : bodyPartsState;
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div class="quiz-result">
+      <div class="r-icon">🏁</div>
+      <h3 style="font-family:var(--font-head);color:var(--gold);margin-bottom:8px">ක්‍රීඩාව අවසන්!</h3>
+      <div class="r-amt">${state.score} / ${state.total}</div>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="${kind==='colormatch'?'openColorMatch()':'openBodyParts()'}">🔁 නැවත ක්‍රීඩා කරන්න</button>
+    </div>`;
+}
+
+// ---------- MATH SHOOTER (primary + middle) ----------
+let shooterState = null;
+let shooterTimer = null;
+
+function genMathQuestion(band){
+  let a,b,op,answer;
+  if(band==='primary'){
+    a = Math.floor(Math.random()*10)+1; b = Math.floor(Math.random()*10)+1;
+    op = Math.random()<0.5 ? '+' : '-';
+    if(op==='-' && b>a){ const t=a; a=b; b=t; }
+    answer = op==='+' ? a+b : a-b;
+  } else {
+    op = Math.random()<0.5 ? '×' : '÷';
+    if(op==='×'){ a = Math.floor(Math.random()*10)+2; b = Math.floor(Math.random()*10)+2; answer = a*b; }
+    else { b = Math.floor(Math.random()*9)+2; answer = Math.floor(Math.random()*10)+2; a = b*answer; }
+  }
+  return {text:`${a} ${op} ${b} = ?`, answer};
+}
+
+function openMathShooter(){
+  const band = getGradeBand(currentStudentGrade);
+  shooterState = {band, score:0, lives:3, round:0, maxRounds:10, current:null};
+  openGameModal('🎯 නිවැරදි පිළිතුරට වෙඩි තියන්න');
+  nextShooterRound();
+}
+
+function nextShooterRound(){
+  stopShooterLoop();
+  if(shooterState.lives<=0 || shooterState.round>=shooterState.maxRounds) return endShooter();
+  const q = genMathQuestion(shooterState.band);
+  shooterState.current = q;
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div class="shooter-wrap">
+      <div class="shooter-hud"><span>❤️ ${shooterState.lives}</span><span>වටය ${shooterState.round+1}/${shooterState.maxRounds}</span><span>ලකුණු: ${shooterState.score}</span></div>
+      <div class="shooter-q">${q.text}</div>
+      <div class="shooter-field" id="shooterField"></div>
+    </div>`;
+  spawnShooterBubbles(q.answer);
+}
+
+function spawnShooterBubbles(answer){
+  const field = document.getElementById('shooterField');
+  if(!field) return;
+  const wrongs = new Set();
+  while(wrongs.size<3){
+    const delta = Math.floor(Math.random()*10)-5;
+    const val = answer + (delta===0?1:delta);
+    if(val!==answer && val>=0) wrongs.add(val);
+  }
+  const values = shuffleArr([answer, ...wrongs]);
+  const duration = shooterState.band==='primary' ? 6 : 4.5;
+  values.forEach((v,i)=>{
+    const bubble = document.createElement('div');
+    bubble.className = 'shooter-bubble';
+    bubble.textContent = v;
+    bubble.style.left = (10 + i*(78/values.length)) + '%';
+    bubble.style.animationDuration = duration+'s';
+    bubble.style.animationDelay = (i*0.3)+'s';
+    bubble.onclick = ()=>hitShooterBubble(v, answer, bubble);
+    field.appendChild(bubble);
+  });
+  shooterTimer = setTimeout(()=>{
+    if(shooterState.current){ shooterState.lives--; advanceShooterRound(); }
+  }, duration*1000 + 400);
+}
+
+function hitShooterBubble(val, answer, el){
+  if(!shooterState.current) return;
+  el.style.animationPlayState = 'paused';
+  if(val===answer){ el.classList.add('hit'); shooterState.score++; }
+  else { el.classList.add('miss'); shooterState.lives--; }
+  advanceShooterRound();
+}
+
+function advanceShooterRound(){
+  clearTimeout(shooterTimer);
+  shooterState.current = null;
+  shooterState.round++;
+  setTimeout(nextShooterRound, 500);
+}
+
+function stopShooterLoop(){
+  if(shooterTimer) clearTimeout(shooterTimer);
+  if(shooterState) shooterState.current = null;
+}
+
+function endShooter(){
+  const body = document.getElementById('gameModalBody');
+  body.innerHTML = `
+    <div class="quiz-result">
+      <div class="r-icon">${shooterState.lives>0?'🏆':'💥'}</div>
+      <h3 style="font-family:var(--font-head);color:var(--gold);margin-bottom:8px">${shooterState.lives>0?'නියමයි!':'ක්‍රීඩාව අවසන්'}</h3>
+      <div class="r-amt">ලකුණු: ${shooterState.score}</div>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="openMathShooter()">🔁 නැවත ක්‍රීඩා කරන්න</button>
+    </div>`;
+}
+
+// ============================================================
 // EXPOSE GLOBALS
 // ============================================================
 window.doLogin          = doLogin;
@@ -1813,6 +2473,19 @@ window.sendAiChatMessage = sendAiChatMessage;
 window.setExamClass         = setExamClass;
 window.renderExamMarksTable = renderExamMarksTable;
 window.downloadExamMarksPDF = downloadExamMarksPDF;
+window.renderGamesPanel        = renderGamesPanel;
+window.launchGame              = launchGame;
+window.closeGameModal          = closeGameModal;
+window.closeGameModalOutside   = closeGameModalOutside;
+window.openMillionaireSubjectPicker = openMillionaireSubjectPicker;
+window.startMillionaire         = startMillionaire;
+window.answerQuiz               = answerQuiz;
+window.useFifty                 = useFifty;
+window.openColorMatch           = openColorMatch;
+window.answerColorMatch         = answerColorMatch;
+window.openBodyParts            = openBodyParts;
+window.answerBodyParts          = answerBodyParts;
+window.openMathShooter          = openMathShooter;
 </script>
 </body>
 </html>
