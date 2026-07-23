@@ -4,7 +4,7 @@
   // Cloudflare Pages dashboard, NOT in this file) so it never reaches the browser.
   
   const ALLOWED_GRADES = ["10", "11"];
-  const GEMINI_MODEL = "gemini-2.5-flash";
+  const GEMINI_MODEL = "gemini-3.1-flash-lite";
   // Cheaper/faster alternative: "gemini-3.1-flash-lite"
   // Avoid gemini-2.5-flash / gemini-2.5-flash-lite — shutting down Oct 16, 2026
   const MAX_HISTORY_MESSAGES = 20; // basic guard against giant payloads
@@ -81,7 +81,7 @@
   
     try {
       const geminiRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${AQ.Ab8RN6LfAY7mgB1zyiEaDa71CtiK9snX4FNFKXEWlXAAhwt9rg}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
