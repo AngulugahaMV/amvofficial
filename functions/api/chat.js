@@ -34,7 +34,7 @@
       return json({ error: "Message too long." }, 400);
     }
   
-    const apiKey = env.GEMINI_API_KEY;
+    const apiKey = env.AQ.Ab8RN6LfAY7mgB1zyiEaDa71CtiK9snX4FNFKXEWlXAAhwt9rg;
     if (!apiKey) {
       return json({ error: "Server is missing GEMINI_API_KEY configuration." }, 500);
     }
