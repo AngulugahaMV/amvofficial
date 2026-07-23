@@ -107,7 +107,13 @@ export async function onRequestPost(context) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error("Gemini API error:", geminiRes.status, errText);
-      return json({ error: "The study bot is temporarily unavailable. Please try again shortly." }, 500);
+      // TEMPORARY DEBUG: expose the real Gemini error so we can see it via curl.
+      // Revert this to the generic message once the underlying issue is fixed.
+      return json({
+        error: "The study bot is temporarily unavailable. Please try again shortly.",
+        debug_geminiStatus: geminiRes.status,
+        debug_geminiBody: errText.slice(0, 800)
+      }, 500);
     }
 
     const data = await geminiRes.json();
